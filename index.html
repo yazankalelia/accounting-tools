@@ -101,10 +101,10 @@
   .btn.copy { background: rgba(61,220,151,0.15); color: var(--green); border: 1px solid rgba(61,220,151,0.3); }
 
   /* Result cards */
-  .results { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 16px; }
-  .rcard { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; }
+  .results { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 12px; margin-top: 16px; }
+  .rcard { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; min-width: 0; }
   .rcard .lbl { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
-  .rcard .val { font-size: 20px; font-weight: 800; color: var(--text); }
+  .rcard .val { font-size: clamp(16px, 5vw, 20px); font-weight: 800; color: var(--text); overflow-wrap: anywhere; }
   .rcard .val.accent { color: var(--accent); }
   .rcard .val.amber { color: var(--amber); }
   .rcard .val.green { color: var(--green); }
@@ -128,6 +128,7 @@
   .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .data-table th, .data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: center; direction: ltr; }
   .data-table th { background: var(--surface-2); color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .data-table thead th { position: sticky; top: 0; z-index: 1; }
   .data-table tr:last-child td { border-bottom: none; }
   .data-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
     overflow: auto; max-height: 280px; margin-top: 12px; position: relative; }
@@ -163,7 +164,7 @@
   .tax-popover label { font-size: 11px; color: var(--muted); font-weight: 600; }
   .tax-popover input { padding: 10px 12px; font-size: 14px; }
   .calc-keys { display: grid; grid-template-columns: repeat(5, 1fr); gap: clamp(4px, 1vw, 8px); margin-bottom: 16px;
-    background: var(--bg-2); padding: clamp(8px, 2vw, 12px); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+    direction: ltr; background: var(--bg-2); padding: clamp(8px, 2vw, 12px); border-radius: var(--radius-sm); border: 1px solid var(--border); }
   .ck { border: none; cursor: pointer; font-family: inherit; font-size: clamp(14px, 2.5vw, 18px); font-weight: 700; color: var(--text);
     background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
     padding: clamp(8px, 2vw, 14px) 0; transition: background .15s, border-color .15s; }
@@ -175,7 +176,6 @@
   .ck.tax { background: rgba(255,94,126,0.15); color: var(--red); border-color: rgba(255,94,126,0.3); }
   .ck.fn { color: var(--muted); font-size: 13px; }
   .ck.danger { color: var(--red); }
-  .ck.wide { grid-column: span 2; }
   .calc-toolbar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid var(--border); }
   .calc-toolbar .btn { flex: 1; min-width: 0; justify-content: center; font-size: 12px; padding: 8px; }
   .calc-history { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -243,25 +243,113 @@
     border: 1px solid var(--border); box-shadow: var(--shadow); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* Mobile: sidebar becomes top horizontal scroll */
+  /* Mobile app bar + bottom-sheet nav (desktop: hidden) */
+  .mobile-bar, .sheet-head, .nav-backdrop { display: none; }
+
+  /* Mobile layout */
   @media (max-width: 768px) {
-    .layout { flex-direction: column; }
-    .sidebar { width: 100%; height: auto; max-height: 140px; border-left: none; border-bottom: 1px solid var(--border);
-      flex-direction: row; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; padding: 8px; gap: 4px; align-items: center; }
-    .sidebar::-webkit-scrollbar { height: 4px; }
-    .brand { border-bottom: none; margin-bottom: 0; padding: 4px 8px; flex-shrink: 0; }
-    .brand .sub { display: none; }
-    .group { margin-bottom: 0; display: flex; gap: 4px; flex-shrink: 0; }
-    .group-title { display: none; }
-    .nav-item { padding: 6px 10px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
-    .nav-item .ico { font-size: 14px; }
-    .main { padding: 16px; }
-    .page-header h1 { font-size: 18px; }
+    .layout { flex-direction: column; height: 100vh; height: 100dvh; }
+
+    /* Top app bar */
+    .mobile-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      flex: 0 0 auto; padding: calc(8px + env(safe-area-inset-top)) 14px 8px;
+      background: var(--surface); border-bottom: 1px solid var(--border); z-index: 30; }
+    .mb-brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .mb-brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green);
+      box-shadow: 0 0 8px var(--green); flex: 0 0 auto; }
+    .mb-titles { min-width: 0; }
+    .mb-app { font-size: 10px; color: var(--muted); letter-spacing: .3px; }
+    .mb-current { font-size: 15px; font-weight: 800; color: var(--text); white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis; max-width: 46vw; line-height: 1.3; }
+    .mb-menu { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 14px;
+      border-radius: 10px; border: 1px solid var(--border-2); background: var(--surface-2);
+      color: var(--text); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; flex: 0 0 auto; }
+    .mb-menu .mb-ico { font-size: 15px; line-height: 1; }
+    .mb-menu[aria-expanded="true"] { background: rgba(79,140,255,0.18); border-color: rgba(79,140,255,0.45); }
+
+    /* Sidebar becomes a bottom sheet */
+    .sidebar { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 96;
+      width: auto; max-width: 560px; margin: 0 auto; max-height: 84vh; max-height: 84dvh;
+      padding: 14px 14px calc(16px + env(safe-area-inset-bottom));
+      background: var(--surface); border: 0; border-top: 1px solid var(--border-2);
+      border-radius: 18px 18px 0 0; box-shadow: 0 -24px 60px rgba(0,0,0,0.6);
+      overflow-y: auto; overscroll-behavior: contain;
+      display: flex; flex-direction: column;
+      transform: translateY(105%); visibility: hidden;
+      transition: transform .3s cubic-bezier(.2,.8,.2,1), visibility .3s; }
+    .sidebar.open { transform: translateY(0); visibility: visible; }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .brand { display: none; }
+    .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 0 2px 12px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+    .sheet-title { font-size: 14px; font-weight: 800; }
+    .sheet-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .sheet-close { width: 44px; height: 44px; flex: 0 0 44px; display: grid; place-items: center;
+      border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2);
+      color: var(--muted); font-size: 13px; cursor: pointer; }
+    .group { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 8px 0 2px; }
+    .group-title { grid-column: 1 / -1; display: block; padding: 8px 2px 2px; margin: 0; }
+    .nav-item { min-height: 46px; padding: 9px 10px; font-size: 13px; }
+    .nav-item .ico { font-size: 16px; width: 22px; }
+    .nav-backdrop { display: block; position: fixed; inset: 0; z-index: 95;
+      background: rgba(4,7,15,0.62); opacity: 0; visibility: hidden;
+      transition: opacity .25s, visibility .25s; }
+    .nav-backdrop.open { opacity: 1; visibility: visible; }
+    body.nav-open .main { overflow: hidden; }
+
+    /* Content */
+    .main { padding: 16px 14px calc(96px + env(safe-area-inset-bottom)); }
+    .page { max-width: 100%; }
+    #page-calc { max-width: 620px; }
+    .page-header { margin-bottom: 16px; }
+    .page-header h1 { font-size: 19px; line-height: 1.35; }
+    .page-header p { font-size: 12px; }
+    .card { padding: 16px; margin-bottom: 14px; border-radius: 10px; }
+    .card-title { font-size: 14px; margin-bottom: 12px; }
+
+    .row { gap: 10px; }
+    .row .field { flex: 1 1 140px; min-width: 0; }
+    .field input, .field select, .field textarea { font-size: 16px; padding: 11px 12px; }
+
+    .results { gap: 10px; }
+    .rcard { padding: 12px; }
+    .rcard .lbl { font-size: 10px; }
+
+    .je { padding: 10px; }
+    .je-header { flex-wrap: wrap; gap: 8px; }
+    .je-table { font-size: 12px; }
+    .je-table th, .je-table td { padding: 7px 6px; }
+
+    .data-table { font-size: 12px; }
+    .data-table th, .data-table td { padding: 7px 8px; white-space: nowrap; }
+    .data-table-wrap { max-height: 250px; -webkit-overflow-scrolling: touch; }
+
+    /* Calculator */
+    .calc-status { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px; margin-bottom: 14px; }
+    .calc-status > span { position: static !important; min-width: 0; display: flex; }
+    .calc-status > span > .calc-chip { width: 100%; }
+    .calc-chip { min-width: 0; min-height: 44px; padding: 0 8px;
+      justify-content: center; gap: 6px; }
+    .calc-chip > span:first-child { font-size: 10px; }
+    .calc-chip .v { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tax-popover { left: 0; right: 0; width: auto; top: calc(100% + 6px); }
+    .calc-display { min-height: 92px; padding: 14px 16px; }
+    .calc-toolbar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .calc-toolbar .btn { flex: none; min-height: 44px; font-size: 12px; padding: 8px 6px; white-space: nowrap; }
+    .calc-keys { grid-template-columns: repeat(5, 1fr); padding: 8px; gap: 6px; }
+    .ck { min-height: 46px; padding: 10px 0; font-size: 15px; }
+    .ck.fn { font-size: 12px; }
+
+    .fb-panel { max-height: calc(100vh - 110px); max-height: calc(100dvh - 110px); overflow-y: auto; }
+    .toast { bottom: calc(84px + env(safe-area-inset-bottom)); max-width: calc(100vw - 32px); text-align: center; }
   }
-  @media (max-width: 480px) {
-    .calc-keys { grid-template-columns: repeat(4, 1fr); }
-    .ck.wide { grid-column: span 2; }
-    .results { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 380px) {
+    .main { padding-left: 12px; padding-right: 12px; }
+    .card { padding: 14px; }
+    .calc-keys { gap: 5px; }
+    .ck { font-size: 14px; }
+    .calc-chip .v { font-size: 12px; }
   }
 
   /* Animations */
@@ -279,8 +367,29 @@
 </head>
 <body>
   <div class="layout">
+    <header class="mobile-bar">
+      <div class="mb-brand">
+        <div class="dot" aria-hidden="true"></div>
+        <div class="mb-titles">
+          <div class="mb-app">أدوات محاسبية</div>
+          <div class="mb-current" id="mbCurrent">حاسبة</div>
+        </div>
+      </div>
+      <button class="mb-menu" id="mbMenu" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="فتح قائمة الأدوات">
+        <span class="mb-ico" aria-hidden="true">☰</span><span>الأدوات</span>
+      </button>
+    </header>
+    <div class="nav-backdrop" id="navBackdrop"></div>
+
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar" aria-label="قائمة الأدوات">
+      <div class="sheet-head">
+        <div>
+          <div class="sheet-title">كل الأدوات</div>
+          <div class="sheet-sub">13 أداة محاسبية</div>
+        </div>
+        <button class="sheet-close" id="sheetClose" type="button" aria-label="إغلاق القائمة">✕</button>
+      </div>
       <div class="brand">
         <div class="dot"></div>
         <div>
@@ -782,12 +891,55 @@
   function safeEval(s){ const safe=s.replace(/[^0-9+\-*/.()%]/g,''); if(safe==='') return NaN; try{return Function('"use strict"; return ('+safe+')')();}catch(e){return NaN;} }
 
   // ---- Navigation ----
-  document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
-    n.classList.add('active');
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    $('page-' + n.dataset.page).classList.add('active');
-  }));
+  const sidebarEl = $('sidebar'), navBackdrop = $('navBackdrop'), mbMenu = $('mbMenu'),
+        sheetClose = $('sheetClose'), mbCurrent = $('mbCurrent');
+  const navItems = [...document.querySelectorAll('.nav-item')];
+  const mainEl = document.querySelector('.main');
+
+  function setNavOpen(open) {
+    if (!sidebarEl) return;
+    sidebarEl.classList.toggle('open', open);
+    if (navBackdrop) navBackdrop.classList.toggle('open', open);
+    if (mbMenu) mbMenu.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('nav-open', open);
+    if (open) {
+      const act = sidebarEl.querySelector('.nav-item.active') || sidebarEl.querySelector('.nav-item');
+      setTimeout(() => { if (act) act.focus(); }, 90);
+    } else if (mbMenu && sidebarEl.contains(document.activeElement)) {
+      mbMenu.focus();
+    }
+  }
+
+  function goTo(page) {
+    navItems.forEach(x => x.classList.toggle('active', x.dataset.page === page));
+    document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + page));
+    const cur = navItems.find(x => x.dataset.page === page);
+    if (mbCurrent && cur) {
+      const lbl = cur.querySelector('.lbl');
+      mbCurrent.textContent = lbl ? lbl.textContent : page;
+    }
+    if (mainEl) mainEl.scrollTop = 0;
+    if (window.innerWidth <= 768) setNavOpen(false);
+  }
+
+  navItems.forEach(n => {
+    n.tabIndex = 0;
+    n.setAttribute('role', 'button');
+    n.addEventListener('click', () => goTo(n.dataset.page));
+    n.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); n.click(); }
+    });
+  });
+
+  if (mbMenu) mbMenu.addEventListener('click', () => setNavOpen(!sidebarEl.classList.contains('open')));
+  if (navBackdrop) navBackdrop.addEventListener('click', () => setNavOpen(false));
+  if (sheetClose) sheetClose.addEventListener('click', () => setNavOpen(false));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebarEl.classList.contains('open')) setNavOpen(false);
+  });
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768 && sidebarEl.classList.contains('open')) setNavOpen(false);
+  });
 
   // ---- Copy helpers ----
   async function copyText(txt) {
