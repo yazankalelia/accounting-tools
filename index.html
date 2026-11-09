@@ -189,6 +189,52 @@
   .calc-history .hr { font-weight: 700; direction: ltr; }
   .calc-history .empty { padding: 12px; text-align: center; color: var(--muted); font-size: 12px; }
 
+  /* Currency rates */
+  .fx-toolbar { display: grid; grid-template-columns: 1.2fr 1fr auto; gap: 12px; align-items: end; }
+  .fx-toolbar > *, .fx-toolbar .field { min-width: 0; }
+  .fx-toolbar select, .fx-toolbar input { width: 100%; min-width: 0; max-width: 100%; text-overflow: ellipsis; }
+  .fx-toolbar .field { margin-bottom: 0; }
+  .fx-refresh { min-height: 42px; white-space: nowrap; }
+  .fx-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    margin-top: 12px; font-size: 11px; color: var(--muted); }
+  .fx-state { display: inline-flex; align-items: center; gap: 6px; }
+  .fx-state .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex: 0 0 auto; }
+  .fx-state.warn .dot { background: var(--amber); }
+  .fx-state.err .dot { background: var(--red); }
+  .fx-pinned { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+  .fx-pin { min-width: 0; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 10px; cursor: pointer; text-align: center; color: var(--text); font: inherit;
+    transition: border-color .15s, background .15s, transform .1s; }
+  .fx-pin:hover { border-color: var(--border-2); background: var(--surface); }
+  .fx-pin:active { transform: scale(.99); }
+  .fx-pin.active { border-color: rgba(79,140,255,0.5); background: rgba(79,140,255,0.10); }
+  .fx-pin .fx-fl { font-size: 18px; line-height: 1; }
+  .fx-pin .fx-code { font-size: 10px; font-weight: 800; color: var(--muted); letter-spacing: .6px; margin-top: 4px; }
+  .fx-pin .fx-val { font-size: clamp(15px, 4.6vw, 20px); font-weight: 800; direction: ltr; margin-top: 2px;
+    font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .fx-pin .fx-sub { font-size: 10px; color: var(--muted); direction: ltr; margin-top: 3px; line-height: 1.3;
+    overflow-wrap: anywhere; }
+  .fx-hint { font-size: 10px; font-weight: 500; color: var(--muted); margin-inline-start: auto; }
+  .fx-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+  .fx-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: center;
+    width: 100%; text-align: right; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 9px 12px; cursor: pointer; color: var(--text); font: inherit;
+    transition: border-color .15s, background .15s; }
+  .fx-row:hover { border-color: var(--border-2); background: var(--surface); }
+  .fx-row.active { border-color: rgba(79,140,255,0.45); background: rgba(79,140,255,0.09); }
+  .fx-row .fx-fl { font-size: 17px; text-align: center; }
+  .fx-row .fx-name { min-width: 0; }
+  .fx-row .fx-name b { font-size: 13px; font-weight: 700; display: block; }
+  .fx-row .fx-name small { font-size: 10px; color: var(--muted); display: block; direction: ltr; text-align: right; }
+  .fx-row .fx-amt { font-size: 15px; font-weight: 800; direction: ltr; text-align: left;
+    font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .fx-row .fx-amt small { font-size: 10px; color: var(--muted); font-weight: 600; }
+  .fx-row .fx-badge { font-size: 9px; color: var(--green); font-weight: 700; }
+  @media (max-width: 520px) {
+    .fx-toolbar { grid-template-columns: 1fr 1fr; }
+    .fx-refresh { grid-column: 1 / -1; width: 100%; }
+  }
+
   /* Feedback */
   .fb-fab { position: fixed; left: 20px; bottom: 20px; z-index: 90;
     display: inline-flex; align-items: center; gap: 8px;
@@ -386,7 +432,7 @@
       <div class="sheet-head">
         <div>
           <div class="sheet-title">كل الأدوات</div>
-          <div class="sheet-sub">13 أداة محاسبية</div>
+          <div class="sheet-sub">14 أداة محاسبية</div>
         </div>
         <button class="sheet-close" id="sheetClose" type="button" aria-label="إغلاق القائمة">✕</button>
       </div>
@@ -402,6 +448,7 @@
         <div class="group-title">الأدوات اليومية</div>
         <div class="nav-item active" data-page="calc"><span class="ico">🧮</span><span class="lbl">حاسبة</span></div>
         <div class="nav-item" data-page="disc"><span class="ico">💱</span><span class="lbl">خصومات/عملات</span></div>
+        <div class="nav-item" data-page="fx"><span class="ico">🌍</span><span class="lbl">أسعار العملات</span></div>
         <div class="nav-item" data-page="profit"><span class="ico">💰</span><span class="lbl">ربح/هامش</span></div>
         <div class="nav-item" data-page="vat"><span class="ico">🧾</span><span class="lbl">VAT</span></div>
       </div>
@@ -526,6 +573,39 @@
           </div>
           <div class="results">
             <div class="rcard"><div class="lbl">النتيجة</div><div class="val accent" id="Fx_result">—</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ FX RATES ============ -->
+      <section class="page" id="page-fx">
+        <div class="page-header">
+          <h1>🌍 أسعار العملات العالمية</h1>
+          <p>تحويل فوري بين 10 عملات بأسعار محدّثة، وأهم 3 عملات مثبّتة في الأعلى</p>
+        </div>
+        <div class="card">
+          <div class="fx-toolbar">
+            <div class="field">
+              <label for="fxAmount">المبلغ</label>
+              <input type="number" id="fxAmount" value="100" min="0" step="any" inputmode="decimal" oninput="fxRender()" />
+            </div>
+            <div class="field">
+              <label for="fxFrom">من عملة</label>
+              <select id="fxFrom" onchange="fxRender()"></select>
+            </div>
+            <button class="btn secondary fx-refresh" id="fxRefresh" type="button" onclick="fxFetch(true)">🔄 تحديث الأسعار</button>
+          </div>
+          <div class="fx-meta">
+            <span class="fx-state" id="fxState"><span class="dot"></span><span id="fxStateText">جارٍ تحميل الأسعار...</span></span>
+            <span id="fxUpdated"></span>
+          </div>
+          <div class="fx-pinned" id="fxPinned" aria-label="أهم ثلاث عملات"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💱 جميع العملات <span class="fx-hint">اضغط على أي عملة لتصبح الأساس</span></div>
+          <div class="fx-list" id="fxList"></div>
+          <div class="table-actions" style="margin-top:12px;">
+            <button class="btn copy sm" type="button" onclick="fxCopy()">📋 نسخ النتائج</button>
           </div>
         </div>
       </section>
@@ -919,6 +999,7 @@
       mbCurrent.textContent = lbl ? lbl.textContent : page;
     }
     if (mainEl) mainEl.scrollTop = 0;
+    if (page === 'fx') fxInit();
     if (window.innerWidth <= 768) setNavOpen(false);
   }
 
@@ -1618,6 +1699,199 @@
       }
     });
   })();
+
+  // ---- currency rates ----
+  const FXR = {
+    cacheKey: 'fxRatesV1',
+    currencies: [
+      { code: 'USD', name: 'دولار أمريكي', flag: '🇺🇸' },
+      { code: 'EUR', name: 'يورو', flag: '🇪🇺' },
+      { code: 'GBP', name: 'جنيه إسترليني', flag: '🇬🇧' },
+      { code: 'SAR', name: 'ريال سعودي', flag: '🇸🇦' },
+      { code: 'AED', name: 'درهم إماراتي', flag: '🇦🇪' },
+      { code: 'EGP', name: 'جنيه مصري', flag: '🇪🇬' },
+      { code: 'KWD', name: 'دينار كويتي', flag: '🇰🇼' },
+      { code: 'QAR', name: 'ريال قطري', flag: '🇶🇦' },
+      { code: 'JOD', name: 'دينار أردني', flag: '🇯🇴' },
+      { code: 'TRY', name: 'ليرة تركية', flag: '🇹🇷' }
+    ],
+    pinned: ['USD', 'SAR', 'EUR'],
+    rates: null,
+    date: '',
+    fetchedAt: 0,
+    loading: false
+  };
+  const fxByCode = (code) => FXR.currencies.find(c => c.code === code);
+  const fxAmountEl = $('fxAmount'), fxFromEl = $('fxFrom'), fxPinnedEl = $('fxPinned'),
+        fxListEl = $('fxList'), fxStateEl = $('fxState'), fxStateTextEl = $('fxStateText'),
+        fxUpdatedEl = $('fxUpdated'), fxRefreshBtn = $('fxRefresh');
+
+  function fxRate(code) {
+    return FXR.rates && typeof FXR.rates[code] === 'number' ? FXR.rates[code] : null;
+  }
+  function fxConvert(amount, from, to) {
+    const rf = fxRate(from), rt = fxRate(to);
+    if (rf == null || rt == null || !rf) return null;
+    return amount * rt / rf;
+  }
+  function fxMoney(n) {
+    if (n == null || !isFinite(n)) return '—';
+    return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function fxUnit(n) {
+    if (n == null || !isFinite(n)) return '—';
+    return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+  }
+  function fxBase() { return (fxFromEl && fxFromEl.value) || 'USD'; }
+  function fxAmount() { const v = parseFloat(fxAmountEl && fxAmountEl.value); return isFinite(v) ? v : 0; }
+  function fxSetState(text, kind) {
+    if (!fxStateEl) return;
+    fxStateEl.className = 'fx-state' + (kind ? ' ' + kind : '');
+    fxStateTextEl.textContent = text;
+  }
+  function fxSetUpdated() {
+    if (!fxUpdatedEl) return;
+    if (!FXR.fetchedAt) { fxUpdatedEl.textContent = ''; return; }
+    const d = new Date(FXR.fetchedAt);
+    const pad = (x) => String(x).padStart(2, '0');
+    const stamp = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    fxUpdatedEl.textContent = 'آخر تحديث: ' + stamp;
+    fxUpdatedEl.title = FXR.date ? ('تاريخ سعر المصدر: ' + FXR.date) : '';
+  }
+
+  function fxRender() {
+    if (!fxPinnedEl || !fxListEl) return;
+    const base = fxBase(), amount = fxAmount();
+    const has = !!FXR.rates;
+    fxPinnedEl.innerHTML = FXR.pinned.map(code => {
+      const c = fxByCode(code) || { code: code, name: code, flag: '🏳️' };
+      const val = has ? fxConvert(amount, base, code) : null;
+      const unit = has ? fxConvert(1, base, code) : null;
+      return '<button class="fx-pin' + (code === base ? ' active' : '') + '" type="button" data-code="' + code + '" title="اجعل ' + c.name + ' الأساس">' +
+        '<div class="fx-fl" aria-hidden="true">' + c.flag + '</div>' +
+        '<div class="fx-code">' + code + '</div>' +
+        '<div class="fx-val">' + (has ? fxMoney(val) : '—') + '</div>' +
+        '<div class="fx-sub">1 ' + base + ' = ' + (has ? fxUnit(unit) : '—') + ' ' + code + '</div>' +
+        '</button>';
+    }).join('');
+    fxListEl.innerHTML = FXR.currencies.map(c => {
+      const val = has ? fxConvert(amount, base, c.code) : null;
+      const unit = has ? fxConvert(1, base, c.code) : null;
+      const isBase = c.code === base;
+      const isPinned = FXR.pinned.includes(c.code);
+      return '<button class="fx-row' + (isBase ? ' active' : '') + '" type="button" data-code="' + c.code + '">' +
+        '<span class="fx-fl" aria-hidden="true">' + c.flag + '</span>' +
+        '<span class="fx-name"><b>' + c.name +
+          (isBase ? ' <span class="fx-badge">الأساس</span>' : (isPinned ? ' <span class="fx-badge">📌</span>' : '')) +
+        '</b><small>1 ' + base + ' = ' + (has ? fxUnit(unit) : '—') + ' ' + c.code + '</small></span>' +
+        '<span class="fx-amt">' + (has ? fxMoney(val) : '—') + ' <small>' + c.code + '</small></span>' +
+        '</button>';
+    }).join('');
+    [fxPinnedEl, fxListEl].forEach(el => {
+      el.querySelectorAll('[data-code]').forEach(b => {
+        b.addEventListener('click', () => { fxFromEl.value = b.dataset.code; fxRender(); });
+      });
+    });
+  }
+
+  function fxSaveCache() {
+    try {
+      localStorage.setItem(FXR.cacheKey, JSON.stringify({ rates: FXR.rates, date: FXR.date, fetchedAt: FXR.fetchedAt }));
+    } catch (e) {}
+  }
+  function fxLoadCache() {
+    try {
+      const raw = localStorage.getItem(FXR.cacheKey);
+      if (!raw) return false;
+      const c = JSON.parse(raw);
+      if (!c || !c.rates) return false;
+      FXR.rates = c.rates;
+      FXR.date = c.date || '';
+      FXR.fetchedAt = c.fetchedAt || 0;
+      return true;
+    } catch (e) { return false; }
+  }
+
+  async function fxFetch(force) {
+    if (!fxPinnedEl || FXR.loading) return;
+    if (!force && FXR.rates && Date.now() - FXR.fetchedAt < 3600000) {
+      fxSetState('أسعار محدّثة', '');
+      fxSetUpdated();
+      fxRender();
+      return;
+    }
+    FXR.loading = true;
+    if (fxRefreshBtn) { fxRefreshBtn.disabled = true; fxRefreshBtn.textContent = '⏳ جارٍ التحديث'; }
+    fxSetState('جارٍ تحديث الأسعار...', 'warn');
+    const urls = [
+      'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json',
+      'https://latest.currency-api.pages.dev/v1/currencies/usd.json',
+      'https://open.er-api.com/v6/latest/USD'
+    ];
+    let ok = false;
+    for (const url of urls) {
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) continue;
+        const data = await res.json();
+        const table = data.usd || data.rates || {};
+        const get = (code) => {
+          const v1 = table[code.toLowerCase()];
+          if (typeof v1 === 'number') return v1;
+          const v2 = table[code.toUpperCase()];
+          return typeof v2 === 'number' ? v2 : null;
+        };
+        const rates = {};
+        FXR.currencies.forEach(c => { const v = get(c.code); if (v != null) rates[c.code] = v; });
+        if (Object.keys(rates).length !== FXR.currencies.length) continue;
+        rates.USD = 1;
+        FXR.rates = rates;
+        FXR.date = data.date || (data.time_last_update_utc ? String(data.time_last_update_utc).slice(0, 16) : '');
+        FXR.fetchedAt = Date.now();
+        fxSaveCache();
+        ok = true;
+        break;
+      } catch (e) {}
+    }
+    FXR.loading = false;
+    if (fxRefreshBtn) { fxRefreshBtn.disabled = false; fxRefreshBtn.textContent = '🔄 تحديث الأسعار'; }
+    if (ok) fxSetState('أسعار محدّثة', '');
+    else if (FXR.rates) fxSetState('تعذر التحديث — تُعرض آخر أسعار محفوظة', 'warn');
+    else fxSetState('تعذر جلب الأسعار، تحقق من الإنترنت', 'err');
+    fxSetUpdated();
+    fxRender();
+  }
+
+  function fxInit() {
+    if (!fxFromEl) return;
+    if (!fxFromEl.options.length) {
+      fxFromEl.innerHTML = FXR.currencies.map(c =>
+        '<option value="' + c.code + '">' + c.flag + ' ' + c.code + ' — ' + c.name + '</option>').join('');
+      fxFromEl.value = 'USD';
+      const had = fxLoadCache();
+      fxRender();
+      fxSetUpdated();
+      if (had) {
+        const fresh = FXR.fetchedAt && Date.now() - FXR.fetchedAt < 3600000;
+        fxSetState(fresh ? 'أسعار محدّثة' : 'أسعار محفوظة — جارٍ التحديث...', fresh ? '' : 'warn');
+      } else {
+        fxSetState('جارٍ تحميل الأسعار...', 'warn');
+      }
+    }
+    fxRender();
+    if (!FXR.loading && (!FXR.rates || Date.now() - FXR.fetchedAt > 3600000)) fxFetch(false);
+  }
+
+  function fxCopy() {
+    const base = fxBase(), amount = fxAmount();
+    const lines = ['تحويل ' + fmt(amount) + ' ' + base + ' (أسعار ' + (FXR.date || 'محفوظة') + ')'];
+    FXR.currencies.forEach(c => {
+      if (c.code === base) return;
+      const v = fxConvert(amount, base, c.code);
+      lines.push(fmt(amount) + ' ' + base + ' = ' + fxMoney(v) + ' ' + c.code);
+    });
+    copyText(lines.join('\n'));
+  }
 
   // ---- init ----
   setTaxRate(15);
