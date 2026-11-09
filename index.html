@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" style="color-scheme: dark;">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0a0e1a" />
+<title>مجموعة أدوات محاسبية متقدمة</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-2: #0f1424;
+    --surface: #141827;
+    --surface-2: #1a1f33;
+    --border: #1f2537;
+    --border-2: #5a6480;
+    --text: #e8eaed;
+    --muted: #9aa3b8;
+    --muted-2: #b4bac9;
+    --accent: #3b6fe8;
+    --accent-2: #5b8cff;
+    --amber: #f5a623;
+    --green: #3ddc97;
+    --red: #ff5e7e;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 8px 24px rgba(0,0,0,0.35);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: "Segoe UI", "Tahoma", "Cairo", system-ui, sans-serif;
+    background: var(--bg); color: var(--text); overflow: hidden; }
+  body { background: radial-gradient(1200px 600px at 80% -10%, rgba(79,140,255,0.08), transparent 60%),
+                   radial-gradient(900px 500px at -10% 110%, rgba(124,92,255,0.06), transparent 60%), var(--bg); }
+
+  /* Layout */
+  .layout { display: flex; height: 100vh; overflow: hidden; }
+  .sidebar {
+    width: 250px; flex-shrink: 0; background: var(--surface); border-left: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow-y: auto; padding: 16px 12px;
+  }
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 16px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+  .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
+  .brand .name { font-size: 15px; font-weight: 700; }
+  .brand .sub { font-size: 11px; color: var(--muted); }
+  .group { margin-bottom: 14px; }
+  .group-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px;
+    padding: 6px 8px; margin-bottom: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm);
+    cursor: pointer; color: var(--text); font-size: 13px; font-weight: 500; transition: background .15s, color .15s;
+    border: 1px solid transparent; }
+  .nav-item:hover { background: var(--surface-2); }
+  .nav-item.active { background: linear-gradient(135deg, rgba(79,140,255,0.18), rgba(124,92,255,0.12));
+    border-color: rgba(79,140,255,0.3); color: #fff; }
+  .nav-item .ico { font-size: 16px; width: 20px; text-align: center; }
+  .nav-item .lbl { flex: 1; }
+
+  .main { flex: 1; overflow-y: auto; padding: 32px; }
+  .main::-webkit-scrollbar { width: 8px; }
+  .main::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
+
+  .page { display: none; max-width: 900px; margin: 0 auto; }
+  #page-calc { max-width: clamp(320px, 90vw, 620px); }
+  .page.active { display: block; }
+  .page-header { margin-bottom: 24px; }
+  .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .page-header p { font-size: 13px; color: var(--muted); }
+
+  /* Cards */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
+  .card-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .card-title .ico { font-size: 18px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 720px) { .grid, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* Form */
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .field label { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .field input, .field select, .field textarea {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text); padding: 10px 12px; font-family: inherit; font-size: 14px; transition: border-color .15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
+  .field textarea { resize: vertical; min-height: 60px; font-family: "Consolas", monospace; }
+  .field .hint { font-size: 11px; color: var(--muted-2); }
+  .row { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
+  .row .field { flex: 1; min-width: 120px; margin-bottom: 0; }
+
+  .btn { border: none; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 700; color: #fff;
+    background: var(--accent); border-radius: var(--radius-sm); padding: 10px 16px; transition: filter .15s;
+    display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { filter: brightness(1.1); }
+  .btn:active { filter: brightness(0.95); }
+  .btn.secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+  .btn.danger { background: var(--red); }
+  .btn.green { background: var(--green); color: #0a0e1a; }
+  .btn.sm { padding: 6px 12px; font-size: 12px; }
+  .btn.copy { background: rgba(61,220,151,0.15); color: var(--green); border: 1px solid rgba(61,220,151,0.3); }
+
+  /* Result cards */
+  .results { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 16px; }
+  .rcard { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; }
+  .rcard .lbl { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .rcard .val { font-size: 20px; font-weight: 800; color: var(--text); }
+  .rcard .val.accent { color: var(--accent); }
+  .rcard .val.amber { color: var(--amber); }
+  .rcard .val.green { color: var(--green); }
+  .rcard .val.red { color: var(--red); }
+  .rcard .sub { font-size: 11px; color: var(--muted-2); margin-top: 4px; }
+
+  /* Journal entry */
+  .je { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-top: 12px; }
+  .je-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .je-title { font-size: 12px; color: var(--amber); font-weight: 700; }
+  .je-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .je-table th, .je-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  .je-table th { color: var(--muted); font-weight: 600; text-align: center; font-size: 11px; }
+  .je-table td.acct { text-align: right; }
+  .je-table td.num { text-align: center; direction: ltr; font-weight: 600; }
+  .je-table tr:last-child td { border-bottom: none; }
+  .je-table .dr { color: var(--amber); }
+  .je-table .cr { color: var(--green); }
+
+  /* Data table */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th, .data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: center; direction: ltr; }
+  .data-table th { background: var(--surface-2); color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: auto; max-height: 280px; margin-top: 12px; position: relative; }
+  .data-table-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+  .data-table-wrap::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
+  .table-actions { display: flex; justify-content: flex-end; margin-bottom: 6px; }
+
+  /* Calculator specific */
+  .calc-display { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: clamp(14px, 2.5vw, 20px) clamp(16px, 3vw, 22px); min-height: clamp(80px, 12vw, 110px);
+    display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; direction: ltr; text-align: right; margin-bottom: 16px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.2); }
+  .calc-expr { font-size: clamp(12px, 2vw, 15px); color: var(--muted); min-height: 16px; word-break: break-all; }
+  .calc-result { font-size: clamp(26px, 6vw, 46px); font-weight: 800; line-height: 1.1; color: var(--text); word-break: break-all; }
+  .calc-result.bump { transform: scale(1.03); transition: transform .15s; }
+  .calc-result.err { color: var(--red); }
+  .calc-status { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .calc-chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px;
+    min-width: 92px; min-height: 40px; padding: 0 14px;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+  .calc-chip:hover { background: var(--surface); border-color: var(--border-2); }
+  .calc-chip > span:first-child { font-size: 11px; font-weight: 700; letter-spacing: .5px; color: var(--muted); text-transform: uppercase; }
+  .calc-chip .v { font-size: 14px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+  .calc-chip.active { background: rgba(61,220,151,0.12); border-color: rgba(61,220,151,0.4); }
+  .calc-chip.active > span:first-child { color: var(--green); }
+  .calc-chip.active .v { color: var(--green); }
+  .tax-popover { position: absolute; top: calc(100% + 8px); left: 0; z-index: 20; width: 240px;
+    background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--radius);
+    padding: 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.45); display: none; flex-direction: column; gap: 12px; }
+  .tax-popover.open { display: flex; }
+  .tax-popover .tp-title { font-size: 12px; font-weight: 700; color: var(--text); }
+  .tax-popover .field { margin-bottom: 0; gap: 6px; }
+  .tax-popover label { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .tax-popover input { padding: 10px 12px; font-size: 14px; }
+  .calc-keys { display: grid; grid-template-columns: repeat(5, 1fr); gap: clamp(4px, 1vw, 8px); margin-bottom: 16px;
+    background: var(--bg-2); padding: clamp(8px, 2vw, 12px); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  .ck { border: none; cursor: pointer; font-family: inherit; font-size: clamp(14px, 2.5vw, 18px); font-weight: 700; color: var(--text);
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: clamp(8px, 2vw, 14px) 0; transition: background .15s, border-color .15s; }
+  .ck:hover { background: var(--surface); border-color: var(--border-2); }
+  .ck:active { background: var(--bg); }
+  .ck.op { background: rgba(79,140,255,0.15); color: var(--accent); border-color: rgba(79,140,255,0.3); }
+  .ck.eq { background: var(--amber); color: #0a0e1a; border-color: var(--amber); }
+  .ck.mem { background: rgba(61,220,151,0.15); color: var(--green); border-color: rgba(61,220,151,0.3); }
+  .ck.tax { background: rgba(255,94,126,0.15); color: var(--red); border-color: rgba(255,94,126,0.3); }
+  .ck.fn { color: var(--muted); font-size: 13px; }
+  .ck.danger { color: var(--red); }
+  .ck.wide { grid-column: span 2; }
+  .calc-toolbar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid var(--border); }
+  .calc-toolbar .btn { flex: 1; min-width: 0; justify-content: center; font-size: 12px; padding: 8px; }
+  .calc-history { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    max-height: 160px; overflow-y: auto; display: none; margin-top: 8px; }
+  .calc-history.open { display: block; }
+  .calc-history .hitem { display: flex; justify-content: space-between; padding: 8px 12px; cursor: pointer;
+    border-bottom: 1px solid var(--border); font-size: 13px; }
+  .calc-history .hitem:hover { background: var(--surface); }
+  .calc-history .hitem:last-child { border-bottom: none; }
+  .calc-history .he { color: var(--muted); direction: ltr; }
+  .calc-history .hr { font-weight: 700; direction: ltr; }
+  .calc-history .empty { padding: 12px; text-align: center; color: var(--muted); font-size: 12px; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--surface); color: var(--text); padding: 10px 18px; border-radius: var(--radius-sm);
+    font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 100;
+    border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Mobile: sidebar becomes top horizontal scroll */
+  @media (max-width: 768px) {
+    .layout { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; max-height: 140px; border-left: none; border-bottom: 1px solid var(--border);
+      flex-direction: row; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; padding: 8px; gap: 4px; align-items: center; }
+    .sidebar::-webkit-scrollbar { height: 4px; }
+    .brand { border-bottom: none; margin-bottom: 0; padding: 4px 8px; flex-shrink: 0; }
+    .brand .sub { display: none; }
+    .group { margin-bottom: 0; display: flex; gap: 4px; flex-shrink: 0; }
+    .group-title { display: none; }
+    .nav-item { padding: 6px 10px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+    .nav-item .ico { font-size: 14px; }
+    .main { padding: 16px; }
+    .page-header h1 { font-size: 18px; }
+  }
+  @media (max-width: 480px) {
+    .calc-keys { grid-template-columns: repeat(4, 1fr); }
+    .ck.wide { grid-column: span 2; }
+    .results { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* Animations */
+  .page.active { animation: fadeIn .2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  button, input, select, textarea { font-family: inherit; }
+  button:active { transform: none !important; }
+  *:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  button:focus-visible, .ck:focus-visible, .calc-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  html { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  select { background-color: var(--surface-2); color: var(--text); }
+  .rcard .val, .data-table td, .je-table td.num { font-variant-numeric: tabular-nums; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="dot"></div>
+        <div>
+          <div class="name">أدوات محاسبية</div>
+          <div class="sub">Pro Suite</div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">الأدوات اليومية</div>
+        <div class="nav-item active" data-page="calc"><span class="ico">🧮</span><span class="lbl">حاسبة</span></div>
+        <div class="nav-item" data-page="disc"><span class="ico">💱</span><span class="lbl">خصومات/عملات</span></div>
+        <div class="nav-item" data-page="profit"><span class="ico">💰</span><span class="lbl">ربح/هامش</span></div>
+        <div class="nav-item" data-page="vat"><span class="ico">🧾</span><span class="lbl">VAT</span></div>
+      </div>
+      <div class="group">
+        <div class="group-title">الأصول والتمويل</div>
+        <div class="nav-item" data-page="loan"><span class="ico">🏦</span><span class="lbl">قروض</span></div>
+        <div class="nav-item" data-page="interest"><span class="ico">📈</span><span class="lbl">فائدة FV/PV</span></div>
+        <div class="nav-item" data-page="depr"><span class="ico">📉</span><span class="lbl">إهلاك</span></div>
+      </div>
+      <div class="group">
+        <div class="group-title">التحليل والاستثمار</div>
+        <div class="nav-item" data-page="be"><span class="ico">⚖️</span><span class="lbl">تعادل</span></div>
+        <div class="nav-item" data-page="npv"><span class="ico">📊</span><span class="lbl">NPV/IRR</span></div>
+        <div class="nav-item" data-page="ratios"><span class="ico">📐</span><span class="lbl">نسب مالية</span></div>
+      </div>
+      <div class="group">
+        <div class="group-title">العمليات والتقييم</div>
+        <div class="nav-item" data-page="aging"><span class="ico">📋</span><span class="lbl">أعمار ديون</span></div>
+        <div class="nav-item" data-page="fxrev"><span class="ico">💱</span><span class="lbl">إعادة تقييم FX</span></div>
+        <div class="nav-item" data-page="inv"><span class="ico">📦</span><span class="lbl">مخزون</span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- ============ CALC ============ -->
+      <section class="page active" id="page-calc">
+        <div class="page-header">
+          <h1>🧮 حاسبة محاسبية</h1>
+          <p>آلة حاسبة مع ذاكرة، ضريبة، خصم، مجموع كلي، سجل</p>
+        </div>
+        <div class="card">
+          <div class="calc-status">
+            <div class="calc-chip" id="chipM" onclick="mc()"><span>M</span><span class="v" id="memVal">0</span></div>
+            <div class="calc-chip" id="chipGT" onclick="grandTotal()"><span>GT</span><span class="v" id="gtVal">0</span></div>
+            <span style="position:relative; display:inline-flex;">
+              <div class="calc-chip" id="chipTax" onclick="toggleSettings()"><span>Tax</span><span class="v" id="taxVal">15%</span></div>
+              <div class="tax-popover" id="settings">
+                <div class="tp-title">إعدادات الضريبة والخصم</div>
+                <div class="field"><label>نسبة الضريبة %</label><input type="number" id="taxRateInput" value="15" min="0" max="100" step="0.5" onchange="setTaxRate(this.value); closeSettings();" /></div>
+                <div class="field"><label>نسبة الخصم %</label><input type="number" id="discRateInput" value="10" min="0" max="100" step="0.5" onchange="closeSettings();" /></div>
+              </div>
+            </span>
+          </div>
+          <div class="calc-display">
+            <div class="calc-expr" id="expr"></div>
+            <div class="calc-result" id="result">0</div>
+          </div>
+          <div class="calc-toolbar">
+            <button class="btn secondary sm" onclick="toggleHistory()">📜 السجل</button>
+            <button class="btn secondary sm" onclick="copyResult()">📋 نسخ</button>
+            <button class="btn secondary sm" onclick="round2()">Round 2</button>
+            <button class="btn sm" onclick="grandTotal()">GT+</button>
+            <button class="btn danger sm" onclick="clearGrandTotal()">CT</button>
+          </div>
+          <div class="calc-keys">
+            <button class="ck mem" data-action="mc">MC</button>
+            <button class="ck mem" data-action="mr">MR</button>
+            <button class="ck mem" data-action="mplus">M+</button>
+            <button class="ck mem" data-action="mminus">M-</button>
+            <button class="ck danger" data-action="clear">C</button>
+            <button class="ck fn" data-action="lparen">(</button>
+            <button class="ck fn" data-action="rparen">)</button>
+            <button class="ck fn" data-action="percent">%</button>
+            <button class="ck fn" data-action="back">⌫</button>
+            <button class="ck danger" data-action="ac">AC</button>
+            <button class="ck" data-num="7">7</button>
+            <button class="ck" data-num="8">8</button>
+            <button class="ck" data-num="9">9</button>
+            <button class="ck op" data-op="/">÷</button>
+            <button class="ck tax" data-action="taxplus">Tax+</button>
+            <button class="ck" data-num="4">4</button>
+            <button class="ck" data-num="5">5</button>
+            <button class="ck" data-num="6">6</button>
+            <button class="ck op" data-op="*">×</button>
+            <button class="ck tax" data-action="taxminus">Tax−</button>
+            <button class="ck" data-num="1">1</button>
+            <button class="ck" data-num="2">2</button>
+            <button class="ck" data-num="3">3</button>
+            <button class="ck op" data-op="-">−</button>
+            <button class="ck tax" data-action="discount">Disc</button>
+            <button class="ck wide" data-num="0">0</button>
+            <button class="ck" data-num=".">.</button>
+            <button class="ck fn" data-action="sign">±</button>
+            <button class="ck op" data-op="+">+</button>
+            <button class="ck eq" data-action="equals">=</button>
+          </div>
+          <div class="calc-history" id="history"></div>
+        </div>
+      </section>
+
+      <!-- ============ DISC ============ -->
+      <section class="page" id="page-disc">
+        <div class="page-header">
+          <h1>💱 خصومات متتالية وتحويل عملات</h1>
+          <p>حساب الخصومات المركبة وتحويل العملات</p>
+        </div>
+        <div class="card">
+          <div class="card-title">🏷️ خصومات متتالية</div>
+          <div class="row">
+            <div class="field"><label>السعر الأصلي</label><input type="number" id="Dc_price" value="1000" oninput="calcDiscount()" /></div>
+            <div class="field"><label>خصم 1 %</label><input type="number" id="Dc_d1" value="10" oninput="calcDiscount()" /></div>
+            <div class="field"><label>خصم 2 %</label><input type="number" id="Dc_d2" value="5" oninput="calcDiscount()" /></div>
+            <div class="field"><label>خصم 3 %</label><input type="number" id="Dc_d3" value="0" oninput="calcDiscount()" /></div>
+          </div>
+          <div class="results">
+            <div class="rcard"><div class="lbl">السعر النهائي</div><div class="val green" id="Dc_final">—</div></div>
+            <div class="rcard"><div class="lbl">إجمالي الخصم %</div><div class="val amber" id="Dc_totalPct">—</div></div>
+            <div class="rcard"><div class="lbl">مبلغ الخصم</div><div class="val red" id="Dc_saved">—</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">💱 تحويل عملات</div>
+          <div class="row">
+            <div class="field"><label>المبلغ</label><input type="number" id="Fx_amount" value="1000" oninput="calcFx()" /></div>
+            <div class="field"><label>من</label>
+              <select id="Fx_from" onchange="calcFx()"><option value="USD">USD</option><option value="EUR">EUR</option><option value="SAR">SAR</option><option value="AED">AED</option><option value="GBP">GBP</option></select>
+            </div>
+            <div class="field"><label>إلى</label>
+              <select id="Fx_to" onchange="calcFx()"><option value="SAR">SAR</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="AED">AED</option><option value="GBP">GBP</option></select>
+            </div>
+            <div class="field"><label>سعر الصرف</label><input type="number" id="Fx_rate" value="3.75" step="0.0001" oninput="calcFx()" /></div>
+          </div>
+          <div class="results">
+            <div class="rcard"><div class="lbl">النتيجة</div><div class="val accent" id="Fx_result">—</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PROFIT ============ -->
+      <section class="page" id="page-profit">
+        <div class="page-header">
+          <h1>💰 ربح وهامش (التسعير)</h1>
+          <p>تحويل مباشر بين تكلفة، سعر، هامش، و markup</p>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>الوضع</label>
+              <select id="P_mode" onchange="calcProfit()">
+                <option value="cp">تكلفة + سعر → هامش</option>
+                <option value="cm">تكلفة + هامش% → سعر</option>
+                <option value="cmk">تكلفة + markup% → سعر</option>
+              </select>
+            </div>
+            <div class="field"><label>تكلفة الشراء</label><input type="number" id="P_cost" value="100" oninput="calcProfit()" /></div>
+          </div>
+          <div class="row" id="P_priceRow">
+            <div class="field"><label>سعر البيع</label><input type="number" id="P_price" value="150" oninput="calcProfit()" /></div>
+          </div>
+          <div class="row" id="P_marginRow" style="display:none;">
+            <div class="field"><label>هامش الربح %</label><input type="number" id="P_margin" value="30" oninput="calcProfit()" /></div>
+          </div>
+          <div class="row" id="P_markupRow" style="display:none;">
+            <div class="field"><label>نسبة Markup %</label><input type="number" id="P_markup" value="50" oninput="calcProfit()" /></div>
+          </div>
+          <div class="results">
+            <div class="rcard"><div class="lbl">سعر البيع</div><div class="val accent" id="P_priceRes">—</div></div>
+            <div class="rcard"><div class="lbl">مبلغ الربح</div><div class="val green" id="P_profit">—</div></div>
+            <div class="rcard"><div class="lbl">هامش الربح %</div><div class="val amber" id="P_marginRes">—</div></div>
+            <div class="rcard"><div class="lbl">نسبة Markup %</div><div class="val" id="P_markupRes">—</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ VAT ============ -->
+      <section class="page" id="page-vat">
+        <div class="page-header">
+          <h1>🧾 حاسبة VAT</h1>
+          <p>حساب الضريبة المستحقة/الاسترداد مع قيد تلقائي</p>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>VAT خرج (مبيعات)</label><input type="number" id="V_out" value="15000" oninput="calcVAT()" /></div>
+            <div class="field"><label>VAT دخل (مشتريات)</label><input type="number" id="V_in" value="8000" oninput="calcVAT()" /></div>
+            <div class="field"><label>adjustments</label><input type="number" id="V_adj" value="0" oninput="calcVAT()" /></div>
+          </div>
+          <div class="results">
+            <div class="rcard"><div class="lbl">VAT صافي مستحق</div><div class="val red" id="V_net">—</div></div>
+            <div class="rcard"><div class="lbl">الحالة</div><div class="val" id="V_status" style="font-size:16px;">—</div></div>
+          </div>
+          <div class="je">
+            <div class="je-header"><span class="je-title">قيد VAT</span><button class="btn copy sm" onclick="copyJE('V_je')">📋 نسخ القيد</button></div>
+            <div id="V_je"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ LOAN ============ -->
+      <section class="page" id="page-loan">
+        <div class="page-header">
+          <h1>🏦 قروض (Loan Amortization)</h1>
+          <p>PMT + جدول إطفاء (أول 24 دفعة)</p>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>مبلغ القرض</label><input type="number" id="L_principal" value="100000" oninput="calcLoan()" /></div>
+            <div class="field"><label>الفائدة السنوية %</label><input type="number" id="L_rate" value="5" step="0.01" oninput="calcLoan()" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>المدة (سنوات)</label><input type="number" id="L_years" value="5" oninput="calcLoan()" /></div>
+            <div class="field"><label>دفعات/سنة</label>
+              <select id="L_freq" onchange="calcLoan()"><option value="12">شهري (12)</option><option value="4">ربع سنوي (4)</option><option value="2">نصف سنوي (2)</option><option value="1">سنوي (1)</option></select>
+            </div>
+          </div>
+          <div class="results">
+            <div class="rcard"><div class="lbl">الدفعة الدورية</div><div class="val accent" id="L_pmt">—</div></div>
+            <div class="rcard"><div class="lbl">إجمالي الدفعات</div><div class="val" id="L_total">—</div></div>
+            <div class="rcard"><div class="lbl">إجمالي الفائدة</div><div class="val red" id="L_interest">—</div></div>
+            <div class="rcard"><div class="lbl">عدد الدفعات</div><div class="val" id="L_n">—</div></div>
+          </div>
+          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('L_table')">📋 نسخ CSV</button></div>
+          <div class="data-table-wrap">
+            <table class="data-table" id="L_table"><thead><tr><th>#</th><th>دفعة</th><th>فائدة</th><th>أصل</th><th>رصيد</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ INTEREST ============ -->
+      <section class="page" id="page-interest">
+        <div class="page-header">
+          <h1>📈 فائدة (FV / PV)</h1>
+          <p>القيمة المستقبلية/الحالية + DCF</p>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>الحساب</label>
+              <select id="I_mode" onchange="calcInterest()"><option value="fv">FV</option><option value="pv">PV</option></select>
+            </div>
+            <div class="field"><label>المبلغ</label><input type="number" id="I_pv" value="10000" oninput="calcInterest()" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>الفائدة السنوية %</label><input type="number" id="I_rate" value="6" step="0.01" oninput="calcInterest()" /></div>
+            <div class="field"><label>سنوات</label><input type="number" id="I_years" value="10" oninput="calcInterest()" /></div>
+            <div class="field"><label>compounding/سنة</label>
+              <select id="I_comp" onchange="calcInterest()"><option value="1">سنوي</option><option value="2">نصف سنوي</option><option value="4">ربع سنوي</option><option value="12">شهري</option><option value="365">يومي</option></select>
+            </div>
+            <div class="field"><label>مساهمة دورية</label><input type="number" id="I_pmt" value="0" oninput="calcInterest()" /></div>
+          </div>
+          <div class="results">
+            <div class="rcard"><div class="lbl" id="I_resTitle">القيمة المستقبلية</div><div class="val accent" id="I_res">—</div></div>
+            <div class="rcard"><div class="lbl">إجمالي الفائدة</div><div class="val" id="I_gain">—</div></div>
+            <div class="rcard"><div class="lbl">قاعدة 72</div><div class="val amber" id="I_rule72">—</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ DEPR ============ -->
+      <section class="page" id="page-depr">
+        <div class="page-header">
+          <h1>📉 إهلاك الأصول (Depreciation)</h1>
+          <p>SL / DDB / SYD + قيد تلقائي</p>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>تكلفة الأصل</label><input type="number" id="D_cost" value="50000" oninput="calcDepr()" /></div>
+            <div class="field"><label>القيمة التخريدية</label><input type="number" id="D_salvage" value="5000" oninput="calcDepr()" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>العمر (سنوات)</label><input type="number" id="D_life" value="5" oninput="calcDepr()" /></div>
+            <div class="field"><label>الطريقة</label>
+              <select id="D_method" onchange="calcDepr()"><option value="sl">قسط ثابت (SL)</option><option value="ddb">رصيد متناقص (DDB)</option><option value="syd">مجموع أرقام (SYD)</option></select>
+            </div>
+          </div>
+          <div class="results">
+            <div class="rcard"><div class="lbl">الإهلاك السنوي</div><div class="val" id="D_first">—</div></div>
+            <div class="rcard"><div class="lbl">الإهلاك الشهري</div><div class="val accent" id="D_monthly">—</div></div>
+            <div class="rcard"><div class="lbl">إجمالي الإهلاك</div><div class="val" id="D_total">—</div></div>
+          </div>
+          <div class="je">
+            <div class="je-header"><span class="je-title">قيد الإهلاك (شهري)</span><button class="btn copy sm" onclick="copyJE('D_je')">📋 نسخ القيد</button></div>
+            <div id="D_je"></div>
+          </div>
+          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('D_table')">📋 نسخ CSV</button></div>
+          <div class="data-table-wrap">
+            <table class="data-table" id="D_table"><thead><tr><th>سنة</th><th>إهلاك</th><th>قيمة دفترية</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ BE ============ -->
+      <section class="page" id="page-be">
+        <div class="page-header">
+          <h1>⚖️ نقطة التعادل (Break-Even)</h1>
+          <p>وحدات/إيراد التعادل + ربح مستهدف</p>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>التكاليف الثابتة</label><input type="number" id="B_fixed" value="10000" oninput="calcBE()" /></div>
+            <div class="field"><label>التكلفة المتغيرة/وحدة</label><input type="number" id="B_var" value="5" oninput="calcBE()" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>سعر البيع/وحدة</label><input type="number" id="B_price" value="15" oninput="calcBE()" /></div>
+            <div class="field"><label>الربح المستهدف</label><input type="number" id="B_target" value="0" oninput="calcBE()" /></div>
+          </div>
+          <div class="results">
+            <div class="rcard"><div class="lbl">وحدات التعادل</div><div class="val accent" id="B_units">—</div></div>
+            <div class="rcard"><div class="lbl">إيراد التعادل</div><div class="val" id="B_revenue">—</div></div>
+            <div class="rcard"><div class="lbl">هامش المساهمة/وحدة</div><div class="val green" id="B_cm">—</div></div>
+            <div class="rcard"><div class="lbl">نسبة المساهمة %</div><div class="val amber" id="B_cmRatio">—</div></div>
+          </div>
+          <div class="rcard" id="B_targetCard" style="display:none; margin-top:10px;"><div class="lbl">وحدات لتحقيق الربح المستهدف</div><div class="val accent" id="B_targetUnits">—</div></div>
+        </div>
+      </section>
+
+      <!-- ============ NPV ============ -->
+      <section class="page" id="page-npv">
+        <div class="page-header">
+          <h1>📊 NPV / IRR / DCF</h1>
+          <p>تقييم استثماري</p>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>الاستثمار الأولي</label><input type="number" id="N_inv" value="100000" oninput="calcNPV()" /></div>
+            <div class="field"><label>معدل الخصم %</label><input type="number" id="N_rate" value="10" step="0.01" oninput="calcNPV()" /></div>
+          </div>
+          <div class="field">
+            <label>التدفقات (مفصولة بفواصل)</label>
+            <input type="text" id="N_cf" value="30000,35000,40000,45000,50000" oninput="calcNPV()" />
+            <div class="hint">السنة 1، 2، 3...</div>
+          </div>
+          <div class="results">
+            <div class="rcard"><div class="lbl">NPV</div><div class="val accent" id="N_npv">—</div></div>
+            <div class="rcard"><div class="lbl">IRR %</div><div class="val green" id="N_irr">—</div></div>
+            <div class="rcard"><div class="lbl">Payback</div><div class="val" id="N_payback">—</div></div>
+            <div class="rcard"><div class="lbl">PI (index)</div><div class="val amber" id="N_pi">—</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ RATIOS ============ -->
+      <section class="page" id="page-ratios">
+        <div class="page-header">
+          <h1>📐 نسب مالية</h1>
+          <p>10 نسب رئيسية</p>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>الأصول المتداولة</label><input type="number" id="R_ca" value="50000" oninput="calcRatios()" /></div>
+            <div class="field"><label>المخزون</label><input type="number" id="R_inv" value="15000" oninput="calcRatios()" /></div>
+            <div class="field"><label>الخصوم المتداولة</label><input type="number" id="R_cl" value="30000" oninput="calcRatios()" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>إجمالي الأصول</label><input type="number" id="R_ta" value="200000" oninput="calcRatios()" /></div>
+            <div class="field"><label>إجمالي الخصوم</label><input type="number" id="R_tl" value="120000" oninput="calcRatios()" /></div>
+            <div class="field"><label>حقوق الملكية</label><input type="number" id="R_eq" value="80000" oninput="calcRatios()" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>الإيرادات</label><input type="number" id="R_rev" value="300000" oninput="calcRatios()" /></div>
+            <div class="field"><label>صافي الربح</label><input type="number" id="R_ni" value="30000" oninput="calcRatios()" /></div>
+            <div class="field"><label>COGS</label><input type="number" id="R_cogs" value="180000" oninput="calcRatios()" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>الذمم (AR)</label><input type="number" id="R_ar" value="40000" oninput="calcRatios()" /></div>
+            <div class="field"><label>الذمم (AP)</label><input type="number" id="R_ap" value="25000" oninput="calcRatios()" /></div>
+          </div>
+          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('R_table')">📋 نسخ CSV</button></div>
+          <div class="data-table-wrap">
+            <table class="data-table" id="R_table"><thead><tr><th>النسبة</th><th>القيمة</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ AGING ============ -->
+      <section class="page" id="page-aging">
+        <div class="page-header">
+          <h1>📋 أعمار الديون + ECL</h1>
+          <p>مخصص مشكوك فيها + قيد تلقائي</p>
+        </div>
+        <div class="card">
+          <div class="grid">
+            <div>
+              <div class="field"><label>0-30 يوم</label><input type="number" id="A_b0" value="50000" oninput="calcAging()" /></div>
+              <div class="field"><label>31-60 يوم</label><input type="number" id="A_b1" value="20000" oninput="calcAging()" /></div>
+              <div class="field"><label>61-90 يوم</label><input type="number" id="A_b2" value="10000" oninput="calcAging()" /></div>
+              <div class="field"><label>91-180 يوم</label><input type="number" id="A_b3" value="5000" oninput="calcAging()" /></div>
+              <div class="field"><label>181+ يوم</label><input type="number" id="A_b4" value="3000" oninput="calcAging()" /></div>
+            </div>
+            <div>
+              <div class="field"><label>نسبة 0-30 %</label><input type="number" id="A_r0" value="1" oninput="calcAging()" /></div>
+              <div class="field"><label>نسبة 31-60 %</label><input type="number" id="A_r1" value="5" oninput="calcAging()" /></div>
+              <div class="field"><label>نسبة 61-90 %</label><input type="number" id="A_r2" value="10" oninput="calcAging()" /></div>
+              <div class="field"><label>نسبة 91-180 %</label><input type="number" id="A_r3" value="25" oninput="calcAging()" /></div>
+              <div class="field"><label>نسبة 181+ %</label><input type="number" id="A_r4" value="50" oninput="calcAging()" /></div>
+            </div>
+          </div>
+          <div class="results">
+            <div class="rcard"><div class="lbl">إجمالي الذمم</div><div class="val" id="A_total">—</div></div>
+            <div class="rcard"><div class="lbl">المخصص (ECL)</div><div class="val red" id="A_prov">—</div></div>
+            <div class="rcard"><div class="lbl">نسبة التعثر (90+)</div><div class="val amber" id="A_default">—</div></div>
+            <div class="rcard"><div class="lbl">صافي الذمم</div><div class="val green" id="A_net">—</div></div>
+          </div>
+          <div class="je">
+            <div class="je-header"><span class="je-title">قيد المخصص</span><button class="btn copy sm" onclick="copyJE('A_je')">📋 نسخ القيد</button></div>
+            <div id="A_je"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ FXREV ============ -->
+      <section class="page" id="page-fxrev">
+        <div class="page-header">
+          <h1>💱 إعادة تقييم FX</h1>
+          <p>فروق عملات + قيد تلقائي</p>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>العملة</label><input type="text" id="FxR_ccy" value="USD" oninput="calcFxRev()" /></div>
+            <div class="field"><label>الرصيد (foreign)</label><input type="number" id="FxR_amt" value="10000" oninput="calcFxRev()" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>السعر القديم</label><input type="number" id="FxR_old" value="3.75" step="0.0001" oninput="calcFxRev()" /></div>
+            <div class="field"><label>السعر الجديد</label><input type="number" id="FxR_new" value="3.80" step="0.0001" oninput="calcFxRev()" /></div>
+          </div>
+          <div class="results">
+            <div class="rcard"><div class="lbl">القيمة القديمة</div><div class="val" id="FxR_oldVal">—</div></div>
+            <div class="rcard"><div class="lbl">القيمة الجديدة</div><div class="val" id="FxR_newVal">—</div></div>
+            <div class="rcard"><div class="lbl">ربح/خسارة FX</div><div class="val" id="FxR_gain">—</div></div>
+          </div>
+          <div class="je">
+            <div class="je-header"><span class="je-title">قيد إعادة التقييم</span><button class="btn copy sm" onclick="copyJE('FxR_je')">📋 نسخ القيد</button></div>
+            <div id="FxR_je"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ INV ============ -->
+      <section class="page" id="page-inv">
+        <div class="page-header">
+          <h1>📦 تقييم المخزون</h1>
+          <p>FIFO / LIFO / WAC</p>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>مخزون أولي (كمية)</label><input type="number" id="Iv_q0" value="0" oninput="calcInv()" /></div>
+            <div class="field"><label>تكلفة أولية/وحدة</label><input type="number" id="Iv_c0" value="0" oninput="calcInv()" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>شراء 1 (كمية)</label><input type="number" id="Iv_q1" value="100" oninput="calcInv()" /></div>
+            <div class="field"><label>شراء 1 (تكلفة/وحدة)</label><input type="number" id="Iv_c1" value="10" oninput="calcInv()" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>شراء 2 (كمية)</label><input type="number" id="Iv_q2" value="100" oninput="calcInv()" /></div>
+            <div class="field"><label>شراء 2 (تكلفة/وحدة)</label><input type="number" id="Iv_c2" value="12" oninput="calcInv()" /></div>
+          </div>
+          <div class="field"><label>الوحدات المباعة</label><input type="number" id="Iv_sold" value="150" oninput="calcInv()" /></div>
+          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('Iv_table')">📋 نسخ CSV</button></div>
+          <div class="data-table-wrap">
+            <table class="data-table" id="Iv_table"><thead><tr><th>الطريقة</th><th>COGS</th><th>مخزون final</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400); }
+  function fmt(n){ if(!isFinite(n)) return 'خطأ'; const r=Math.round(n*1e9)/1e9; return r.toLocaleString('en-US',{maximumFractionDigits:9}); }
+  function safeEval(s){ const safe=s.replace(/[^0-9+\-*/.()%]/g,''); if(safe==='') return NaN; try{return Function('"use strict"; return ('+safe+')')();}catch(e){return NaN;} }
+
+  // ---- Navigation ----
+  document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+    n.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    $('page-' + n.dataset.page).classList.add('active');
+  }));
+
+  // ---- Copy helpers ----
+  async function copyText(txt) {
+    try { await navigator.clipboard.writeText(txt); toast('تم النسخ'); }
+    catch (e) { toast('تعذر النسخ'); }
+  }
+  function copyJE(id) {
+    const el = $(id);
+    const txt = el.dataset.text || el.innerText.trim();
+    copyText(txt);
+  }
+  function copyTable(id) {
+    const table = $(id);
+    const rows = [];
+    table.querySelectorAll('tr').forEach(tr => {
+      const cells = [];
+      tr.querySelectorAll('th, td').forEach(td => cells.push(td.innerText.trim()));
+      rows.push(cells.join(','));
+    });
+    copyText(rows.join('\n'));
+  }
+  async function copyResult() {
+    const txt = resultEl.textContent;
+    try { await navigator.clipboard.writeText(txt); toast('تم النسخ: ' + txt); }
+    catch (e) { toast('تعذر النسخ'); }
+  }
+
+  function setJE(id, rows) {
+    const el = $(id);
+    let html = '<table class="je-table"><thead><tr><th>الحساب</th><th>مدين (Dr)</th><th>دائن (Cr)</th></tr></thead><tbody>';
+    let txtLines = [];
+    rows.forEach(r => {
+      const dr = r.dr != null ? fmt(r.dr) : '';
+      const cr = r.cr != null ? fmt(r.cr) : '';
+      html += `<tr><td class="acct">${r.account}</td><td class="num ${r.dr!=null?'dr':''}">${dr}</td><td class="num ${r.cr!=null?'cr':''}">${cr}</td></tr>`;
+      const amt = r.dr != null ? dr : cr;
+      txtLines.push((r.dr != null ? 'Dr' : 'Cr') + '  ' + r.account + ' ........ ' + amt);
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+    el.dataset.text = txtLines.join('\n');
+  }
+
+  // ---- calculator ----
+  const exprEl = $('expr'), resultEl = $('result');
+  const memVal = $('memVal'), gtVal = $('gtVal'), taxVal = $('taxVal');
+  const historyEl = $('history');
+  let expression = '', justCalculated = false, memory = 0, grandTotalVal = 0, taxRate = 0.15, history = [], lastResult = 0, lastExpr = '';
+  const chipM = $('chipM'), chipGT = $('chipGT'), chipTax = $('chipTax');
+
+  function updateDisplay() {
+    exprEl.textContent = justCalculated ? (lastExpr ? lastExpr + ' =' : expression) : expression;
+    let preview = '0';
+    try {
+      let e = expression;
+      while (/[+\-*/.(]$/.test(e)) e = e.slice(0, -1);
+      if (e === '' && expression !== '') preview = expression;
+      else if (e !== '') { const v = safeEval(e); preview = isNaN(v) ? (expression || '0') : fmt(v); }
+    } catch (err) { preview = expression || '0'; }
+    if (expression === '') preview = '0';
+    resultEl.textContent = preview;
+    resultEl.classList.toggle('err', preview === 'خطأ');
+    memVal.textContent = fmt(memory);
+    gtVal.textContent = fmt(grandTotalVal);
+    chipM.classList.toggle('active', memory !== 0);
+    chipGT.classList.toggle('active', grandTotalVal !== 0);
+  }
+  function appendNum(n) {
+    if (justCalculated) { expression = ''; lastExpr = ''; justCalculated = false; }
+    const last = expression.slice(-1);
+    if (n === '.') {
+      const match = expression.match(/(\d*\.?\d*)$/);
+      const current = match ? match[0] : '';
+      if (current.includes('.')) return;
+      if (expression === '' || /[+\-*/(]/.test(last)) expression += '0.';
+      else expression += '.';
+      updateDisplay(); return;
+    }
+    expression += n; updateDisplay();
+  }
+  function appendOp(op) {
+    if (justCalculated) { justCalculated = false; lastExpr = ''; }
+    if (expression === '') { if (op === '-') expression = '-'; updateDisplay(); return; }
+    const last = expression.slice(-1);
+    if (/[+\-*/]/.test(last)) expression = expression.slice(0, -1) + op;
+    else expression += op;
+    updateDisplay();
+  }
+  function clearAll() { expression = ''; lastExpr = ''; justCalculated = false; updateDisplay(); }
+  function allClear() { clearAll(); memory = 0; grandTotalVal = 0; history = []; renderHistory(); updateDisplay(); toast('تم المسح'); }
+  function backspace() {
+    if (justCalculated) { expression = ''; lastExpr = ''; justCalculated = false; }
+    else expression = expression.slice(0, -1);
+    updateDisplay();
+  }
+  function toggleSign() {
+    const m = expression.match(/^(.*?)(-?)(\d+\.?\d*)$/);
+    if (m && (m[1] === '' || /[+\-*/(]$/.test(m[1]))) {
+      expression = m[1] + (m[2] === '-' ? '' : '-') + m[3];
+      updateDisplay();
+    }
+  }
+  function percent() {
+    if (expression === '') return;
+    const m = expression.match(/^(.*?)([+\-*/])(\d+\.?\d*)$/);
+    if (m) {
+      const left = m[1], op = m[2], right = parseFloat(m[3]);
+      if (op === '+' || op === '-') {
+        const base = safeEval(left); if (isNaN(base)) return;
+        expression = left + op + (base * right / 100);
+      } else expression = left + op + (right / 100);
+    } else {
+      const m2 = expression.match(/(\d+\.?\d*)$/);
+      if (m2) { const num = parseFloat(m2[0]); expression = expression.slice(0, -m2[0].length) + (num / 100); }
+    }
+    updateDisplay();
+  }
+  function lparen() { if (justCalculated) { expression = ''; lastExpr = ''; justCalculated = false; } expression += '('; updateDisplay(); }
+  function rparen() { expression += ')'; updateDisplay(); }
+  function evaluate() {
+    if (expression === '') return;
+    let expr = expression;
+    while (/[+\-*/.(]$/.test(expr)) expr = expr.slice(0, -1);
+    if (expr === '') return;
+    const val = safeEval(expr);
+    if (isNaN(val) || !isFinite(val)) { resultEl.textContent = 'خطأ'; resultEl.classList.add('err'); return; }
+    const formatted = fmt(val);
+    lastExpr = expression;
+    history.unshift({ expr: expression, res: formatted });
+    if (history.length > 30) history.pop();
+    renderHistory();
+    lastResult = val;
+    expression = String(val);
+    justCalculated = true;
+    resultEl.classList.add('bump');
+    setTimeout(() => resultEl.classList.remove('bump'), 150);
+    updateDisplay();
+  }
+  function mc() { memory = 0; updateDisplay(); toast('MC'); }
+  function mr() { if (justCalculated) { expression = ''; lastExpr = ''; justCalculated = false; } expression += memory.toString(); updateDisplay(); }
+  function mplus() { const v = safeEval(justCalculated ? (expression || lastResult.toString()) : expression); if (!isNaN(v)) { memory += v; updateDisplay(); toast('M+ ' + fmt(memory)); } }
+  function mminus() { const v = safeEval(justCalculated ? (expression || lastResult.toString()) : expression); if (!isNaN(v)) { memory -= v; updateDisplay(); toast('M- ' + fmt(memory)); } }
+  function setTaxRate(v) { taxRate = (parseFloat(v) || 0) / 100; taxVal.textContent = (taxRate*100).toFixed(1).replace(/\.0$/,'') + '%'; toast('ضريبة ' + taxVal.textContent); }
+  function taxPlus() {
+    const base = justCalculated ? lastResult : safeEval(expression); if (isNaN(base)) return;
+    const val = base * (1 + taxRate);
+    lastExpr = base + ' + Tax';
+    history.unshift({ expr: base + ' + Tax', res: fmt(val) }); renderHistory();
+    lastResult = val; expression = String(val); justCalculated = true; updateDisplay();
+  }
+  function taxMinus() {
+    const base = justCalculated ? lastResult : safeEval(expression); if (isNaN(base)) return;
+    const val = base / (1 + taxRate);
+    lastExpr = base + ' − Tax';
+    history.unshift({ expr: base + ' − Tax', res: fmt(val) }); renderHistory();
+    lastResult = val; expression = String(val); justCalculated = true; updateDisplay();
+  }
+  function discount() {
+    const rate = parseFloat($('discRateInput').value) || 0;
+    const base = justCalculated ? lastResult : safeEval(expression); if (isNaN(base)) return;
+    const val = base * (1 - rate / 100);
+    lastExpr = base + ' − ' + rate + '%';
+    history.unshift({ expr: base + ' − ' + rate + '%', res: fmt(val) }); renderHistory();
+    lastResult = val; expression = String(val); justCalculated = true; updateDisplay();
+    toast('خصم ' + rate + '%');
+  }
+  function grandTotal() {
+    const v = justCalculated ? lastResult : safeEval(expression); if (isNaN(v)) return;
+    grandTotalVal += v;
+    history.unshift({ expr: 'GT+ ' + fmt(v), res: fmt(grandTotalVal) }); renderHistory();
+    updateDisplay(); toast('GT = ' + fmt(grandTotalVal));
+  }
+  function clearGrandTotal() { grandTotalVal = 0; updateDisplay(); toast('CT'); }
+  function round2() {
+    const base = justCalculated ? lastResult : safeEval(expression); if (isNaN(base)) return;
+    const val = Math.round(base * 100) / 100;
+    lastExpr = 'Round ' + base;
+    history.unshift({ expr: 'Round ' + base, res: fmt(val) }); renderHistory();
+    lastResult = val; expression = String(val); justCalculated = true; updateDisplay();
+  }
+  function renderHistory() {
+    if (history.length === 0) { historyEl.innerHTML = '<div class="empty">لا توجد عمليات</div>'; return; }
+    historyEl.innerHTML = history.map((h, i) => `<div class="hitem" onclick="loadHistory(${i})"><span class="he">${h.expr}</span><span class="hr">${h.res}</span></div>`).join('');
+  }
+  function loadHistory(i) {
+    const h = history[i]; if (!h) return;
+    expression = h.res.replace(/,/g, ''); lastExpr = ''; justCalculated = true; lastResult = parseFloat(expression); updateDisplay();
+  }
+  function toggleHistory() { historyEl.classList.toggle('open'); if (historyEl.classList.contains('open')) renderHistory(); }
+  function toggleSettings() {
+    const s = $('settings');
+    s.classList.toggle('open');
+  }
+  function closeSettings() { const s = $('settings'); if (s) s.classList.remove('open'); }
+  document.addEventListener('click', (e) => {
+    const s = $('settings'); const chip = $('chipTax');
+    if (!s || !s.classList.contains('open')) return;
+    if (s.contains(e.target) || (chip && chip.contains(e.target))) return;
+    s.classList.remove('open');
+  });
+  document.querySelectorAll('#page-calc .ck').forEach(btn => btn.addEventListener('click', (e) => {
+    if (btn.dataset.num !== undefined) appendNum(btn.dataset.num);
+    else if (btn.dataset.op) appendOp(btn.dataset.op);
+    else {
+      const a = btn.dataset.action;
+      if (a === 'clear') clearAll();
+      else if (a === 'ac') allClear();
+      else if (a === 'back') backspace();
+      else if (a === 'percent') percent();
+      else if (a === 'lparen') lparen();
+      else if (a === 'rparen') rparen();
+      else if (a === 'sign') toggleSign();
+      else if (a === 'equals') evaluate();
+      else if (a === 'mc') mc();
+      else if (a === 'mr') mr();
+      else if (a === 'mplus') mplus();
+      else if (a === 'mminus') mminus();
+      else if (a === 'taxplus') taxPlus();
+      else if (a === 'taxminus') taxMinus();
+      else if (a === 'discount') discount();
+    }
+  }));
+  window.addEventListener('keydown', (e) => {
+    const active = document.querySelector('.page.active');
+    if (!active || active.id !== 'page-calc') return;
+    if (e.key >= '0' && e.key <= '9') appendNum(e.key);
+    else if (e.key === '.') appendNum('.');
+    else if (['+','-','*','/'].includes(e.key)) appendOp(e.key);
+    else if (e.key === '(') lparen();
+    else if (e.key === ')') rparen();
+    else if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); evaluate(); }
+    else if (e.key === 'Backspace') backspace();
+    else if (e.key === 'Escape') clearAll();
+    else if (e.key === '%') percent();
+  });
+  setTaxRate(15);
+  renderHistory();
+  updateDisplay();
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSettings(); });
+
+  // ---- tools ----
+  function calcDiscount() {
+    const price = parseFloat($('Dc_price').value) || 0;
+    const d1 = parseFloat($('Dc_d1').value) || 0;
+    const d2 = parseFloat($('Dc_d2').value) || 0;
+    const d3 = parseFloat($('Dc_d3').value) || 0;
+    let final = price * (1 - d1/100) * (1 - d2/100) * (1 - d3/100);
+    const saved = price - final;
+    const totalPct = price > 0 ? (saved / price) * 100 : 0;
+    $('Dc_final').textContent = fmt(final);
+    $('Dc_totalPct').textContent = fmt(totalPct) + '%';
+    $('Dc_saved').textContent = fmt(saved);
+  }
+  function calcFx() {
+    const amt = parseFloat($('Fx_amount').value) || 0;
+    const rate = parseFloat($('Fx_rate').value) || 0;
+    const res = amt * rate;
+    const from = $('Fx_from').value, to = $('Fx_to').value;
+    $('Fx_result').textContent = fmt(res) + ' ' + to;
+    toast(fmt(amt) + ' ' + from + ' = ' + fmt(res) + ' ' + to);
+  }
+  function calcProfit() {
+    const cost = parseFloat($('P_cost').value) || 0;
+    const mode = $('P_mode').value;
+    let price, profit, margin, markup;
+    if (mode === 'cp') {
+      price = parseFloat($('P_price').value) || 0;
+      profit = price - cost;
+      margin = price > 0 ? (profit / price) * 100 : 0;
+      markup = cost > 0 ? (profit / cost) * 100 : 0;
+    } else if (mode === 'cm') {
+      margin = parseFloat($('P_margin').value) || 0;
+      price = margin < 100 ? cost / (1 - margin / 100) : 0;
+      profit = price - cost;
+      markup = cost > 0 ? (profit / cost) * 100 : 0;
+    } else {
+      markup = parseFloat($('P_markup').value) || 0;
+      price = cost * (1 + markup / 100);
+      profit = price - cost;
+      margin = price > 0 ? (profit / price) * 100 : 0;
+    }
+    $('P_priceRes').textContent = fmt(price);
+    $('P_profit').textContent = fmt(profit);
+    $('P_marginRes').textContent = fmt(margin) + '%';
+    $('P_markupRes').textContent = fmt(markup) + '%';
+  }
+  $('P_mode').addEventListener('change', () => {
+    const m = $('P_mode').value;
+    $('P_priceRow').style.display = (m === 'cp') ? 'flex' : 'none';
+    $('P_marginRow').style.display = (m === 'cm') ? 'flex' : 'none';
+    $('P_markupRow').style.display = (m === 'cmk') ? 'flex' : 'none';
+    calcProfit();
+  });
+
+  function calcVAT() {
+    const out = parseFloat($('V_out').value) || 0;
+    const inn = parseFloat($('V_in').value) || 0;
+    const adj = parseFloat($('V_adj').value) || 0;
+    const net = out - inn + adj;
+    $('V_net').textContent = fmt(Math.abs(net));
+    $('V_status').textContent = net >= 0 ? 'مستحق للدفع' : 'استرداد';
+    if (net >= 0) {
+      setJE('V_je', [
+        { account: 'ضريبة المبيعات', dr: Math.abs(net), cr: null },
+        { account: 'ذمم ضريبية دائنة', dr: null, cr: Math.abs(net) }
+      ]);
+    } else {
+      setJE('V_je', [
+        { account: 'ذمم ضريبية مدينة', dr: Math.abs(net), cr: null },
+        { account: 'ضريبة المشتريات', dr: null, cr: Math.abs(net) }
+      ]);
+    }
+  }
+
+  function calcLoan() {
+    const P = parseFloat($('L_principal').value) || 0;
+    const annual = parseFloat($('L_rate').value) || 0;
+    const years = parseFloat($('L_years').value) || 0;
+    const freq = parseInt($('L_freq').value) || 12;
+    const r = annual / 100 / freq;
+    const n = years * freq;
+    if (P <= 0 || n <= 0) { toast('بيانات غير صحيحة'); return; }
+    let pmt;
+    if (r === 0) pmt = P / n;
+    else pmt = P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+    const total = pmt * n;
+    const interest = total - P;
+    $('L_pmt').textContent = fmt(pmt);
+    $('L_total').textContent = fmt(total);
+    $('L_interest').textContent = fmt(interest);
+    $('L_n').textContent = n;
+    const tbody = $('L_table').querySelector('tbody');
+    let bal = P; let rows = '';
+    const limit = Math.min(n, 24);
+    for (let i = 1; i <= limit; i++) {
+      const intPart = bal * r;
+      const prinPart = pmt - intPart;
+      bal -= prinPart;
+      if (bal < 0) bal = 0;
+      rows += `<tr><td>${i}</td><td>${fmt(pmt)}</td><td>${fmt(intPart)}</td><td>${fmt(prinPart)}</td><td>${fmt(bal)}</td></tr>`;
+    }
+    if (n > 24) rows += `<tr><td colspan="5" style="color:var(--muted)">... ${n - 24} دفعة متبقية</td></tr>`;
+    tbody.innerHTML = rows;
+  }
+
+  function calcInterest() {
+    const mode = $('I_mode').value;
+    const pv = parseFloat($('I_pv').value) || 0;
+    const annual = parseFloat($('I_rate').value) || 0;
+    const years = parseFloat($('I_years').value) || 0;
+    const comp = parseInt($('I_comp').value) || 1;
+    const pmt = parseFloat($('I_pmt').value) || 0;
+    const r = annual / 100 / comp;
+    const n = years * comp;
+    let res, gain;
+    if (mode === 'fv') {
+      const growth = Math.pow(1 + r, n);
+      res = pv * growth;
+      if (pmt !== 0 && r !== 0) res += pmt * ((growth - 1) / r);
+      else if (pmt !== 0) res += pmt * n;
+      gain = res - pv - (pmt * n);
+      $('I_resTitle').textContent = 'القيمة المستقبلية (FV)';
+    } else {
+      const growth = Math.pow(1 + r, n);
+      res = pv / growth;
+      gain = pv - res;
+      $('I_resTitle').textContent = 'القيمة الحالية (PV)';
+    }
+    $('I_res').textContent = fmt(res);
+    $('I_gain').textContent = fmt(gain);
+    const rule = annual > 0 ? (72 / annual).toFixed(2) : '—';
+    $('I_rule72').textContent = rule === '—' ? '—' : rule + ' سنة';
+  }
+
+  function calcDepr() {
+    const cost = parseFloat($('D_cost').value) || 0;
+    const salvage = parseFloat($('D_salvage').value) || 0;
+    const life = parseInt($('D_life').value) || 1;
+    const method = $('D_method').value;
+    const depreciable = cost - salvage;
+    let schedule = [];
+    if (method === 'sl') {
+      const annual = depreciable / life;
+      let book = cost;
+      for (let y = 1; y <= life; y++) { book -= annual; schedule.push({ y, dep: annual, book: Math.max(book, salvage) }); }
+    } else if (method === 'ddb') {
+      const rate = 2 / life;
+      let book = cost;
+      for (let y = 1; y <= life; y++) {
+        let dep = book * rate;
+        if (book - dep < salvage) dep = book - salvage;
+        if (dep < 0) dep = 0;
+        book -= dep;
+        schedule.push({ y, dep, book: Math.max(book, salvage) });
+      }
+    } else if (method === 'syd') {
+      const sumYears = life * (life + 1) / 2;
+      let book = cost;
+      for (let y = 1; y <= life; y++) {
+        const remaining = life - y + 1;
+        const dep = depreciable * (remaining / sumYears);
+        book -= dep;
+        schedule.push({ y, dep, book: Math.max(book, salvage) });
+      }
+    }
+    const total = schedule.reduce((a, b) => a + b.dep, 0);
+    const annual = schedule[0]?.dep || 0;
+    const monthly = annual / 12;
+    $('D_first').textContent = fmt(annual);
+    $('D_monthly').textContent = fmt(monthly);
+    $('D_total').textContent = fmt(total);
+    setJE('D_je', [
+      { account: 'مصروف إهلاك الأصول', dr: monthly, cr: null },
+      { account: 'مجمع إهلاك الأصول', dr: null, cr: monthly }
+    ]);
+    const tbody = $('D_table').querySelector('tbody');
+    tbody.innerHTML = schedule.map(s => `<tr><td>${s.y}</td><td>${fmt(s.dep)}</td><td>${fmt(s.book)}</td></tr>`).join('');
+  }
+
+  function calcBE() {
+    const fixed = parseFloat($('B_fixed').value) || 0;
+    const vcost = parseFloat($('B_var').value) || 0;
+    const price = parseFloat($('B_price').value) || 0;
+    const target = parseFloat($('B_target').value) || 0;
+    const cm = price - vcost;
+    if (cm <= 0) { toast('سعر البيع يجب أن يتجاوز التكلفة المتغيرة'); return; }
+    const units = fixed / cm;
+    const revenue = units * price;
+    const cmRatio = (cm / price) * 100;
+    $('B_units').textContent = fmt(units);
+    $('B_revenue').textContent = fmt(revenue);
+    $('B_cm').textContent = fmt(cm);
+    $('B_cmRatio').textContent = fmt(cmRatio) + '%';
+    if (target > 0) {
+      const tu = (fixed + target) / cm;
+      $('B_targetUnits').textContent = fmt(tu);
+      $('B_targetCard').style.display = 'block';
+    } else {
+      $('B_targetCard').style.display = 'none';
+    }
+  }
+
+  function calcNPV() {
+    const inv = parseFloat($('N_inv').value) || 0;
+    const rate = (parseFloat($('N_rate').value) || 0) / 100;
+    const cfs = $('N_cf').value.split(',').map(s => parseFloat(s.trim())).filter(x => !isNaN(x));
+    let npv = -inv;
+    for (let i = 0; i < cfs.length; i++) npv += cfs[i] / Math.pow(1 + rate, i + 1);
+    let pvInflows = 0;
+    for (let i = 0; i < cfs.length; i++) pvInflows += cfs[i] / Math.pow(1 + rate, i + 1);
+    const pi = inv > 0 ? pvInflows / inv : 0;
+    let cum = -inv, payback = null;
+    for (let i = 0; i < cfs.length; i++) {
+      cum += cfs[i];
+      if (cum >= 0 && payback === null) {
+        const prev = cum - cfs[i];
+        payback = (i + (-prev / cfs[i]));
+      }
+    }
+    function npvAt(r) {
+      let v = -inv;
+      for (let i = 0; i < cfs.length; i++) v += cfs[i] / Math.pow(1 + r, i + 1);
+      return v;
+    }
+    let lo = -0.99, hi = 10, irr = NaN;
+    if (npvAt(lo) * npvAt(hi) < 0) {
+      for (let iter = 0; iter < 100; iter++) {
+        const mid = (lo + hi) / 2;
+        if (npvAt(mid) > 0) lo = mid; else hi = mid;
+      }
+      irr = (lo + hi) / 2;
+    }
+    $('N_npv').textContent = fmt(npv);
+    $('N_irr').textContent = isNaN(irr) ? '—' : fmt(irr * 100) + '%';
+    $('N_payback').textContent = payback === null ? 'لا استرداد' : fmt(payback) + ' سنة';
+    $('N_pi').textContent = fmt(pi);
+  }
+
+  function calcRatios() {
+    const ca = parseFloat($('R_ca').value) || 0;
+    const inv = parseFloat($('R_inv').value) || 0;
+    const cl = parseFloat($('R_cl').value) || 0;
+    const ta = parseFloat($('R_ta').value) || 0;
+    const tl = parseFloat($('R_tl').value) || 0;
+    const eq = parseFloat($('R_eq').value) || 0;
+    const rev = parseFloat($('R_rev').value) || 0;
+    const ni = parseFloat($('R_ni').value) || 0;
+    const cogs = parseFloat($('R_cogs').value) || 0;
+    const ar = parseFloat($('R_ar').value) || 0;
+    const ap = parseFloat($('R_ap').value) || 0;
+    const rows = [];
+    const add = (name, val, suffix = '') => rows.push(`<tr><td>${name}</td><td>${fmt(val)}${suffix}</td></tr>`);
+    add('السيولة (Current Ratio)', cl > 0 ? ca / cl : 0);
+    add('السيولة السريعة (Quick)', cl > 0 ? (ca - inv) / cl : 0);
+    add('المديونية (D/E)', eq > 0 ? tl / eq : 0);
+    add('ROA (العائد على الأصول) %', ta > 0 ? (ni / ta) * 100 : 0, '%');
+    add('ROE (العائد على الملكية) %', eq > 0 ? (ni / eq) * 100 : 0, '%');
+    add('هامش إجمالي %', rev > 0 ? ((rev - cogs) / rev) * 100 : 0, '%');
+    add('هامش صافي %', rev > 0 ? (ni / rev) * 100 : 0, '%');
+    add('دوران الأصول', ta > 0 ? rev / ta : 0);
+    add('DSO (أيام تحصيل)', rev > 0 ? (ar / rev) * 365 : 0, ' يوم');
+    add('DPO (أيام دفع)', cogs > 0 ? (ap / cogs) * 365 : 0, ' يوم');
+    $('R_table').querySelector('tbody').innerHTML = rows.join('');
+  }
+
+  function calcAging() {
+    const buckets = [parseFloat($('A_b0').value)||0, parseFloat($('A_b1').value)||0, parseFloat($('A_b2').value)||0, parseFloat($('A_b3').value)||0, parseFloat($('A_b4').value)||0];
+    const rates = [parseFloat($('A_r0').value)||0, parseFloat($('A_r1').value)||0, parseFloat($('A_r2').value)||0, parseFloat($('A_r3').value)||0, parseFloat($('A_r4').value)||0];
+    const total = buckets.reduce((a,b)=>a+b,0);
+    let prov = 0;
+    for (let i = 0; i < 5; i++) prov += buckets[i] * rates[i] / 100;
+    const overdue90 = buckets[3] + buckets[4];
+    const defaultRatio = total > 0 ? (overdue90 / total) * 100 : 0;
+    const net = total - prov;
+    $('A_total').textContent = fmt(total);
+    $('A_prov').textContent = fmt(prov);
+    $('A_default').textContent = fmt(defaultRatio) + '%';
+    $('A_net').textContent = fmt(net);
+    setJE('A_je', [
+      { account: 'مصروف مخصص الديون مشكوك في تحصيلها', dr: prov, cr: null },
+      { account: 'مخصص الديون المشكوك في تحصيلها', dr: null, cr: prov }
+    ]);
+  }
+
+  function calcFxRev() {
+    const amt = parseFloat($('FxR_amt').value) || 0;
+    const oldR = parseFloat($('FxR_old').value) || 0;
+    const newR = parseFloat($('FxR_new').value) || 0;
+    const oldVal = amt * oldR;
+    const newVal = amt * newR;
+    const gain = newVal - oldVal;
+    $('FxR_oldVal').textContent = fmt(oldVal);
+    $('FxR_newVal').textContent = fmt(newVal);
+    $('FxR_gain').textContent = fmt(gain);
+    const isGain = gain >= 0;
+    const ccy = $('FxR_ccy').value;
+    if (isGain) {
+      setJE('FxR_je', [
+        { account: ccy + ' (حساب)', dr: Math.abs(gain), cr: null },
+        { account: 'أرباح فروق تقييم عملات', dr: null, cr: Math.abs(gain) }
+      ]);
+    } else {
+      setJE('FxR_je', [
+        { account: 'خسائر فروق تقييم عملات', dr: Math.abs(gain), cr: null },
+        { account: ccy + ' (حساب)', dr: null, cr: Math.abs(gain) }
+      ]);
+    }
+  }
+
+  function calcInv() {
+    const q0 = parseFloat($('Iv_q0').value) || 0;
+    const c0 = parseFloat($('Iv_c0').value) || 0;
+    const q1 = parseFloat($('Iv_q1').value) || 0;
+    const c1 = parseFloat($('Iv_c1').value) || 0;
+    const q2 = parseFloat($('Iv_q2').value) || 0;
+    const c2 = parseFloat($('Iv_c2').value) || 0;
+    const sold = parseFloat($('Iv_sold').value) || 0;
+    const layers = [];
+    if (q0 > 0) layers.push({ cost: c0, qty: q0 });
+    if (q1 > 0) layers.push({ cost: c1, qty: q1 });
+    if (q2 > 0) layers.push({ cost: c2, qty: q2 });
+    const totalQty = layers.reduce((a, b) => a + b.qty, 0);
+    const totalCost = layers.reduce((a, b) => a + b.qty * b.cost, 0);
+    let rem = sold, cogsFIFO = 0;
+    const fifoLayers = layers.map(l => ({ ...l }));
+    for (const l of fifoLayers) {
+      const take = Math.min(l.qty, rem);
+      cogsFIFO += take * l.cost;
+      l.qty -= take;
+      rem -= take;
+      if (rem <= 0) break;
+    }
+    const endFIFO = fifoLayers.reduce((a, b) => a + b.qty * b.cost, 0);
+    rem = sold; let cogsLIFO = 0;
+    const lifoLayers = layers.map(l => ({ ...l })).reverse();
+    for (const l of lifoLayers) {
+      const take = Math.min(l.qty, rem);
+      cogsLIFO += take * l.cost;
+      l.qty -= take;
+      rem -= take;
+      if (rem <= 0) break;
+    }
+    const endLIFO = lifoLayers.reduce((a, b) => a + b.qty * b.cost, 0);
+    const wac = totalQty > 0 ? totalCost / totalQty : 0;
+    const cogsWAC = sold * wac;
+    const endWAC = (totalQty - sold) * wac;
+    const tbody = $('Iv_table').querySelector('tbody');
+    tbody.innerHTML = `
+      <tr><td>FIFO</td><td>${fmt(cogsFIFO)}</td><td>${fmt(endFIFO)}</td></tr>
+      <tr><td>LIFO</td><td>${fmt(cogsLIFO)}</td><td>${fmt(endLIFO)}</td></tr>
+      <tr><td>WAC</td><td>${fmt(cogsWAC)}</td><td>${fmt(endWAC)}</td></tr>`;
+  }
+
+  // ---- init ----
+  setTaxRate(15);
+  renderHistory();
+  updateDisplay();
+  // auto-calc all tools on load
+  ['calcDiscount','calcFx','calcProfit','calcVAT','calcLoan','calcInterest','calcDepr','calcBE','calcNPV','calcRatios','calcAging','calcFxRev','calcInv'].forEach(f => { try { window[f](); } catch(e){} });
+</script>
+</body>
+</html>
