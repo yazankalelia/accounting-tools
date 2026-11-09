@@ -189,6 +189,53 @@
   .calc-history .hr { font-weight: 700; direction: ltr; }
   .calc-history .empty { padding: 12px; text-align: center; color: var(--muted); font-size: 12px; }
 
+  /* Feedback */
+  .fb-fab { position: fixed; left: 20px; bottom: 20px; z-index: 90;
+    display: inline-flex; align-items: center; gap: 8px;
+    min-height: 44px; padding: 0 16px; border-radius: 999px;
+    background: var(--accent); color: #fff; border: 1px solid rgba(255,255,255,0.14);
+    font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.4); transition: background .15s; }
+  .fb-fab:hover { background: #2f5fd0; }
+  .fb-fab .ico { font-size: 16px; line-height: 1; }
+  .fb-panel { position: fixed; left: 20px; bottom: 76px; z-index: 91;
+    width: 340px; max-width: calc(100vw - 40px);
+    background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--radius);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.55); padding: 16px;
+    display: none; flex-direction: column; gap: 12px; }
+  .fb-panel.open { display: flex; }
+  .fb-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .fb-title { font-size: 14px; font-weight: 800; color: var(--text); }
+  .fb-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .fb-close { width: 30px; height: 30px; flex: 0 0 30px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--muted);
+    cursor: pointer; font-size: 13px; display: grid; place-items: center; }
+  .fb-close:hover { color: var(--text); border-color: var(--border-2); }
+  .fb-form { display: flex; flex-direction: column; gap: 12px; }
+  .fb-field { display: flex; flex-direction: column; gap: 6px; }
+  .fb-field label { font-size: 12px; font-weight: 700; color: var(--muted-2); }
+  .fb-field label .req { color: var(--red); }
+  .fb-field input, .fb-field textarea { width: 100%; background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text);
+    padding: 10px 12px; font-family: inherit; font-size: 14px; }
+  .fb-field textarea { resize: vertical; min-height: 96px; max-height: 220px; }
+  .fb-field input:focus, .fb-field textarea:focus { outline: none; border-color: var(--accent); }
+  .fb-field input[aria-invalid="true"], .fb-field textarea[aria-invalid="true"] { border-color: var(--red); }
+  .fb-count { font-size: 10px; color: var(--muted); text-align: left; direction: ltr; }
+  .fb-hp { position: absolute !important; left: -9999px !important; width: 1px !important;
+    height: 1px !important; opacity: 0; pointer-events: none; }
+  .fb-status { font-size: 11px; color: var(--muted); }
+  .fb-status.err { color: var(--red); }
+  .fb-status.ok { color: var(--green); }
+  .fb-send { min-height: 42px; border-radius: var(--radius-sm); border: 1px solid transparent;
+    background: var(--accent); color: #fff; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+  .fb-send:hover { background: #2f5fd0; }
+  .fb-send:disabled { opacity: .6; cursor: wait; }
+  @media (max-width: 520px) {
+    .fb-panel { left: 12px; right: 12px; width: auto; max-width: none; bottom: 68px; }
+    .fb-fab { left: 12px; bottom: 12px; }
+  }
+
   /* Toast */
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
     background: var(--surface); color: var(--text); padding: 10px 18px; border-radius: var(--radius-sm);
@@ -698,6 +745,33 @@
       </section>
     </main>
   </div>
+
+  <div class="fb-panel" id="fbPanel" role="dialog" aria-labelledby="fbTitle" aria-hidden="true">
+    <div class="fb-head">
+      <div>
+        <div class="fb-title" id="fbTitle">أرسل ملاحظتك</div>
+        <div class="fb-sub">تصل ملاحظتك إلى مالك الموقع</div>
+      </div>
+      <button class="fb-close" id="fbClose" type="button" aria-label="إغلاق صندوق الملاحظات">✕</button>
+    </div>
+    <form class="fb-form" id="fbForm" novalidate>
+      <div class="fb-field">
+        <label for="fbName">الاسم <span class="req">*</span></label>
+        <input id="fbName" name="name" type="text" maxlength="60" required autocomplete="name" placeholder="اكتب اسمك" />
+      </div>
+      <div class="fb-field">
+        <label for="fbMsg">الملاحظة <span class="req">*</span></label>
+        <textarea id="fbMsg" name="message" maxlength="1000" required rows="4" placeholder="اكتب ملاحظتك أو اقتراحك..."></textarea>
+        <div class="fb-count"><span id="fbCount">0</span>/1000</div>
+      </div>
+      <input class="fb-hp" id="fbHp" type="checkbox" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <div class="fb-status" id="fbStatus" role="status" aria-live="polite"></div>
+      <button class="fb-send" id="fbSend" type="submit">إرسال الملاحظة</button>
+    </form>
+  </div>
+  <button class="fb-fab" id="fbFab" type="button" aria-expanded="false" aria-controls="fbPanel" aria-label="فتح صندوق الملاحظات">
+    <span class="ico" aria-hidden="true">💬</span><span>ملاحظة</span>
+  </button>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1306,6 +1380,92 @@
       <tr><td>LIFO</td><td>${fmt(cogsLIFO)}</td><td>${fmt(endLIFO)}</td></tr>
       <tr><td>WAC</td><td>${fmt(cogsWAC)}</td><td>${fmt(endWAC)}</td></tr>`;
   }
+
+  // ---- feedback ----
+  const FB_CONFIG = {
+    formAction: 'https://docs.google.com/forms/d/e/1FAIpQLSc7k7syL8D9ZBvhQ9_sgulbMDbo-w1opK-ws3hZSzTH8zWvCg/formResponse',
+    nameEntry: 'entry.1357012636',
+    messageEntry: 'entry.693388470'
+  };
+  (function initFeedback() {
+    const fab = $('fbFab'), panel = $('fbPanel'), closeBtn = $('fbClose'), form = $('fbForm');
+    if (!fab || !panel || !form) return;
+    const nameEl = $('fbName'), msgEl = $('fbMsg'), countEl = $('fbCount');
+    const statusEl = $('fbStatus'), sendBtn = $('fbSend'), hp = $('fbHp');
+
+    function setOpen(open) {
+      panel.classList.toggle('open', open);
+      panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+      fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) setTimeout(() => nameEl.focus(), 40);
+    }
+    function setStatus(text, kind) {
+      statusEl.textContent = text;
+      statusEl.className = 'fb-status' + (kind ? ' ' + kind : '');
+    }
+
+    fab.addEventListener('click', () => setOpen(!panel.classList.contains('open')));
+    closeBtn.addEventListener('click', () => setOpen(false));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && panel.classList.contains('open')) setOpen(false);
+    });
+    document.addEventListener('click', (e) => {
+      if (!panel.classList.contains('open')) return;
+      if (panel.contains(e.target) || fab.contains(e.target)) return;
+      setOpen(false);
+    });
+
+    try { const saved = localStorage.getItem('fbName'); if (saved) nameEl.value = saved; } catch (e) {}
+    msgEl.addEventListener('input', () => { countEl.textContent = String(msgEl.value.length); });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (hp.checked) return;
+      const name = nameEl.value.trim();
+      const message = msgEl.value.trim();
+      const nameBad = name.length < 2;
+      const msgBad = message.length < 5;
+      nameEl.setAttribute('aria-invalid', nameBad ? 'true' : 'false');
+      msgEl.setAttribute('aria-invalid', msgBad ? 'true' : 'false');
+      if (nameBad) { setStatus('يرجى كتابة الاسم (حرفان على الأقل).', 'err'); nameEl.focus(); return; }
+      if (msgBad) { setStatus('يرجى كتابة الملاحظة (5 أحرف على الأقل).', 'err'); msgEl.focus(); return; }
+
+      try {
+        const last = parseInt(localStorage.getItem('fbLast') || '0', 10);
+        if (Date.now() - last < 45000) {
+          setStatus('أرسلت ملاحظة حديثاً، انتظر قليلاً قبل إرسال أخرى.', 'err');
+          return;
+        }
+      } catch (e) {}
+
+      if (!FB_CONFIG.formAction || !FB_CONFIG.nameEntry || !FB_CONFIG.messageEntry) {
+        setStatus('خدمة الإرسال غير مفعّلة بعد. تواصل مع مالك الموقع.', 'err');
+        return;
+      }
+
+      sendBtn.disabled = true;
+      setStatus('جاري الإرسال...');
+      const body = new URLSearchParams();
+      body.set(FB_CONFIG.nameEntry, name);
+      body.set(FB_CONFIG.messageEntry,
+        'الاسم: ' + name + '\n\nالملاحظة:\n' + message +
+        '\n\n---\nالصفحة: ' + location.href +
+        '\nالتاريخ: ' + new Date().toLocaleString('ar-EG'));
+      try {
+        await fetch(FB_CONFIG.formAction, { method: 'POST', mode: 'no-cors', body: body });
+        try { localStorage.setItem('fbName', name); localStorage.setItem('fbLast', String(Date.now())); } catch (e) {}
+        form.reset();
+        countEl.textContent = '0';
+        setStatus('تم إرسال ملاحظتك بنجاح، شكراً لك!', 'ok');
+        toast('تم إرسال الملاحظة ✅');
+        setTimeout(() => { setOpen(false); setStatus(''); }, 1500);
+      } catch (err) {
+        setStatus('تعذر الإرسال. تحقق من الاتصال وحاول مرة أخرى.', 'err');
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+  })();
 
   // ---- init ----
   setTaxRate(15);
