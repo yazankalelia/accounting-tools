@@ -1,9 +1,24 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" style="color-scheme: dark;">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#0a0e1a" />
+<script>
+  (function () {
+    try {
+      var m = localStorage.getItem('sc:theme') || 'dark';
+      if (m !== 'dark' && m !== 'light' && m !== 'auto') m = 'dark';
+      var light = m === 'light' ||
+        (m === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches);
+      var r = document.documentElement;
+      r.setAttribute('data-theme', light ? 'light' : 'dark');
+      r.style.colorScheme = light ? 'light' : 'dark';
+      var t = document.querySelector('meta[name="theme-color"]');
+      if (t) t.setAttribute('content', light ? '#f2f5fb' : '#0a0e1a');
+    } catch (e) {}
+  })();
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B1220'/%3E%3Crect x='7' y='7' width='6' height='18' rx='2' fill='%23E8B04B'/%3E%3Crect x='19' y='7' width='6' height='11' rx='2' fill='%237EA6FF'/%3E%3C/svg%3E" />
 <title>مجموعة أدوات محاسبية متقدمة</title>
 <style>
@@ -54,7 +69,7 @@
     cursor: pointer; color: var(--text); font-size: 13px; font-weight: 500; transition: background .15s, color .15s;
     border: 1px solid transparent; }
   .nav-item:hover { background: var(--surface-2); }
-  .nav-item.active { background: var(--surface-2); border-color: rgba(79,140,255,0.35); color: #fff; position: relative; }
+  .nav-item.active { background: var(--surface-2); border-color: rgba(79,140,255,0.35); color: var(--active-ink, #fff); position: relative; }
   .nav-item.active::after { content: ""; position: absolute; inset-block: 6px; inset-inline-end: 0; width: 2px;
     border-radius: 0; background: var(--accent-2); }
   .nav-item .ico { font-size: 16px; width: 20px; text-align: center;
@@ -106,8 +121,8 @@
   .btn:hover { filter: brightness(1.1); }
   .btn:active { filter: brightness(0.95); }
   .btn.secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
-  .btn.danger { background: var(--red); }
-  .btn.green { background: var(--green); color: #0a0e1a; }
+  .btn.danger { background: var(--red); color: var(--danger-ink, #fff); }
+  .btn.green { background: var(--green); color: var(--green-ink, #0a0e1a); }
   .btn.sm { padding: 6px 12px; font-size: 12px; }
   .btn:disabled, .ck:disabled, .fb-send:disabled { opacity: .55; cursor: not-allowed; }
   .btn.copy { background: rgba(61,220,151,0.15); color: var(--green); border: 1px solid rgba(61,220,151,0.3); }
@@ -339,6 +354,7 @@
       transition: transform .3s cubic-bezier(.2,.8,.2,1), visibility .3s; }
     .sidebar.open { transform: translateY(0); visibility: visible; }
     .sidebar::-webkit-scrollbar { width: 4px; }
+    .side-bottom { bottom: env(safe-area-inset-bottom, 0px); }
     .brand { display: none; }
     .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px;
       padding: 0 2px 12px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
@@ -438,8 +454,46 @@
     --total: #E8B04B;
     --amber: var(--total);
     --accent-ink: #7EA6FF;
+    --danger-ink: #24070e;
     --radius: 10px;
     --radius-sm: 4px;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #f2f5fb;
+    --bg-2: #e9eff9;
+    --surface: #ffffff;
+    --surface-2: #f4f7fd;
+    --border: #d5ddea;
+    --border-2: #aeb9ce;
+    --text: #16213a;
+    --muted: #55627e;
+    --muted-2: #414d66;
+    --total: #8a5a00;
+    --amber: #8a5a00;
+    --accent-ink: #1c4fd8;
+    --green: #0a6b41;
+    --red: #bf1f3d;
+    --accent: #3b6fe8;
+    --accent-2: #2f5fd0;
+    --accent-hover: #2a56c4;
+    --active-ink: #0b2a6b;
+    --green-ink: #ffffff;
+    --danger-ink: #ffffff;
+    --shadow: 0 8px 24px rgba(22,33,58,.14);
+  }
+  :root[data-theme="light"] body {
+    background: radial-gradient(1200px 600px at 80% -10%, rgba(59,111,232,0.10), transparent 60%),
+                radial-gradient(900px 500px at -10% 110%, rgba(124,92,255,0.07), transparent 60%), var(--bg);
+  }
+  :root[data-theme="light"] .nav-item.active { color: var(--active-ink); }
+  :root[data-theme="light"] .btn.green { color: var(--green-ink); }
+  :root[data-theme="light"] .ck.eq { color: #fff; }
+  :root[data-theme="light"] .data-table tbody tr:hover { background: rgba(22,33,58,0.04); }
+  :root[data-theme="light"] .coa-backdrop { background: rgba(22,33,58,0.38); }
+  :root[data-theme="light"] .tax-popover { box-shadow: 0 18px 50px rgba(22,33,58,.18); }
+  @media (max-width: 768px) {
+    :root[data-theme="light"] .sidebar { box-shadow: 0 -18px 50px rgba(22,33,58,.18); }
   }
   html, body { background: var(--bg); }
   body { background-image: none; }
@@ -469,8 +523,10 @@
   .fx-row.active { background: var(--surface-2); }
 
   /* الحفظ المحلي — تذييل القائمة */
-  .side-foot { margin-top: auto; display: flex; align-items: center; gap: 8px;
-    padding: 12px 8px 6px; border-top: 1px solid var(--border); color: var(--muted);
+  .side-bottom { margin-top: auto; position: sticky; bottom: 0; z-index: 2;
+    background: var(--surface); border-top: 1px solid var(--border); }
+  .side-foot { display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; color: var(--muted);
     font-size: 11px; line-height: 1.4; }
   .side-foot .sf-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green);
     flex: 0 0 auto; transition: background .2s; }
@@ -481,6 +537,39 @@
   .side-foot .sf-clear { border: 0; background: transparent; color: var(--muted); font: inherit;
     font-size: 11px; padding: 2px 4px; cursor: pointer; border-radius: var(--radius-sm); }
   .side-foot .sf-clear:hover { color: var(--red); background: var(--surface-2); }
+
+  /* ===== الوصولية والمظهر ودليل الأدوات (المرحلة 8) ===== */
+  .skip-link { position: fixed; top: -80px; inset-inline-start: 12px; z-index: 200;
+    background: var(--accent); color: #fff; padding: 10px 16px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 800; text-decoration: none; transition: top .15s; }
+  .skip-link:focus { top: 12px; }
+  .main:focus, .page-header h1:focus { outline: none; }
+  .theme-row { display: flex; align-items: center; gap: 8px;
+    padding: 8px 8px 2px; }
+  .theme-row .theme-lbl { font-size: 11px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .theme-seg { display: flex; flex: 1; gap: 2px; background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: 999px; padding: 2px; }
+  .theme-btn { flex: 1; border: 0; background: transparent; color: var(--muted); font: inherit;
+    font-size: 11px; font-weight: 700; padding: 6px 4px; border-radius: 999px; cursor: pointer; min-height: 32px; }
+  .theme-btn[aria-pressed="true"] { background: var(--surface); color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  :root[data-theme="light"] .theme-btn[aria-pressed="true"] { box-shadow: 0 1px 3px rgba(22,33,58,.18); }
+  .page-header { position: relative; padding-inline-end: 48px; }
+  .help-btn { position: absolute; inset-inline-end: 0; top: 0; width: 36px; height: 36px;
+    display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--border-2);
+    background: var(--surface-2); color: var(--muted); font: inherit; font-size: 17px;
+    font-weight: 800; line-height: 1; cursor: pointer; }
+  .help-btn:hover, .help-btn:focus-visible { color: var(--text); border-color: var(--accent); }
+  .help-modal { max-width: 620px; }
+  .help-body h3 { font-size: 13px; font-weight: 800; color: var(--text); margin: 14px 0 6px; }
+  .help-body h3:first-child { margin-top: 0; }
+  .help-body p, .help-body li { font-size: 13px; line-height: 1.75; color: var(--muted-2); }
+  .help-body ul { padding-inline-start: 20px; margin: 4px 0; }
+  .help-body li::marker { color: var(--accent-ink); }
+  .help-tip { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 8px 12px; margin-top: 12px; }
+  .help-tip p { margin: 0; }
+
   /* ===== محرك القيود ===== */
   .je-code { display: block; font-size: 11px; color: var(--muted); font-weight: 600;
     direction: ltr; text-align: right; letter-spacing: .3px; margin-top: 2px; }
@@ -693,7 +782,12 @@
     #printRoot .data-table-wrap { overflow: visible; max-height: none !important; }
     #printRoot .tape-list { max-height: none !important; overflow: visible !important; }
     #printRoot table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
-    #printRoot th, #printRoot td { border: 1px solid #999; padding: 4px 6px; text-align: right; color: #000 !important; }
+    #printRoot { direction: rtl; }
+    #printRoot th, #printRoot td { border: 1px solid #999; padding: 4px 6px; text-align: right;
+      color: #000 !important; direction: rtl; unicode-bidi: plaintext; }
+    #printRoot th:first-child, #printRoot td:first-child { text-align: right; }
+    #printRoot .num { direction: ltr; text-align: center; unicode-bidi: isolate; }
+    #printRoot [dir="ltr"] { direction: ltr; text-align: left; unicode-bidi: isolate; }
     #printRoot thead { display: table-header-group; }
     #printRoot tr { break-inside: avoid; }
     #printRoot .je, #printRoot .tape-item, #printRoot .je-log, #printRoot .je-row { break-inside: avoid; }
@@ -708,6 +802,7 @@
 </style>
 </head>
 <body>
+  <a class="skip-link" href="#mainContent">تخطَّ إلى المحتوى</a>
   <div class="layout">
     <header class="mobile-bar">
       <div class="mb-brand">
@@ -742,7 +837,7 @@
 
       <div class="group">
         <div class="group-title">الأدوات اليومية</div>
-        <div class="nav-item active" data-page="calc"><span class="ico" aria-hidden="true">▣</span><span class="lbl">حاسبة</span></div>
+        <div class="nav-item active" data-page="calc" aria-current="page"><span class="ico" aria-hidden="true">▣</span><span class="lbl">حاسبة</span></div>
         <div class="nav-item" data-page="disc"><span class="ico" aria-hidden="true">⇄</span><span class="lbl">خصومات/عملات</span></div>
         <div class="nav-item" data-page="fx"><span class="ico" aria-hidden="true">¤</span><span class="lbl">أسعار العملات</span></div>
         <div class="nav-item" data-page="profit"><span class="ico" aria-hidden="true">%</span><span class="lbl">ربح/هامش</span></div>
@@ -771,16 +866,26 @@
         <div class="group-title">السجل والتدقيق</div>
         <div class="nav-item" data-page="tape"><span class="ico" aria-hidden="true">▦</span><span class="lbl">السجل والقيود</span></div>
       </div>
-      <div class="side-foot" id="sideFoot" title="الحفظ التلقائي">
-        <span class="sf-dot" aria-hidden="true"></span>
-        <span class="sf-text" id="saveState">محفوظ محلياً</span>
-        <button class="sf-keys" id="keysOpen" type="button" title="اختصارات لوحة المفاتيح (?)" aria-haspopup="dialog">⌨</button>
-        <button class="sf-clear" id="coaOpen" type="button" title="دليل الحسابات">دليل</button>
-        <button class="sf-clear" id="clearStore" type="button" title="مسح البيانات المحفوظة">مسح</button>
+      <div class="side-bottom">
+        <div class="theme-row" role="group" aria-label="مظهر الواجهة">
+          <span class="theme-lbl">المظهر</span>
+          <div class="theme-seg">
+            <button class="theme-btn" type="button" data-theme-set="dark" aria-pressed="true">داكن</button>
+            <button class="theme-btn" type="button" data-theme-set="light" aria-pressed="false">فاتح</button>
+            <button class="theme-btn" type="button" data-theme-set="auto" aria-pressed="false">تلقائي</button>
+          </div>
+        </div>
+        <div class="side-foot" id="sideFoot" title="الحفظ التلقائي">
+          <span class="sf-dot" aria-hidden="true"></span>
+          <span class="sf-text" id="saveState">محفوظ محلياً</span>
+          <button class="sf-keys" id="keysOpen" type="button" title="اختصارات لوحة المفاتيح (?)" aria-haspopup="dialog">⌨</button>
+          <button class="sf-clear" id="coaOpen" type="button" title="دليل الحسابات">دليل</button>
+          <button class="sf-clear" id="clearStore" type="button" title="مسح البيانات المحفوظة">مسح</button>
+        </div>
       </div>
     </aside>
 
-    <main class="main">
+    <main class="main" id="mainContent" tabindex="-1" aria-label="محتوى الأداة">
       <!-- ============ CALC ============ -->
       <section class="page active" id="page-calc">
         <div class="page-header">
@@ -1492,6 +1597,19 @@
     </div>
   </div>
 
+  <div class="coa-backdrop" id="helpBackdrop"></div>
+  <div class="coa-modal keys-modal help-modal" id="helpBox" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="coa-head">
+      <div class="coa-title" id="helpTitle">دليل الأداة</div>
+      <button class="coa-x" id="helpClose" type="button" aria-label="إغلاق الدليل">✕</button>
+    </div>
+    <div class="coa-body help-body" id="helpBody"></div>
+    <div class="coa-foot">
+      <span class="coa-hint">افتح الدليل في أي أداة بالضغط على <kbd>Alt</kbd>+<kbd>H</kbd> أو زر <b>؟</b></span>
+      <button class="btn sm" id="helpDone" type="button">تم</button>
+    </div>
+  </div>
+
   <div class="coa-backdrop" id="repBackdrop"></div>
   <div class="coa-modal keys-modal" id="repBox" role="dialog" aria-modal="true" aria-labelledby="repTitle">
     <div class="coa-head">
@@ -1533,7 +1651,7 @@
     <div class="print-foot">أُعدّ بواسطة أدوات محاسبية · Pro Suite — <span id="phFoot"></span></div>
   </div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
   const $ = (id) => document.getElementById(id);
@@ -1561,8 +1679,20 @@
     }
   }
 
+  function focusPageHeading(page) {
+    const h = document.querySelector('#page-' + page + ' .page-header h1');
+    if (!h) return;
+    if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1');
+    try { h.focus({ preventScroll: true }); } catch (e) { try { h.focus(); } catch (err) {} }
+  }
+
   function goTo(page) {
-    navItems.forEach(x => x.classList.toggle('active', x.dataset.page === page));
+    navItems.forEach(x => {
+      const on = x.dataset.page === page;
+      x.classList.toggle('active', on);
+      if (on) x.setAttribute('aria-current', 'page');
+      else x.removeAttribute('aria-current');
+    });
     document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + page));
     const cur = navItems.find(x => x.dataset.page === page);
     if (mbCurrent && cur) {
@@ -1581,8 +1711,20 @@
     n.setAttribute('role', 'button');
     n.addEventListener('click', () => goTo(n.dataset.page));
     n.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); n.click(); }
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        n.click();
+        focusPageHeading(n.dataset.page);
+      }
     });
+  });
+
+  const skipLink = document.querySelector('.skip-link');
+  if (skipLink) skipLink.addEventListener('click', function (e) {
+    if (!mainEl) return;
+    e.preventDefault();
+    try { mainEl.focus({ preventScroll: true }); } catch (err) { mainEl.focus(); }
+    mainEl.scrollTop = 0;
   });
 
   if (mbMenu) mbMenu.addEventListener('click', () => setNavOpen(!sidebarEl.classList.contains('open')));
@@ -1683,7 +1825,7 @@
   }
 
   function renderJE(el, entry) {
-    let html = '<table class="je-table"><thead><tr><th>الحساب</th><th>مدين (Dr)</th><th>دائن (Cr)</th></tr></thead><tbody>';
+    let html = '<table class="je-table"><thead><tr><th scope="col">الحساب</th><th scope="col">مدين (Dr)</th><th scope="col">دائن (Cr)</th></tr></thead><tbody>';
     if (!entry.lines.length) {
       html += '<tr><td class="acct" colspan="3" style="color:var(--muted);text-align:center;">لا توجد مبالغ</td></tr>';
     }
@@ -1975,7 +2117,7 @@
     return tag === 'input' || tag === 'textarea' || tag === 'select' || el.isContentEditable === true;
   }
   function anyModalOpen() {
-    return ['coaModal', 'revBox', 'copyBox', 'keysBox', 'repBox', 'bkBox'].some(function (id) {
+    return ['coaModal', 'revBox', 'copyBox', 'keysBox', 'repBox', 'bkBox', 'helpBox'].some(function (id) {
       const el = $(id);
       return !!el && el.classList.contains('open');
     });
@@ -1995,6 +2137,263 @@
       copyText(SCJE.format(e, 'erp'), 'نُسخ آخر قيد: ' + e.no);
     }).catch(function () { toast('تعذر النسخ'); });
   }
+
+  // ===== المظهر (المرحلة 8) =====
+  const SCTheme = (function () {
+    const KEY = 'sc:theme';
+    const MODES = ['dark', 'light', 'auto'];
+    const LABELS = { dark: 'داكن', light: 'فاتح', auto: 'تلقائي' };
+    const META = { dark: '#0a0e1a', light: '#f2f5fb' };
+    const mq = window.matchMedia ? matchMedia('(prefers-color-scheme: light)') : null;
+    let mode = 'dark';
+
+    function normalize(m) { return MODES.indexOf(m) >= 0 ? m : 'dark'; }
+    function resolved(m) {
+      m = normalize(m);
+      if (m === 'auto') return mq && mq.matches ? 'light' : 'dark';
+      return m;
+    }
+    function paint() {
+      const d = resolved(mode);
+      const r = document.documentElement;
+      r.setAttribute('data-theme', d);
+      r.style.colorScheme = d;
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', META[d]);
+      Array.prototype.forEach.call(document.querySelectorAll('[data-theme-set]'), function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-theme-set') === mode ? 'true' : 'false');
+      });
+      return d;
+    }
+    function apply(m, save) {
+      mode = normalize(m);
+      if (save !== false) { try { localStorage.setItem(KEY, mode); } catch (e) {} }
+      paint();
+      return mode;
+    }
+    function cycle() {
+      const i = MODES.indexOf(mode);
+      apply(MODES[(i + 1) % MODES.length]);
+      toast('المظهر: ' + LABELS[mode]);
+      return mode;
+    }
+    function init() {
+      try { mode = normalize(localStorage.getItem(KEY) || 'dark'); } catch (e) { mode = 'dark'; }
+      paint();
+      Array.prototype.forEach.call(document.querySelectorAll('[data-theme-set]'), function (b) {
+        b.addEventListener('click', function () { apply(b.getAttribute('data-theme-set')); });
+      });
+      if (mq) {
+        const onChange = function () { if (mode === 'auto') paint(); };
+        if (mq.addEventListener) mq.addEventListener('change', onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+      }
+      return mode;
+    }
+    return { init: init, apply: apply, cycle: cycle, mode: function () { return mode; },
+      resolved: function () { return resolved(mode); } };
+  })();
+  window.SCTheme = SCTheme;
+
+  // ===== دليل الأدوات (المرحلة 8) =====
+  const HELP = {
+    calc: {
+      title: 'حاسبة محاسبية',
+      about: 'حاسبة يومية بذاكرة M ومجموع GT وضريبة قابلة للضبط وخصم، مع سجل محلي للعمليات.',
+      inputs: ['الأرقام والعمليات من لوحة المفاتيح أو من أزرار الحاسبة', 'نسبة الضريبة والخصم من شريط Tax أعلى الشاشة'],
+      outputs: ['النتيجة الفورية في شاشة الحاسبة', 'قيم M وGT لتجميع المبالغ', 'سجل آخر العمليات محفوظ محلياً'],
+      tip: 'Esc يصفّر الحاسبة وEnter يظهر النتيجة، وAlt+T يضيف الضريبة فوراً.'
+    },
+    disc: {
+      title: 'خصومات وتحويل عملات',
+      about: 'حساب صافي السعر بعد خصومات متتالية وتحويل مبلغ بين عملتين بسعر صرف يدوي.',
+      inputs: ['السعر الأصلي ونسب الخصم 1 و2 و3', 'المبلغ والعملة المصدر والهدف وسعر الصرف'],
+      outputs: ['السعر النهائي وإجمالي الخصم ونسبته', 'المبلغ المحوّل بالعملة الهدف'],
+      tip: 'الخصومات متتالية ولا تُجمع؛ كل خصم يُطبّق على المتبقي بعد الخصم السابق.'
+    },
+    fx: {
+      title: 'أسعار العملات',
+      about: 'أسعار عملات محدّثة من مصدر شبكي مع تحويل فوري بين 10 عملات.',
+      inputs: ['المبلغ والعملة الأساس', 'زر تحديث الأسعار'],
+      outputs: ['أسعار العملات وأهم ثلاث عملات مثبتة', 'قيمة التحويل وإمكانية نسخ النتائج'],
+      tip: 'قد يتعذر التحديث دون إنترنت؛ تبقى آخر أسعار محفوظة متاحة للاستخدام.'
+    },
+    profit: {
+      title: 'ربح وهامش التسعير',
+      about: 'تحويل مباشر بين التكلفة وسعر البيع وهامش الربح ونسبة markup.',
+      inputs: ['تكلفة الشراء', 'اختيار الوضع: سعر بيع، هامش %، أو markup %'],
+      outputs: ['سعر البيع المقترح ومبلغ الربح', 'هامش الربح ونسبة markup'],
+      tip: 'الهامش يُحسب على سعر البيع، بينما markup يُحسب على التكلفة.'
+    },
+    vat: {
+      title: 'ضريبة القيمة المضافة',
+      about: 'حساب صافي ضريبة القيمة المضافة مع قيد محاسبي تلقائي متوازن.',
+      inputs: ['ضريبة المخرجات (المبيعات)', 'ضريبة المدخلات (المشتريات)', 'قيمة التسويات إن وجدت'],
+      outputs: ['الصافي المستحق أو مبلغ الاسترداد', 'قيد VAT جاهز للترحيل'],
+      tip: 'الفرق السالب يعني استرداداً وليس التزاماً على المنشأة.'
+    },
+    loan: {
+      title: 'قروض وإطفاء',
+      about: 'حساب الدفعة الدورية وجدول إطفاء القرض على مدى السداد.',
+      inputs: ['مبلغ القرض والفائدة السنوية', 'المدة بالسنوات وعدد الدفعات في السنة'],
+      outputs: ['الدفعة الدورية وإجمالي الدفعات والفوائد', 'جدول إطفاء لأول 24 دفعة'],
+      tip: 'الجدول يوضح نصيب الفائدة من كل دفعة ونصيب سداد الأصل والرصيد المتبقي.'
+    },
+    interest: {
+      title: 'فائدة FV/PV',
+      about: 'القيمة المستقبلية أو الحالية مع فائدة مركبة ومساهمات دورية.',
+      inputs: ['اختيار FV أو PV والمبلغ الأساس', 'الفائدة السنوية وعدد السنوات', 'عدد مرات التركيب والمساهمة الدورية'],
+      outputs: ['القيمة المطلوبة وإجمالي الفائدة', 'قاعدة 72 لتقدير زمن مضاعفة المبلغ'],
+      tip: 'اختر PV لخصم مبلغ مستقبلي إلى قيمته الحالية بدلاً من حساب نموه.'
+    },
+    depr: {
+      title: 'إهلاك الأصول',
+      about: 'إهلاك الأصول بطريقة القسط الثابت أو الرصيد المتناقص أو مجموع أرقام السنوات.',
+      inputs: ['تكلفة الأصل والقيمة التخريدية والعمر الإنتاجي', 'طريقة الإهلاك وتاريخ الشراء'],
+      outputs: ['إهلاك السنة الأولى والقسط الشهري', 'جدول إهلاك شهري وقيد الإهلاك'],
+      tip: 'شهر الشراء يُحتسب كاملاً وفق السياسة المطبقة هنا (IAS 16).'
+    },
+    be: {
+      title: 'نقطة التعادل',
+      about: 'حساب نقطة التعادل بالوحدات والإيراد مع ربح مستهدف اختياري.',
+      inputs: ['التكاليف الثابتة والتكلفة المتغيرة للوحدة', 'سعر البيع للوحدة والربح المستهدف'],
+      outputs: ['وحدات وإيراد التعادل', 'هامش المساهمة ونسبته', 'الوحدات المطلوبة لتحقيق الربح المستهدف'],
+      tip: 'إذا كان سعر البيع أقل من التكلفة المتغيرة فلا توجد نقطة تعادل.'
+    },
+    npv: {
+      title: 'NPV / IRR / DCF',
+      about: 'تقييم جدوى استثمار باستخدام صافي القيمة الحالية ومعدل العائد الداخلي.',
+      inputs: ['الاستثمار الأولي ومعدل الخصم', 'التدفقات النقدية السنوية مفصولة بفواصل'],
+      outputs: ['NPV وIRR', 'فترة الاسترداد ومؤشر الربحية PI'],
+      tip: 'NPV الموجب يعني أن المشروع يضيف قيمة بمعدل الخصم المحدد.'
+    },
+    ratios: {
+      title: 'نسب مالية',
+      about: 'حساب عشر نسب مالية رئيسية من بيانات الميزانية وقائمة الدخل.',
+      inputs: ['الأصول والخصوم المتداولة والمخزون', 'إجمالي الأصول والخصوم وحقوق الملكية', 'الإيرادات وصافي الربح وCOGS والذمم'],
+      outputs: ['جدول النسب العشر مع قيمها', 'إمكانية نسخ الجدول وتصديره CSV'],
+      tip: 'النسب للمقارنة والتحليل؛ راجع سياسات المنشأة قبل الاعتماد عليها.'
+    },
+    aging: {
+      title: 'أعمار الديون وECL',
+      about: 'تحليل أعمار الذمم وحساب مخصص الخسائر الائتمانية المتوقعة وفق IFRS 9.',
+      inputs: ['أرصدة الفئات العمرية الخمس', 'نسبة المخصص لكل فئة', 'عامل التعديل المستقبلي'],
+      outputs: ['إجمالي الذمم والمخصص وصافي الذمم', 'نسبة التعثر للفئة 90+', 'قيد المخصص'],
+      tip: 'عامل تعديل 1.20 يرفع المخصص 20% لتغطية مخاطر مستقبلية إضافية.'
+    },
+    fxrev: {
+      title: 'إعادة تقييم FX',
+      about: 'إعادة تقييم رصيد بعملة أجنبية عند تغير سعر الصرف.',
+      inputs: ['رمز العملة والرصيد الأجنبي', 'سعر الصرف القديم وسعر الصرف الجديد'],
+      outputs: ['القيمة القديمة والجديدة للرصيد', 'ربح أو خسارة فروق العملة', 'قيد إعادة التقييم'],
+      tip: 'الفرق الموجب ربح غير محقق والسالبة خسارة، ويُسجّلان في الأرباح والخسائر.'
+    },
+    inv: {
+      title: 'تقييم المخزون',
+      about: 'تقييم المخزون بطرق FIFO وLIFO والمتوسط المرجح ومقارنة نتائجها.',
+      inputs: ['المخزون الأولي وكميات وتكاليف الشراء 1 و2', 'عدد الوحدات المباعة'],
+      outputs: ['تكلفة المبيعات وقيمة المخزون النهائي لكل طريقة', 'جدول مقارنة الطرق'],
+      tip: 'طريقة LIFO ممنوعة في IAS 2 وتُعرض هنا للمقارنة فقط.'
+    },
+    bank: {
+      title: 'التسوية البنكية',
+      about: 'مطابقة رصيد كشف البنك مع رصيد الدفاتر عبر البنود المعلقة.',
+      inputs: ['رصيد كشف البنك ورصيد الدفتر', 'الشيكات المعلقة والإيداعات في الطريق', 'العمولات والفوائد غير المسجلة'],
+      outputs: ['الرصيد المعدل للبنك والدفتر والفرق', 'حالة التسوية', 'قيد تسوية متوازن'],
+      tip: 'تساوي الرصيدين المعدلين يعني تسوية سليمة؛ أي فرق يستدعي مراجعة البنود.'
+    },
+    tape: {
+      title: 'السجل والقيود',
+      about: 'سجل مركزي للقطات الحساب والقيود المرحّلة وسجل التدقيق مع بحث وفلترة ونسخ احتياطي.',
+      inputs: ['بحث فوري ونوع وحالة ونطاق تاريخ', 'ملف JSON لاستعادة نسخة احتياطية'],
+      outputs: ['لقطات قابلة لإعادة التشغيل', 'قيود مرحّلة قابلة للنسخ أو العكس أو الحذف', 'تصدير CSV ونسخة احتياطية كاملة'],
+      tip: 'الفلاتر تؤثر على تصدير CSV للقيود؛ صفّرها لتصدير كل القيود.'
+    }
+  };
+
+  const SCHelp = (function () {
+    const box = $('helpBox'), backdrop = $('helpBackdrop'), body = $('helpBody'), title = $('helpTitle');
+    const closeBtn = $('helpClose'), doneBtn = $('helpDone');
+    let returnTo = null, current = 'calc';
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function list(items) {
+      return '<ul>' + (items || []).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
+    }
+    function render(id) {
+      const h = HELP[id] || HELP.calc;
+      current = HELP[id] ? id : 'calc';
+      if (title) title.textContent = 'دليل: ' + h.title;
+      if (!body) return;
+      body.innerHTML =
+        '<h3>ما تفعله الأداة</h3><p>' + esc(h.about) + '</p>' +
+        '<h3>المدخلات المطلوبة</h3>' + list(h.inputs) +
+        '<h3>المخرجات</h3>' + list(h.outputs) +
+        '<div class="help-tip"><p><b>ملاحظة:</b> ' + esc(h.tip) + '</p></div>';
+    }
+    function isOpen() { return !!box && box.classList.contains('open'); }
+    function open(id) {
+      if (!box) return;
+      returnTo = document.activeElement;
+      render(id || current);
+      box.classList.add('open');
+      if (backdrop) backdrop.classList.add('open');
+      document.body.classList.add('modal-open');
+      setTimeout(function () { if (closeBtn) closeBtn.focus(); }, 30);
+    }
+    function openCurrent() {
+      const p = document.querySelector('.page.active');
+      open(p ? p.id.replace('page-', '') : 'calc');
+    }
+    function close() {
+      if (!box) return;
+      box.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('open');
+      document.body.classList.remove('modal-open');
+      if (returnTo && returnTo.focus) { try { returnTo.focus(); } catch (e) {} }
+      returnTo = null;
+    }
+    function init() {
+      Array.prototype.forEach.call(document.querySelectorAll('.page'), function (page) {
+        const head = page.querySelector('.page-header');
+        if (!head || head.querySelector('.help-btn')) return;
+        const id = page.id.replace('page-', '');
+        const h = HELP[id];
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'help-btn';
+        b.setAttribute('data-help', id);
+        b.setAttribute('aria-haspopup', 'dialog');
+        b.setAttribute('aria-label', 'شرح أداة ' + (h ? h.title : id));
+        b.textContent = '؟';
+        b.addEventListener('click', function () { open(id); });
+        head.appendChild(b);
+      });
+      if (box) {
+        box.addEventListener('keydown', function (e) {
+          if (e.key !== 'Tab') return;
+          const items = Array.prototype.filter.call(
+            box.querySelectorAll('button, input, select, textarea'),
+            function (el) { return !el.disabled && el.offsetParent !== null; });
+          if (!items.length) return;
+          const first = items[0], last = items[items.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        });
+      }
+      if (closeBtn) closeBtn.addEventListener('click', close);
+      if (doneBtn) doneBtn.addEventListener('click', close);
+      if (backdrop) backdrop.addEventListener('click', close);
+      return true;
+    }
+    return { init: init, open: open, openCurrent: openCurrent, close: close, isOpen: isOpen,
+      render: render, help: HELP };
+  })();
+  window.SCHelp = SCHelp;
 
   const Keys = (function () {
     const box = $('keysBox'), backdrop = $('keysBackdrop'), list = $('keysList');
@@ -2016,6 +2415,8 @@
       { k: ['Alt','E'], t: 'تصدير جدول الصفحة CSV' },
       { k: ['Alt','B'], t: 'نسخة احتياطية كاملة (JSON)' },
       { k: ['/'], t: 'بحث فوري في أرشيف السجل' },
+      { k: ['Alt','H'], t: 'فتح دليل الأداة الحالية' },
+      { k: ['Alt','Shift','D'], t: 'تبديل المظهر: داكن / فاتح / تلقائي' },
       { k: ['?'], t: 'فتح قائمة الاختصارات' }
     ];
     function draw() {
@@ -2082,12 +2483,18 @@
     // Esc: نافذة الاختصارات أولاً، ثم بقية النوافذ تتولى أمرها
     if (e.key === 'Escape') {
       if (Keys.isOpen()) { e.preventDefault(); Keys.close(); return; }
+      if (typeof SCHelp !== 'undefined' && SCHelp.isOpen()) { e.preventDefault(); SCHelp.close(); return; }
       if (anyModalOpen()) return;
       const s = $('settings');
       if (s && s.classList.contains('open')) { closeSettings(); return; }
       if (isTyping(e.target)) { try { e.target.blur(); } catch (err) {} return; }
       const cur = document.querySelector('.page.active');
       if (cur && cur.id === 'page-calc') { e.preventDefault(); clearAll(); }
+      return;
+    }
+    if (e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey && (e.key === 'd' || e.key === 'D')) {
+      e.preventDefault();
+      SCTheme.cycle();
       return;
     }
     if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey && (e.key === 'p' || e.key === 'P')) {
@@ -2118,6 +2525,11 @@
       return;
     }
     if (isTyping(e.target) || anyModalOpen()) return;
+    if (e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey && (e.key === 'h' || e.key === 'H')) {
+      e.preventDefault();
+      SCHelp.openCurrent();
+      return;
+    }
     if (!e.ctrlKey && !e.altKey && !e.metaKey && e.key === '/') {
       const act = document.querySelector('.page.active');
       if (act && act.id !== 'page-calc') {
@@ -4427,8 +4839,12 @@
       if (!page) return false;
       const title = pageTitle();
       if (page.id === 'page-tape') return exportJournal();
-      const table = page.querySelector('table');
-      if (table) return exportCSV(table.id, title);
+      const table = page.querySelector('table.data-table') || page.querySelector('table');
+      if (table) {
+        const rows = tableRows(table);
+        if (!rows.length) { toast('الجدول فارغ'); return false; }
+        return download(rows, title);
+      }
       const cards = Array.prototype.map.call(page.querySelectorAll('.rcard'), function (c) {
         const l = c.querySelector('.lbl'), v = c.querySelector('.val');
         return [l ? l.textContent.trim() : '', v ? v.textContent.trim() : ''];
@@ -4962,12 +5378,60 @@
   window.SCBackup = SCBackup;
 
   // ---- init ----
+  function a11yBoot() {
+    let n = 0;
+    Array.prototype.forEach.call(document.querySelectorAll('.page'), function (p) {
+      p.setAttribute('role', 'region');
+      const h = p.querySelector('.page-header h1');
+      if (h) {
+        if (!h.id) h.id = 'ttl-' + p.id.replace('page-', '');
+        p.setAttribute('aria-labelledby', h.id);
+      }
+    });
+    const controls = document.querySelectorAll('input, select, textarea');
+    Array.prototype.forEach.call(controls, function (el) {
+      if (el.type === 'hidden' || el.hasAttribute('hidden')) return;
+      if (!el.id) el.id = 'fld-' + (++n);
+      let lab = null;
+      try { lab = document.querySelector('label[for="' + el.id + '"]'); } catch (e) {}
+      if (!lab) {
+        const f = el.closest('.field, .fld, .fb-field');
+        lab = f ? f.querySelector('label') : null;
+        if (lab && !lab.getAttribute('for')) lab.setAttribute('for', el.id);
+      }
+      if (!lab && el.closest('label')) lab = el.closest('label');
+      if (!lab && !el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby')) {
+        const f = el.closest('.field, .fld, .fb-field');
+        const lbl = f ? f.querySelector('label') : null;
+        const ph = el.getAttribute('placeholder');
+        el.setAttribute('aria-label', (lbl && lbl.textContent.trim()) || ph || ('حقل ' + n));
+      }
+      const fld = el.closest('.field, .fld');
+      const hint = fld ? fld.querySelector('.hint') : null;
+      if (hint) {
+        if (!hint.id) hint.id = 'hint-' + (++n);
+        if (!el.getAttribute('aria-describedby')) el.setAttribute('aria-describedby', hint.id);
+      }
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('table th'), function (th) {
+      if (!th.hasAttribute('scope')) th.setAttribute('scope', 'col');
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.ico'), function (el) {
+      el.setAttribute('aria-hidden', 'true');
+    });
+    const act = document.querySelector('.nav-item.active');
+    if (act) act.setAttribute('aria-current', 'page');
+  }
+
   function recalcAll() {
     ['calcDiscount','calcFx','calcProfit','calcVAT','calcLoan','calcInterest','calcDepr','calcBE','calcNPV','calcRatios','calcAging','calcFxRev','calcInv','calcBank']
       .forEach(function (f) { try { window[f](); } catch (e) {} });
   }
 
   function bootApp() {
+    SCTheme.init();
+    SCHelp.init();
+    a11yBoot();
     Promise.resolve(Persist.init())
       .then(function () { return window.SCCOA ? SCCOA.ready() : null; })
       .then(function () { return window.SCJE ? SCJE.loadPosted() : null; })
@@ -4978,6 +5442,7 @@
         recalcAll();
         renderHistory();
         updateDisplay();
+        a11yBoot();
         try {
           const n = sessionStorage.getItem('sc:restored');
           if (n) {
@@ -4989,6 +5454,7 @@
         recalcAll();
         renderHistory();
         updateDisplay();
+        a11yBoot();
       });
   }
 
