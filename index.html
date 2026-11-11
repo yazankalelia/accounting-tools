@@ -151,6 +151,9 @@
   .je-table tr:last-child td { border-bottom: none; }
   .je-table .dr { color: var(--amber); }
   .je-table .cr { color: var(--green); }
+  .je-note { margin-top: 8px; padding: 8px 10px; border-radius: var(--radius-sm); font-size: 11.5px; line-height: 1.7;
+    color: var(--amber); background: rgba(245,181,68,0.1); border: 1px solid rgba(245,181,68,0.3); }
+  .je-note[hidden] { display: none; }
 
   /* Data table */
   .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -177,8 +180,10 @@
   .calc-chip { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px;
     min-width: 92px; min-height: 40px; padding: 0 14px;
     background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: inherit; font-family: inherit; font-size: inherit; text-align: start;
     cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
   .calc-chip:hover { background: var(--surface); border-color: var(--border-2); }
+  .calc-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .calc-chip > span:first-child { font-size: 11px; font-weight: 700; letter-spacing: .5px; color: var(--muted); text-transform: uppercase; }
   .calc-chip .v { font-size: 14px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
   .calc-chip.active { background: rgba(61,220,151,0.12); border-color: rgba(61,220,151,0.4); }
@@ -210,9 +215,12 @@
   .calc-history { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
     max-height: 160px; overflow-y: auto; display: none; margin-top: 8px; }
   .calc-history.open { display: block; }
-  .calc-history .hitem { display: flex; justify-content: space-between; padding: 8px 12px; cursor: pointer;
-    border-bottom: 1px solid var(--border); font-size: 13px; }
+  .calc-history .hitem { display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    width: 100%; padding: 8px 12px; cursor: pointer; background: none; border: 0;
+    border-bottom: 1px solid var(--border); color: inherit; font-family: inherit; font-size: 13px;
+    text-align: start; }
   .calc-history .hitem:hover { background: var(--surface); }
+  .calc-history .hitem:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .calc-history .hitem:last-child { border-bottom: none; }
   .calc-history .he { color: var(--muted); direction: ltr; }
   .calc-history .hr { font-weight: 700; direction: ltr; }
@@ -543,6 +551,10 @@
     background: var(--accent); color: #fff; padding: 10px 16px; border-radius: var(--radius-sm);
     font-size: 13px; font-weight: 800; text-decoration: none; transition: top .15s; }
   .skip-link:focus { top: 12px; }
+  .noscript-msg { margin: 24px auto; max-width: 560px; padding: 20px 22px; border-radius: var(--radius);
+    background: var(--surface); border: 1px solid var(--border-2); color: var(--text);
+    font-size: 15px; line-height: 1.9; text-align: center; }
+  .noscript-msg strong { color: var(--amber); display: block; margin-bottom: 6px; font-size: 17px; }
   .main:focus, .page-header h1:focus { outline: none; }
   .theme-row { display: flex; align-items: center; gap: 8px;
     padding: 8px 8px 2px; }
@@ -802,6 +814,12 @@
 </style>
 </head>
 <body>
+  <noscript>
+    <div class="noscript-msg" role="alert">
+      <strong>يلزم تشغيل JavaScript</strong>
+      هذه الأداة تعمل بالكامل داخل متصفحك ولا ترسل بياناتك إلى أي خادم، لكنها تحتاج JavaScript لتعمل الحسابات والحفظ والقيود. يرجى تفعيل JavaScript في إعدادات المتصفح ثم إعادة تحميل الصفحة.
+    </div>
+  </noscript>
   <a class="skip-link" href="#mainContent">تخطَّ إلى المحتوى</a>
   <div class="layout">
     <header class="mobile-bar">
@@ -894,10 +912,10 @@
         </div>
         <div class="card">
           <div class="calc-status">
-            <div class="calc-chip" id="chipM" onclick="mc()"><span>M</span><span class="v" id="memVal">0</span></div>
-            <div class="calc-chip" id="chipGT" onclick="grandTotal()"><span>GT</span><span class="v" id="gtVal">0</span></div>
+            <button type="button" class="calc-chip" id="chipM" onclick="mc()" aria-label="الذاكرة"><span aria-hidden="true">M</span><span class="v" id="memVal">0</span></button>
+            <button type="button" class="calc-chip" id="chipGT" onclick="grandTotal()" aria-label="المجموع الكلي"><span aria-hidden="true">GT</span><span class="v" id="gtVal">0</span></button>
             <span style="position:relative; display:inline-flex;">
-              <div class="calc-chip" id="chipTax" onclick="toggleSettings()"><span>Tax</span><span class="v" id="taxVal">15%</span></div>
+              <button type="button" class="calc-chip" id="chipTax" onclick="toggleSettings()" aria-label="إعدادات الضريبة" aria-expanded="false" aria-controls="settings"><span aria-hidden="true">Tax</span><span class="v" id="taxVal">15%</span></button>
               <div class="tax-popover" id="settings">
                 <div class="tp-title">إعدادات الضريبة والخصم</div>
                 <div class="field"><label>نسبة الضريبة %</label><input type="number" id="taxRateInput" value="15" min="0" max="100" step="0.5" onchange="setTaxRate(this.value); closeSettings();" /></div>
@@ -1086,6 +1104,7 @@
           <div class="je">
             <div class="je-header"><span class="je-title">قيد VAT</span></div>
             <div id="V_je"></div>
+            <div class="je-note" id="V_note" hidden></div>
           </div>
         </div>
       </section>
@@ -1657,6 +1676,7 @@
   const $ = (id) => document.getElementById(id);
   function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400); }
   function fmt(n){ if(!isFinite(n)) return 'خطأ'; const r=Math.round(n*1e9)/1e9; return r.toLocaleString('en-US',{maximumFractionDigits:9}); }
+  function escHtml(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
   function safeEval(s){ const safe=s.replace(/[^0-9+\-*/.()%]/g,''); if(safe==='') return NaN; try{return Function('"use strict"; return ('+safe+')')();}catch(e){return NaN;} }
 
   // ---- Navigation ----
@@ -1950,6 +1970,9 @@
     resultEl.classList.toggle('err', preview === 'خطأ');
     memVal.textContent = fmt(memory);
     gtVal.textContent = fmt(grandTotalVal);
+    const cm = $('chipM'), cg = $('chipGT');
+    if (cm) cm.setAttribute('aria-label', 'الذاكرة: ' + fmt(memory));
+    if (cg) cg.setAttribute('aria-label', 'المجموع الكلي: ' + fmt(grandTotalVal));
     chipM.classList.toggle('active', memory !== 0);
     chipGT.classList.toggle('active', grandTotalVal !== 0);
     if (window.Persist && window.Persist.calcChanged) window.Persist.calcChanged();
@@ -2030,7 +2053,7 @@
   function mr() { if (justCalculated) { expression = ''; lastExpr = ''; justCalculated = false; } expression += memory.toString(); updateDisplay(); }
   function mplus() { const v = safeEval(justCalculated ? (expression || lastResult.toString()) : expression); if (!isNaN(v)) { memory += v; updateDisplay(); toast('M+ ' + fmt(memory)); } }
   function mminus() { const v = safeEval(justCalculated ? (expression || lastResult.toString()) : expression); if (!isNaN(v)) { memory -= v; updateDisplay(); toast('M- ' + fmt(memory)); } }
-  function setTaxRate(v, silent) { taxRate = (parseFloat(v) || 0) / 100; taxVal.textContent = (taxRate*100).toFixed(1).replace(/\.0$/,'') + '%'; const ti = $('taxRateInput'); if (ti) ti.value = (taxRate*100).toFixed(1).replace(/\.0$/,''); if (!silent) toast('ضريبة ' + taxVal.textContent); }
+  function setTaxRate(v, silent) { taxRate = (parseFloat(v) || 0) / 100; taxVal.textContent = (taxRate*100).toFixed(1).replace(/\.0$/,'') + '%'; const ti = $('taxRateInput'); if (ti) ti.value = (taxRate*100).toFixed(1).replace(/\.0$/,''); const ct = $('chipTax'); if (ct) ct.setAttribute('aria-label', 'إعدادات الضريبة: ' + taxVal.textContent); if (!silent) toast('ضريبة ' + taxVal.textContent); }
   function taxPlus() {
     const base = justCalculated ? lastResult : safeEval(expression); if (isNaN(base)) return;
     const val = base * (1 + taxRate);
@@ -2070,8 +2093,15 @@
   }
   function renderHistory() {
     if (history.length === 0) { historyEl.innerHTML = '<div class="empty">لا توجد عمليات</div>'; return; }
-    historyEl.innerHTML = history.map((h, i) => `<div class="hitem" onclick="loadHistory(${i})"><span class="he">${h.expr}</span><span class="hr">${h.res}</span></div>`).join('');
+    historyEl.innerHTML = history.map((h, i) =>
+      `<button type="button" class="hitem" data-hi="${i}" title="استرجاع الناتج"><span class="he">${escHtml(h.expr)}</span><span class="hr">${escHtml(h.res)}</span></button>`
+    ).join('');
   }
+  historyEl.addEventListener('click', (e) => {
+    const item = e.target.closest('.hitem');
+    if (!item || !historyEl.contains(item)) return;
+    loadHistory(Number(item.dataset.hi));
+  });
   function loadHistory(i) {
     const h = history[i]; if (!h) return;
     expression = h.res.replace(/,/g, ''); lastExpr = ''; justCalculated = true; lastResult = parseFloat(expression); updateDisplay();
@@ -2080,13 +2110,20 @@
   function toggleSettings() {
     const s = $('settings');
     s.classList.toggle('open');
+    const chip = $('chipTax');
+    if (chip) chip.setAttribute('aria-expanded', s.classList.contains('open') ? 'true' : 'false');
   }
-  function closeSettings() { const s = $('settings'); if (s) s.classList.remove('open'); }
+  function closeSettings() {
+    const s = $('settings');
+    if (s) s.classList.remove('open');
+    const chip = $('chipTax');
+    if (chip) chip.setAttribute('aria-expanded', 'false');
+  }
   document.addEventListener('click', (e) => {
     const s = $('settings'); const chip = $('chipTax');
     if (!s || !s.classList.contains('open')) return;
     if (s.contains(e.target) || (chip && chip.contains(e.target))) return;
-    s.classList.remove('open');
+    closeSettings();
   });
   document.querySelectorAll('#page-calc .ck').forEach(btn => btn.addEventListener('click', (e) => {
     if (btn.dataset.num !== undefined) appendNum(btn.dataset.num);
@@ -2230,7 +2267,7 @@
       about: 'حساب صافي ضريبة القيمة المضافة مع قيد محاسبي تلقائي متوازن.',
       inputs: ['ضريبة المخرجات (المبيعات)', 'ضريبة المدخلات (المشتريات)', 'قيمة التسويات إن وجدت'],
       outputs: ['الصافي المستحق أو مبلغ الاسترداد', 'قيد VAT جاهز للترحيل'],
-      tip: 'الفرق السالب يعني استرداداً وليس التزاماً على المنشأة.'
+      tip: 'الفرق السالب يعني استرداداً وليس التزاماً على المنشأة. قيد الإقفال يُصفّر 2200 و2210 كاملين، وحقل التسويات يعدّل صافي المستحق فقط ولا يدخل القيد لعدم وجود حساب مقابل.'
     },
     loan: {
       title: 'قروض وإطفاء',
@@ -2553,8 +2590,8 @@
     else if (key === '(') lparen();
     else if (key === ')') rparen();
     else if (key === 'Enter' || key === '=') { e.preventDefault(); evaluate(); }
-    else if (key === 'Backspace') backspace();
-    else if (key === '%') percent();
+    else if (key === 'Backspace') { e.preventDefault(); backspace(); }
+    else if (key === '%') { e.preventDefault(); percent(); }
   }, true);
   setTaxRate(15);
   renderHistory();
@@ -2580,7 +2617,6 @@
     const res = amt * rate;
     const from = $('Fx_from').value, to = $('Fx_to').value;
     $('Fx_result').textContent = fmt(res) + ' ' + to;
-    toast(fmt(amt) + ' ' + from + ' = ' + fmt(res) + ' ' + to);
   }
   function calcProfit() {
     const cost = parseFloat($('P_cost').value) || 0;
@@ -2622,16 +2658,23 @@
     const net = out - inn + adj;
     $('V_net').textContent = fmt(Math.abs(net));
     $('V_status').textContent = net >= 0 ? 'مستحق للدفع' : 'استرداد';
-    if (net >= 0) {
-      setJE('V_je', [
-        { code: '2200', account: 'ضريبة المبيعات', dr: Math.abs(net), cr: null },
-        { code: '2400', account: 'ذمم ضريبية دائنة', dr: null, cr: Math.abs(net) }
-      ]);
-    } else {
-      setJE('V_je', [
-        { code: '2400', account: 'ذمم ضريبية مدينة', dr: Math.abs(net), cr: null },
-        { code: '2210', account: 'ضريبة المشتريات', dr: null, cr: Math.abs(net) }
-      ]);
+    // قيد إقفال: يُصفّر ضريبة المخرجات وضريبة المدخلات معاً، والصافي قبل التسويات إلى 2400
+    const lines = [];
+    if (out > 0) lines.push({ code: '2200', account: 'ضريبة المخرجات', dr: out, cr: null });
+    if (inn > 0) lines.push({ code: '2210', account: 'ضريبة المدخلات', dr: null, cr: inn });
+    const bal = out - inn;
+    if (bal > 0) lines.push({ code: '2400', account: 'ذمم ضريبية دائنة', dr: null, cr: bal });
+    else if (bal < 0) lines.push({ code: '2400', account: 'ذمم ضريبية مدينة', dr: Math.abs(bal), cr: null });
+    setJE('V_je', lines);
+    const noteEl = $('V_note');
+    if (noteEl) {
+      if (adj !== 0) {
+        noteEl.textContent = 'التسويات (' + fmt(adj) + ') معدّلة في صافي المستحق ولا تدخل قيد الإقفال لعدم وجود حساب مقابل.';
+        noteEl.hidden = false;
+      } else {
+        noteEl.textContent = '';
+        noteEl.hidden = true;
+      }
     }
   }
 
@@ -2910,7 +2953,6 @@
     $('FxR_newVal').textContent = fmt(newVal);
     $('FxR_gain').textContent = fmt(gain);
     const isGain = gain >= 0;
-    const ccy = $('FxR_ccy').value;
     if (isGain) {
       setJE('FxR_je', [
         { code: '1150', account: 'حسابات بعملات أجنبية', dr: Math.abs(gain), cr: null },
@@ -3616,6 +3658,11 @@
     };
   })();
   window.Persist = Persist;
+  // حفظ فوري عند مغادرة الصفحة أو إخفائها لتقليل نافذة فقدان آخر تعديل
+  window.addEventListener('pagehide', function () { if (window.Persist) Persist.flush(); });
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden' && window.Persist) Persist.flush();
+  });
 
   // ================= دليل الحسابات · SCCOA =================
   const SCCOA = (function () {
@@ -4132,9 +4179,10 @@
     const REPLAY = {
       disc: 'calcDiscount', profit: 'calcProfit', vat: 'calcVAT', loan: 'calcLoan',
       interest: 'calcInterest', depr: 'calcDepr', be: 'calcBE', npv: 'calcNPV',
-      ratios: 'calcRatios', aging: 'calcAging', inv: 'calcInv', bank: 'calcBank'
+      ratios: 'calcRatios', aging: 'calcAging', inv: 'calcInv', bank: 'calcBank',
+      fxrev: 'calcFxRev'
     };
-    const NO_REPLAY = { fx: 'أسعار العملات تُجلب حيّة', fxrev: 'إعادة التقييم تعتمد سعر صرف حيّ' };
+    const NO_REPLAY = { fx: 'أسعار العملات تُجلب حيّة' };
     const KINDS = { 'je-post': 'ترحيل', 'je-reverse': 'عكس', 'je-delete': 'حذف' };
     let snapMap = {}, booted = false, suppress = false, seq = 0, jeCount = 0;
     let revMode = '', revTarget = '', revReturn = null;
