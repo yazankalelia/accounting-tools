@@ -621,6 +621,48 @@
   .side-foot .sf-keys { border: 0; background: transparent; color: var(--muted); font: inherit;
     font-size: 13px; line-height: 1; padding: 2px 5px; cursor: pointer; border-radius: var(--radius-sm); }
   .side-foot .sf-keys:hover { color: var(--text); background: var(--surface-2); }
+
+  /* ===== التقارير والطباعة (المرحلة 6) ===== */
+  .rep-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; }
+  .rep-bar .btn { padding: 5px 9px; font-size: 11px; gap: 4px; }
+  .rep-bar .rep-meta { flex: 1 1 160px; min-width: 0; font-size: 11px; color: var(--muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+  .table-actions { gap: 6px; }
+  #printRoot { display: none; }
+  @media print {
+    @page { size: A4; margin: 14mm 12mm; }
+    html, body { height: auto !important; overflow: visible !important;
+      background: #fff !important; color: #000 !important; }
+    body > *:not(#printRoot) { display: none !important; }
+    .layout, .mobile-bar, .fb-fab, .fb-panel, .toast, .coa-modal, .coa-backdrop, .nav-backdrop { display: none !important; }
+    #printRoot { display: block !important; color: #000; font-size: 11pt; }
+    #printRoot .print-head { border-bottom: 2px solid #111; padding-bottom: 8px; margin-bottom: 12px; }
+    #printRoot .ph-org { font-size: 15pt; font-weight: 800; }
+    #printRoot .ph-title { font-size: 12.5pt; font-weight: 700; margin-top: 2px; }
+    #printRoot .ph-meta { display: flex; justify-content: space-between; gap: 12px;
+      font-size: 9pt; color: #333; margin-top: 6px; }
+    #printRoot .page-header { display: none; }
+    #printRoot .page { display: block !important; }
+    #printRoot .card { background: none; border: 0; padding: 0; margin: 0 0 12px; }
+    #printRoot .card-title { font-size: 11pt; border-bottom: 1px solid #ccc; padding-bottom: 3px; margin-bottom: 6px; }
+    #printRoot .results { break-inside: avoid; }
+    #printRoot .rcard { background: #fff; border: 1px solid #bbb; padding: 8px 10px; }
+    #printRoot .rcard .val { color: #000 !important; font-size: 12pt; }
+    #printRoot .data-table-wrap { overflow: visible; max-height: none !important; }
+    #printRoot .tape-list { max-height: none !important; overflow: visible !important; }
+    #printRoot table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+    #printRoot th, #printRoot td { border: 1px solid #999; padding: 4px 6px; text-align: right; color: #000 !important; }
+    #printRoot thead { display: table-header-group; }
+    #printRoot tr { break-inside: avoid; }
+    #printRoot .je, #printRoot .tape-item, #printRoot .je-log, #printRoot .je-row { break-inside: avoid; }
+    #printRoot .print-foot { margin-top: 14px; border-top: 1px solid #bbb; padding-top: 6px;
+      font-size: 8.5pt; color: #555; }
+    #printRoot .btn, #printRoot .table-actions, #printRoot .je-acts, #printRoot .keys-hint,
+    #printRoot .calc-keys, #printRoot .calc-toolbar, #printRoot .calc-history, #printRoot .rep-bar,
+    #printRoot .tape-acts, #printRoot .hint, #printRoot .coa-hint, #printRoot .tax-popover,
+    #printRoot .je-btn, #printRoot .keyboard, #printRoot .modal { display: none !important; }
+    #printRoot .pv { font-weight: 700; color: #000; }
+  }
 </style>
 </head>
 <body>
@@ -1348,6 +1390,36 @@
     </div>
   </div>
 
+  <div class="coa-backdrop" id="repBackdrop"></div>
+  <div class="coa-modal keys-modal" id="repBox" role="dialog" aria-modal="true" aria-labelledby="repTitle">
+    <div class="coa-head">
+      <div class="coa-title" id="repTitle">رأس التقرير</div>
+      <button class="coa-x" id="repClose" type="button" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="coa-body">
+      <div class="field"><label for="repOrg">اسم المؤسسة</label>
+        <input type="text" id="repOrg" maxlength="60" placeholder="مثال: مؤسسة النخبة للمحاسبة" /></div>
+      <div class="field" style="margin-top:12px;"><label for="repPeriod">الفترة (اختياري)</label>
+        <input type="text" id="repPeriod" maxlength="60" placeholder="مثال: يناير – نوفمبر 2026" /></div>
+      <p class="table-note">يظهر الاسم والفترة في أعلى ورقة الطباعة/PDF وفي ملف CSV. يُحفظ محلياً على هذا الجهاز.</p>
+    </div>
+    <div class="coa-foot">
+      <span class="coa-hint" id="repHint" role="alert"></span>
+      <button class="btn secondary sm" id="repCancel" type="button">إلغاء</button>
+      <button class="btn sm" id="repSave" type="button">حفظ</button>
+    </div>
+  </div>
+
+  <div id="printRoot" aria-hidden="true">
+    <div class="print-head">
+      <div class="ph-org" id="phOrg">مؤسستي</div>
+      <div class="ph-title" id="phTitle">تقرير</div>
+      <div class="ph-meta"><span id="phPeriod"></span><span id="phDate"></span></div>
+    </div>
+    <div id="printArea"></div>
+    <div class="print-foot">أُعدّ بواسطة أدوات محاسبية · Pro Suite — <span id="phFoot"></span></div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -1827,6 +1899,8 @@
       { k: ['Ctrl','Shift','C'], t: 'نسخ آخر قيد بصيغة ERP' },
       { k: ['F1'], t: 'الانتقال إلى الحاسبة' },
       { k: ['F2'], t: 'الانتقال إلى السجل والقيود' },
+      { k: ['Ctrl','P'], t: 'طباعة / PDF للصفحة الحالية' },
+      { k: ['Alt','E'], t: 'تصدير جدول الصفحة CSV' },
       { k: ['?'], t: 'فتح قائمة الاختصارات' }
     ];
     function draw() {
@@ -1899,6 +1973,16 @@
       if (isTyping(e.target)) { try { e.target.blur(); } catch (err) {} return; }
       const cur = document.querySelector('.page.active');
       if (cur && cur.id === 'page-calc') { e.preventDefault(); clearAll(); }
+      return;
+    }
+    if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey && (e.key === 'p' || e.key === 'P')) {
+      e.preventDefault();
+      if (window.SCReport) SCReport.printPage();
+      return;
+    }
+    if (e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 'e' || e.key === 'E')) {
+      e.preventDefault();
+      if (window.SCReport) SCReport.exportPage();
       return;
     }
     if (e.ctrlKey && e.shiftKey && !e.altKey && (e.key === 'C' || e.key === 'c')) {
@@ -3926,6 +4010,309 @@
   })();
   window.SCTape = SCTape;
 
+  // ===== التقارير: طباعة/PDF + CSV (المرحلة 6) =====
+  const SCReport = (function () {
+    const K_HEAD = 'repHead';
+    const TBL_NAMES = {
+      L_table: 'جدول-الأقساط', D_table: 'جدول-الإهلاك', R_table: 'النسب-المالية',
+      A_table: 'أعمار-الديون', Iv_table: 'المخزون', Br_table: 'التسوية-البنكية'
+    };
+    let head = { org: 'مؤسستي', period: '' };
+    let returnTo = null;
+
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    function dateStr() {
+      const d = new Date();
+      return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear();
+    }
+    function stamp() {
+      const d = new Date();
+      return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
+    }
+    function pageTitle() {
+      const h = document.querySelector('.page.active .page-header h1');
+      if (!h) return 'تقرير';
+      const c = h.cloneNode(true);
+      Array.prototype.forEach.call(c.querySelectorAll('.ico'), function (el) { el.remove(); });
+      return c.textContent.replace(/\s+/g, ' ').trim() || 'تقرير';
+    }
+    function refreshMeta() {
+      const txt = (head.org || 'مؤسستي') + (head.period ? ' · ' + head.period : '');
+      Array.prototype.forEach.call(document.querySelectorAll('.rep-meta'), function (el) {
+        el.textContent = txt;
+        el.title = txt;
+      });
+      const po = $('phOrg');
+      if (po) po.textContent = head.org || 'مؤسستي';
+    }
+
+    // ---------- CSV ----------
+    function csvCell(v) {
+      let s = String(v == null ? '' : v).replace(/\s+/g, ' ').trim();
+      if (/^-?\d{1,3}(,\d{3})*(\.\d+)?$/.test(s)) s = s.replace(/,/g, '');
+      return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }
+    function fileName(name) {
+      const base = String(name || 'تقرير').replace(/[\\/:*?"<>|()\[\]\r\n\t]+/g, '-').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+      return (base || 'تقرير') + '-' + stamp() + '.csv';
+    }
+    function download(rows, name) {
+      const meta = [
+        ['المؤسسة', head.org || 'مؤسستي'],
+        ['التقرير', name],
+        ['الفترة', head.period || 'كما في ' + dateStr()],
+        ['تاريخ الإصدار', dateStr()]
+      ];
+      const lines = meta.map(function (r) { return r.map(csvCell).join(','); });
+      lines.push('');
+      rows.forEach(function (r) { lines.push(r.map(csvCell).join(',')); });
+      const blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const fn = fileName(name);
+      a.href = url; a.download = fn; a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () { URL.revokeObjectURL(url); if (a.parentNode) a.parentNode.removeChild(a); }, 1500);
+      toast('نُزِّل: ' + fn);
+      return true;
+    }
+    function tableRows(table) {
+      const rows = [];
+      Array.prototype.forEach.call(table.querySelectorAll('tr'), function (tr) {
+        if (tr.closest('.je-acts')) return;
+        const cells = Array.prototype.slice.call(tr.children).filter(function (c) {
+          return c.tagName === 'TD' || c.tagName === 'TH';
+        });
+        if (!cells.length) return;
+        if (!cells[0].textContent.trim() && cells.length === 1) return;
+        rows.push(cells.map(function (c) {
+          const inp = c.querySelector('input');
+          if (inp) return inp.value;
+          return c.innerText;
+        }));
+      });
+      return rows;
+    }
+    function exportCSV(tableId, name) {
+      const t = tableId ? $(tableId) : null;
+      if (!t) { toast('لا يوجد جدول للتصدير في هذه الصفحة'); return false; }
+      const rows = tableRows(t);
+      if (!rows.length) { toast('الجدول فارغ'); return false; }
+      return download(rows, name || TBL_NAMES[tableId] || (tableId || 'جدول'));
+    }
+    function exportJournal() {
+      if (!window.SCJE || typeof SCJE.allEntries !== 'function') { toast('لا توجد قيود للتصدير'); return false; }
+      return SCJE.allEntries().then(function (rows) {
+        const items = [['رقم القيد', 'التاريخ', 'البيان', 'رمز الحساب', 'الحساب', 'مدين', 'دائن', 'الحالة']];
+        (rows || []).forEach(function (e) {
+          (e.lines || []).forEach(function (l) {
+            items.push([
+              e.no || '', e.date || '', e.memo || '', l.code || '', l.name || '',
+              l.debit ? l.debit : '', l.credit ? l.credit : '',
+              e.reversed ? 'معكوس' : (e.posted ? 'مرحّل ' + e.posted : 'مسودة')
+            ]);
+          });
+        });
+        if (items.length === 1) { toast('لا توجد قيود للتصدير بعد'); return false; }
+        return download(items, 'القيود-المحاسبية');
+      }).catch(function () { toast('تعذر تصدير القيود'); return false; });
+    }
+    function exportPage() {
+      const page = document.querySelector('.page.active');
+      if (!page) return false;
+      const title = pageTitle();
+      if (page.id === 'page-tape') return exportJournal();
+      const table = page.querySelector('table');
+      if (table) return exportCSV(table.id, title);
+      const cards = Array.prototype.map.call(page.querySelectorAll('.rcard'), function (c) {
+        const l = c.querySelector('.lbl'), v = c.querySelector('.val');
+        return [l ? l.textContent.trim() : '', v ? v.textContent.trim() : ''];
+      }).filter(function (r) { return r[0] || r[1]; });
+      if (cards.length) return download([['البند', 'القيمة']].concat(cards), title);
+      const res = page.querySelector('.calc-result') || page.querySelector('#result');
+      return download([['البند', 'القيمة'], ['النتيجة', res ? res.textContent.trim() : '']], title);
+    }
+
+    // ---------- Print / PDF ----------
+    function fillHead(title) {
+      const d = new Date();
+      $('phOrg').textContent = head.org || 'مؤسستي';
+      $('phTitle').textContent = title;
+      $('phPeriod').textContent = head.period ? ('الفترة: ' + head.period) : ('كما في ' + dateStr());
+      $('phDate').textContent = 'تاريخ الإصدار: ' + dateStr();
+      $('phFoot').textContent = d.toLocaleString('en-GB');
+    }
+    function buildClone(page) {
+      const clone = page.cloneNode(true);
+      clone.classList.remove('active');
+      clone.removeAttribute('id');
+      Array.prototype.forEach.call(clone.querySelectorAll('[style*="display:none"], [style*="display: none"]'), function (el) {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      });
+      Array.prototype.forEach.call(clone.querySelectorAll('input'), function (inp) {
+        const s = document.createElement('span');
+        s.className = 'pv';
+        s.textContent = String(inp.value || '').trim() || '—';
+        if (inp.parentNode) inp.parentNode.replaceChild(s, inp);
+      });
+      Array.prototype.forEach.call(clone.querySelectorAll('select'), function (sel) {
+        const s = document.createElement('span');
+        s.className = 'pv';
+        s.textContent = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].textContent.trim() : '';
+        if (sel.parentNode) sel.parentNode.replaceChild(s, sel);
+      });
+      Array.prototype.forEach.call(clone.querySelectorAll('textarea'), function (ta) {
+        const s = document.createElement('span');
+        s.className = 'pv';
+        s.textContent = String(ta.value || '').trim() || '—';
+        if (ta.parentNode) ta.parentNode.replaceChild(s, ta);
+      });
+      ['.btn', 'button', '.table-actions', '.keys-hint', '.keys-open', '.calc-keys', '.calc-toolbar',
+       '.calc-history', '.calc-status', '.rep-bar', '.tape-acts', '.je-acts', '.je-btn',
+       '.page-header', '.tax-popover', '.hint', '.coa-hint', '.card-title .ico'].forEach(function (sel) {
+        Array.prototype.forEach.call(clone.querySelectorAll(sel), function (el) {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        });
+      });
+      return clone;
+    }
+    function printPage() {
+      const page = document.querySelector('.page.active');
+      const area = $('printArea');
+      if (!page || !area) return false;
+      const title = pageTitle();
+      fillHead(title);
+      area.innerHTML = '';
+      area.appendChild(buildClone(page));
+      const prev = document.title;
+      document.title = (head.org ? head.org + ' — ' : '') + title;
+      let done = false;
+      const restore = function () {
+        if (done) return;
+        done = true;
+        area.innerHTML = '';
+        document.title = prev;
+      };
+      window.addEventListener('afterprint', restore, { once: true });
+      setTimeout(function () {
+        try { window.print(); } catch (e) { toast('تعذر فتح الطباعة'); }
+        setTimeout(restore, 1200);
+      }, 80);
+      return true;
+    }
+
+    // ---------- رأس التقرير ----------
+    const box = $('repBox'), backdrop = $('repBackdrop');
+    function openHead() {
+      if (!box) return;
+      returnTo = document.activeElement;
+      $('repOrg').value = head.org || '';
+      $('repPeriod').value = head.period || '';
+      $('repHint').textContent = '';
+      box.classList.add('open');
+      if (backdrop) backdrop.classList.add('open');
+      document.body.classList.add('modal-open');
+      setTimeout(function () { const el = $('repOrg'); if (el) { el.focus(); el.select(); } }, 40);
+    }
+    function closeHead() {
+      if (!box) return;
+      box.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('open');
+      document.body.classList.remove('modal-open');
+      if (returnTo && returnTo.focus) { try { returnTo.focus(); } catch (e) {} }
+      returnTo = null;
+    }
+    function saveHead() {
+      const org = ($('repOrg').value || '').trim().slice(0, 60);
+      if (!org) { $('repHint').textContent = 'اسم المؤسسة مطلوب'; $('repOrg').focus(); return; }
+      head = { org: org, period: ($('repPeriod').value || '').trim().slice(0, 60) };
+      refreshMeta();
+      closeHead();
+      toast('حُفظ رأس التقرير');
+      if (window.SCStore && SCStore.kvSet) SCStore.kvSet(K_HEAD, head).catch(function () {});
+    }
+
+    if (box) {
+      box.addEventListener('keydown', function (e) {
+        if (e.key !== 'Tab') return;
+        const items = Array.prototype.filter.call(
+          box.querySelectorAll('button, input, select, textarea'),
+          function (el) { return !el.disabled && el.offsetParent !== null; });
+        if (!items.length) return;
+        const first = items[0], last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      });
+    }
+    if (backdrop) backdrop.addEventListener('click', closeHead);
+    if ($('repClose')) $('repClose').addEventListener('click', closeHead);
+    if ($('repCancel')) $('repCancel').addEventListener('click', closeHead);
+    if ($('repSave')) $('repSave').addEventListener('click', saveHead);
+    if ($('repOrg')) $('repOrg').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); saveHead(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && box && box.classList.contains('open')) closeHead();
+    });
+
+    // ---------- الأزرار ----------
+    function buildBars() {
+      Array.prototype.forEach.call(document.querySelectorAll('.page'), function (page) {
+        if (page.querySelector('.rep-bar')) return;
+        const header = page.querySelector('.page-header');
+        if (!header) return;
+        const bar = document.createElement('div');
+        bar.className = 'rep-bar';
+        bar.innerHTML =
+          '<button class="btn secondary sm" type="button" data-rep="csv" title="تنزيل CSV للجدول الأساسي">⤓ CSV</button>' +
+          '<button class="btn secondary sm" type="button" data-rep="pdf" title="طباعة أو حفظ PDF">⎙ طباعة / PDF</button>' +
+          '<button class="btn secondary sm" type="button" data-rep="head" title="اسم المؤسسة والفترة">⚙ رأس التقرير</button>' +
+          '<span class="rep-meta"></span>';
+        header.appendChild(bar);
+        bar.addEventListener('click', function (e) {
+          const b = e.target.closest ? e.target.closest('button[data-rep]') : null;
+          if (!b) return;
+          if (b.dataset.rep === 'csv') exportPage();
+          else if (b.dataset.rep === 'pdf') printPage();
+          else openHead();
+        });
+      });
+      refreshMeta();
+    }
+    function wireTableButtons() {
+      Array.prototype.forEach.call(document.querySelectorAll('button[onclick^="copyTable"]'), function (btn) {
+        if (btn.dataset.csvWired) return;
+        const m = (btn.getAttribute('onclick') || '').match(/copyTable\('([^']+)'\)/);
+        if (!m) return;
+        btn.dataset.csvWired = '1';
+        const b2 = document.createElement('button');
+        b2.className = 'btn secondary sm';
+        b2.type = 'button';
+        b2.textContent = '⤓ CSV';
+        b2.title = 'تنزيل هذا الجدول كملف CSV';
+        b2.addEventListener('click', function () { exportCSV(m[1], TBL_NAMES[m[1]] || m[1]); });
+        btn.insertAdjacentElement('afterend', b2);
+      });
+    }
+
+    function init() {
+      return SCStore.kvGet(K_HEAD).then(function (v) {
+        if (v && typeof v === 'object') head = { org: v.org || 'مؤسستي', period: v.period || '' };
+      }).catch(function () {}).then(function () {
+        buildBars();
+        wireTableButtons();
+        refreshMeta();
+      });
+    }
+
+    return {
+      init: init, printPage: printPage, exportPage: exportPage, exportCSV: exportCSV,
+      openHead: openHead, head: function () { return { org: head.org, period: head.period }; }
+    };
+  })();
+  window.SCReport = SCReport;
+
   // ---- init ----
   function recalcAll() {
     ['calcDiscount','calcFx','calcProfit','calcVAT','calcLoan','calcInterest','calcDepr','calcBE','calcNPV','calcRatios','calcAging','calcFxRev','calcInv','calcBank']
@@ -3937,6 +4324,7 @@
       .then(function () { return window.SCCOA ? SCCOA.ready() : null; })
       .then(function () { return window.SCJE ? SCJE.loadPosted() : null; })
       .then(function () { return window.SCTape ? SCTape.ready() : null; })
+      .then(function () { return window.SCReport ? SCReport.init() : null; })
       .then(function () {
         recalcAll();
         renderHistory();
