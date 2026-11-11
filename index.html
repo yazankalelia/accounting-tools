@@ -585,6 +585,42 @@
   .rev-ta:focus { outline: none; border-color: var(--accent); }
   .rev-block { margin-bottom: 14px; }
   #revErr { color: var(--red); }
+
+  /* ===== المعايير المحاسبية ===== */
+  .std-badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 800;
+    border-radius: 999px; padding: 1px 8px; border: 1px solid var(--border); color: var(--muted);
+    white-space: nowrap; margin-inline-start: 6px; }
+  .std-badge.red { color: var(--red); border-color: rgba(255,94,126,.4); background: rgba(255,94,126,.12); }
+  .std-badge.ok { color: var(--green); border-color: rgba(61,220,151,.35); background: rgba(61,220,151,.1); }
+  .std-note { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; line-height: 1.65;
+    color: var(--muted); background: rgba(255,94,126,.06); border: 1px solid rgba(255,94,126,.22);
+    border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 12px; }
+  .std-note.ok { background: rgba(61,220,151,.06); border-color: rgba(61,220,151,.22); }
+  .std-note b { color: var(--text); }
+  .std-note .ico { font-weight: 800; color: var(--red); flex: 0 0 auto; }
+  .std-note.ok .ico { color: var(--green); }
+  .table-note { font-size: 11px; color: var(--muted); line-height: 1.65; margin-top: 8px; }
+
+  /* ===== اختصارات لوحة المفاتيح ===== */
+  .keys-hint { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); }
+  .keys-hint span { display: inline-flex; align-items: center; gap: 5px; }
+  .keys-hint kbd, .keys-row kbd { font-family: inherit; font-size: 11px; font-weight: 700; color: var(--text);
+    background: var(--bg-2); border: 1px solid var(--border-2); border-bottom-width: 2px;
+    border-radius: 4px; padding: 1px 6px; direction: ltr; white-space: nowrap; }
+  .keys-list { display: flex; flex-direction: column; }
+  .keys-row { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 8px 2px; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .keys-row:last-child { border-bottom: 0; }
+  .keys-row .k { display: flex; gap: 5px; flex: 0 0 auto; }
+  .keys-row .t { color: var(--muted); text-align: right; }
+  .keys-modal { max-width: 480px; }
+  .keys-open { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 12px;
+    padding: 6px 2px 0; cursor: pointer; text-decoration: underline; }
+  .keys-open:hover { color: var(--text); }
+  .side-foot .sf-keys { border: 0; background: transparent; color: var(--muted); font: inherit;
+    font-size: 13px; line-height: 1; padding: 2px 5px; cursor: pointer; border-radius: var(--radius-sm); }
+  .side-foot .sf-keys:hover { color: var(--text); background: var(--surface-2); }
 </style>
 </head>
 <body>
@@ -608,7 +644,7 @@
       <div class="sheet-head">
         <div>
           <div class="sheet-title">كل الأدوات</div>
-          <div class="sheet-sub">15 أداة محاسبية</div>
+          <div class="sheet-sub">16 أداة محاسبية</div>
         </div>
         <button class="sheet-close" id="sheetClose" type="button" aria-label="إغلاق القائمة">✕</button>
       </div>
@@ -645,6 +681,7 @@
         <div class="nav-item" data-page="aging"><span class="ico" aria-hidden="true">◔</span><span class="lbl">أعمار ديون</span></div>
         <div class="nav-item" data-page="fxrev"><span class="ico" aria-hidden="true">↻</span><span class="lbl">إعادة تقييم FX</span></div>
         <div class="nav-item" data-page="inv"><span class="ico" aria-hidden="true">▤</span><span class="lbl">مخزون</span></div>
+        <div class="nav-item" data-page="bank"><span class="ico" aria-hidden="true">⇋</span><span class="lbl">تسوية بنكية</span></div>
       </div>
       <div class="group">
         <div class="group-title">السجل والتدقيق</div>
@@ -653,6 +690,7 @@
       <div class="side-foot" id="sideFoot" title="الحفظ التلقائي">
         <span class="sf-dot" aria-hidden="true"></span>
         <span class="sf-text" id="saveState">محفوظ محلياً</span>
+        <button class="sf-keys" id="keysOpen" type="button" title="اختصارات لوحة المفاتيح (?)" aria-haspopup="dialog">⌨</button>
         <button class="sf-clear" id="coaOpen" type="button" title="دليل الحسابات">دليل</button>
         <button class="sf-clear" id="clearStore" type="button" title="مسح البيانات المحفوظة">مسح</button>
       </div>
@@ -688,6 +726,14 @@
             <button class="btn secondary sm" onclick="round2()">Round 2</button>
             <button class="btn sm" onclick="grandTotal()">GT+</button>
             <button class="btn danger sm" onclick="clearGrandTotal()">CT</button>
+          </div>
+          <div class="keys-hint" aria-label="اختصارات لوحة المفاتيح">
+            <span><kbd>Enter</kbd> نتيجة</span>
+            <span><kbd>Esc</kbd> تصفير</span>
+            <span><kbd>⌫</kbd> حذف</span>
+            <span><kbd>F2</kbd> السجل</span>
+            <span><kbd>Alt</kbd>+<kbd>T</kbd> ضريبة</span>
+            <button class="keys-open" id="keysOpenCalc" type="button" aria-haspopup="dialog">كل الاختصارات</button>
           </div>
           <div class="calc-keys">
             <button class="ck mem" data-action="mc">MC</button>
@@ -917,7 +963,7 @@
       <section class="page" id="page-depr">
         <div class="page-header">
           <h1><span class="ico" aria-hidden="true">↘</span> إهلاك الأصول (Depreciation)</h1>
-          <p>SL / DDB / SYD + قيد تلقائي</p>
+          <p>SL / DDB / SYD + إهلاك نسبي للسنة الأولى + جدول شهري</p>
         </div>
         <div class="card">
           <div class="row">
@@ -930,10 +976,20 @@
               <select id="D_method" onchange="calcDepr()"><option value="sl">قسط ثابت (SL)</option><option value="ddb">رصيد متناقص (DDB)</option><option value="syd">مجموع أرقام (SYD)</option></select>
             </div>
           </div>
+          <div class="row">
+            <div class="field"><label>تاريخ الشراء (شهر/سنة)</label>
+              <input type="month" id="D_start" value="" oninput="calcDepr()" />
+              <div class="hint" id="D_m1hint">بافتراض أن السنة المالية تبدأ في يناير</div>
+            </div>
+            <div class="field"><label>سياسة الشهر الأول</label>
+              <div class="hint" style="padding-top:9px;">شهر الشراء يُحتسب كاملاً (IAS 16 §55)</div>
+            </div>
+          </div>
           <div class="results">
-            <div class="rcard"><div class="lbl">الإهلاك السنوي</div><div class="val" id="D_first">—</div></div>
-            <div class="rcard"><div class="lbl">الإهلاك الشهري</div><div class="val accent" id="D_monthly">—</div></div>
+            <div class="rcard"><div class="lbl">إهلاك السنة الأولى</div><div class="val amber" id="D_first">—</div></div>
+            <div class="rcard"><div class="lbl">القسط الشهري (السنة الأولى)</div><div class="val accent" id="D_monthly">—</div></div>
             <div class="rcard"><div class="lbl">إجمالي الإهلاك</div><div class="val" id="D_total">—</div></div>
+            <div class="rcard"><div class="lbl">نهاية العمر الإنتاجي</div><div class="val" id="D_end">—</div></div>
           </div>
           <div class="je">
             <div class="je-header"><span class="je-title">قيد الإهلاك (شهري)</span></div>
@@ -941,8 +997,9 @@
           </div>
           <div class="table-actions"><button class="btn copy sm" onclick="copyTable('D_table')">نسخ CSV</button></div>
           <div class="data-table-wrap">
-            <table class="data-table" id="D_table"><thead><tr><th>سنة</th><th>إهلاك</th><th>قيمة دفترية</th></tr></thead><tbody></tbody></table>
+            <table class="data-table" id="D_table"><thead><tr><th>الشهر</th><th>السنة المالية</th><th>الإهلاك الشهري</th><th>مجمع الإهلاك</th><th>القيمة الدفترية</th></tr></thead><tbody></tbody></table>
           </div>
+          <div class="table-note" id="D_note">—</div>
         </div>
       </section>
 
@@ -1050,6 +1107,10 @@
               <div class="field"><label>نسبة 61-90 %</label><input type="number" id="A_r2" value="10" oninput="calcAging()" /></div>
               <div class="field"><label>نسبة 91-180 %</label><input type="number" id="A_r3" value="25" oninput="calcAging()" /></div>
               <div class="field"><label>نسبة 181+ %</label><input type="number" id="A_r4" value="50" oninput="calcAging()" /></div>
+              <div class="field"><label>عامل التعديل المستقبلي (IFRS 9)</label>
+                <input type="number" id="A_flf" value="1" min="0" step="0.05" oninput="calcAging()" />
+                <div class="hint">×1.00 بلا تعديل · ×1.20 يرفع المخصص 20% لمخاطر مستقبلية</div>
+              </div>
             </div>
           </div>
           <div class="results">
@@ -1062,6 +1123,11 @@
             <div class="je-header"><span class="je-title">قيد المخصص</span></div>
             <div id="A_je"></div>
           </div>
+          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('A_table')">نسخ CSV</button></div>
+          <div class="data-table-wrap">
+            <table class="data-table" id="A_table"><thead><tr><th>الفئة</th><th>الرصيد</th><th>النسبة %</th><th>المخصص</th></tr></thead><tbody></tbody></table>
+          </div>
+          <div class="table-note" id="A_note">—</div>
         </div>
       </section>
 
@@ -1116,6 +1182,44 @@
           <div class="data-table-wrap">
             <table class="data-table" id="Iv_table"><thead><tr><th>الطريقة</th><th>COGS</th><th>مخزون final</th></tr></thead><tbody></tbody></table>
           </div>
+          <div class="std-note" id="Iv_note"><span class="ico">!</span><span><b>IAS 2:</b> طريقة LIFO ممنوعة في المعايير الدولية. تُعرض هنا للمقارنة فقط ولا يجوز استخدامها في القوائم المالية — المعتمد هو FIFO أو المتوسط المرجّح.</span></div>
+        </div>
+      </section>
+
+      <!-- ============ BANK REC ============ -->
+      <section class="page" id="page-bank">
+        <div class="page-header">
+          <h1><span class="ico" aria-hidden="true">⇋</span> التسوية البنكية (Bank Rec)</h1>
+          <p>رصيد البنك + شيكات معلقة + إيداعات في الطريق + عمولات وفوائد · قيد تسوية متوازن</p>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>رصيد كشف البنك</label><input type="number" id="Br_bank" value="120000" oninput="calcBank()" /></div>
+            <div class="field"><label>رصيد الدفتر (البنك)</label><input type="number" id="Br_book" value="117100" oninput="calcBank()" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>شيكات معلقة (لم تُصرف)</label><input type="number" id="Br_checks" value="8000" oninput="calcBank()" /></div>
+            <div class="field"><label>إيداعات في الطريق</label><input type="number" id="Br_deposits" value="5000" oninput="calcBank()" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>عمولات/مصاريف بنكية غير مسجلة</label><input type="number" id="Br_fees" value="300" oninput="calcBank()" /></div>
+            <div class="field"><label>فوائد دائنة غير مسجلة</label><input type="number" id="Br_interest" value="200" oninput="calcBank()" /></div>
+          </div>
+          <div class="results">
+            <div class="rcard"><div class="lbl">الرصيد المعدل (بنك)</div><div class="val accent" id="Br_adjBank">—</div></div>
+            <div class="rcard"><div class="lbl">الرصيد المعدل (دفتر)</div><div class="val accent" id="Br_adjBook">—</div></div>
+            <div class="rcard"><div class="lbl">الفرق</div><div class="val" id="Br_diff">—</div></div>
+            <div class="rcard"><div class="lbl">حالة التسوية</div><div class="val" id="Br_state">—</div></div>
+          </div>
+          <div class="je">
+            <div class="je-header"><span class="je-title">قيد التسوية (عمولات وفوائد)</span></div>
+            <div id="Br_je"></div>
+          </div>
+          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('Br_table')">نسخ CSV</button></div>
+          <div class="data-table-wrap">
+            <table class="data-table" id="Br_table"><thead><tr><th>البند</th><th>المبلغ</th></tr></thead><tbody></tbody></table>
+          </div>
+          <div class="std-note" id="Br_note"><span class="ico">i</span><span>—</span></div>
         </div>
       </section>
 
@@ -1228,6 +1332,22 @@
     </div>
   </div>
 
+  <div class="coa-backdrop" id="keysBackdrop"></div>
+  <div class="coa-modal keys-modal" id="keysBox" role="dialog" aria-modal="true" aria-labelledby="keysTitle">
+    <div class="coa-head">
+      <div class="coa-title" id="keysTitle">اختصارات لوحة المفاتيح</div>
+      <button class="coa-x" id="keysClose" type="button" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="coa-body">
+      <div class="keys-list" id="keysList"></div>
+      <p class="table-note">الاختصارات لا تعمل أثناء الكتابة داخل الحقول. <kbd>Esc</kbd> يغلق النوافذ ويعيدك للحاسبة.</p>
+    </div>
+    <div class="coa-foot">
+      <span class="coa-hint">اضغط <kbd>?</kbd> في أي وقت لفتح هذه القائمة</span>
+      <button class="btn sm" id="keysDone" type="button">تم</button>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -1316,15 +1436,17 @@
     }
     toast('تعذر النسخ');
   }
-  async function copyText(txt) {
+  async function copyText(txt, okMsg) {
     const text = String(txt == null ? '' : txt);
-    if (!text) { toast('لا يوجد نص للنسخ'); return; }
+    const done = okMsg || 'تم النسخ';
+    if (!text) { toast('لا يوجد نص للنسخ'); return false; }
     const ret = document.activeElement;
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      try { await navigator.clipboard.writeText(text); toast('تم النسخ'); return; } catch (e) {}
+      try { await navigator.clipboard.writeText(text); toast(done); return true; } catch (e) {}
     }
-    if (legacyCopy(text)) { toast('تم النسخ'); return; }
+    if (legacyCopy(text)) { toast(done); return true; }
     manualCopy(text, ret);
+    return false;
   }
   function copyJE(id) {
     const el = $(id);
@@ -1661,19 +1783,151 @@
       else if (a === 'discount') discount();
     }
   }));
-  window.addEventListener('keydown', (e) => {
+  // ===== اختصارات لوحة المفاتيح (المرحلة 5) =====
+  function isTyping(el) {
+    if (!el) return false;
+    const tag = (el.tagName || '').toLowerCase();
+    return tag === 'input' || tag === 'textarea' || tag === 'select' || el.isContentEditable === true;
+  }
+  function anyModalOpen() {
+    return ['coaModal', 'revBox', 'copyBox', 'keysBox'].some(function (id) {
+      const el = $(id);
+      return !!el && el.classList.contains('open');
+    });
+  }
+  const AR_DIGITS = { '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9','٫':'.','٬':'' };
+  const KEY_ALIAS = { '×': '*', '÷': '/', '−': '-', '–': '-' };
+  function normKey(k) {
+    if (AR_DIGITS[k] !== undefined) return AR_DIGITS[k];
+    return KEY_ALIAS[k] || k;
+  }
+
+  function copyLastJE() {
+    if (!window.SCJE || typeof SCJE.allEntries !== 'function') { toast('لا توجد قيود بعد'); return; }
+    SCJE.allEntries().then(function (rows) {
+      if (!rows || !rows.length) { toast('لا توجد قيود بعد'); return; }
+      const e = rows[0];
+      copyText(SCJE.format(e, 'erp'), 'نُسخ آخر قيد: ' + e.no);
+    }).catch(function () { toast('تعذر النسخ'); });
+  }
+
+  const Keys = (function () {
+    const box = $('keysBox'), backdrop = $('keysBackdrop'), list = $('keysList');
+    const closeBtn = $('keysClose'), doneBtn = $('keysDone');
+    let returnTo = null;
+    const ROWS = [
+      { k: ['0','1','2','3','4','5','6','7','8','9'], t: 'إدخال الأرقام' },
+      { k: ['+','−','×','÷'], t: 'العمليات الحسابية' },
+      { k: ['Enter'], t: 'إظهار النتيجة (أو =)' },
+      { k: ['⌫'], t: 'حذف آخر خانة' },
+      { k: ['%'], t: 'النسبة المئوية' },
+      { k: ['(',')'], t: 'الأقواس' },
+      { k: ['Esc'], t: 'تصفير الحاسبة أو إغلاق النافذة' },
+      { k: ['Alt','T'], t: 'إضافة الضريبة للسطر الحالي' },
+      { k: ['Ctrl','Shift','C'], t: 'نسخ آخر قيد بصيغة ERP' },
+      { k: ['F1'], t: 'الانتقال إلى الحاسبة' },
+      { k: ['F2'], t: 'الانتقال إلى السجل والقيود' },
+      { k: ['?'], t: 'فتح قائمة الاختصارات' }
+    ];
+    function draw() {
+      if (!list || list.children.length) return;
+      ROWS.forEach(function (row) {
+        const div = document.createElement('div');
+        div.className = 'keys-row';
+        const k = document.createElement('span');
+        k.className = 'k';
+        row.k.forEach(function (key, i) {
+          if (i) { const plus = document.createElement('span'); plus.textContent = '+'; k.appendChild(plus); }
+          const kb = document.createElement('kbd');
+          kb.textContent = key;
+          k.appendChild(kb);
+        });
+        const t = document.createElement('span');
+        t.className = 't';
+        t.textContent = row.t;
+        div.appendChild(k);
+        div.appendChild(t);
+        list.appendChild(div);
+      });
+    }
+    function isOpen() { return !!box && box.classList.contains('open'); }
+    function open() {
+      if (!box) return;
+      returnTo = document.activeElement;
+      draw();
+      box.classList.add('open');
+      if (backdrop) backdrop.classList.add('open');
+      document.body.classList.add('modal-open');
+      setTimeout(function () { if (closeBtn) closeBtn.focus(); }, 30);
+    }
+    function close() {
+      if (!box) return;
+      box.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('open');
+      document.body.classList.remove('modal-open');
+      if (returnTo && returnTo.focus) { try { returnTo.focus(); } catch (e) {} }
+      returnTo = null;
+    }
+    if (box) {
+      box.addEventListener('keydown', function (e) {
+        if (e.key !== 'Tab') return;
+        const items = Array.prototype.filter.call(
+          box.querySelectorAll('button, input, select, textarea'),
+          function (el) { return !el.disabled && el.offsetParent !== null; });
+        if (!items.length) return;
+        const first = items[0], last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      });
+    }
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (doneBtn) doneBtn.addEventListener('click', close);
+    if (backdrop) backdrop.addEventListener('click', close);
+    const openBtn = $('keysOpen'), openBtn2 = $('keysOpenCalc');
+    if (openBtn) openBtn.addEventListener('click', open);
+    if (openBtn2) openBtn2.addEventListener('click', open);
+    return { open: open, close: close, isOpen: isOpen };
+  })();
+
+  window.addEventListener('keydown', function (e) {
+    // Esc: نافذة الاختصارات أولاً، ثم بقية النوافذ تتولى أمرها
+    if (e.key === 'Escape') {
+      if (Keys.isOpen()) { e.preventDefault(); Keys.close(); return; }
+      if (anyModalOpen()) return;
+      const s = $('settings');
+      if (s && s.classList.contains('open')) { closeSettings(); return; }
+      if (isTyping(e.target)) { try { e.target.blur(); } catch (err) {} return; }
+      const cur = document.querySelector('.page.active');
+      if (cur && cur.id === 'page-calc') { e.preventDefault(); clearAll(); }
+      return;
+    }
+    if (e.ctrlKey && e.shiftKey && !e.altKey && (e.key === 'C' || e.key === 'c')) {
+      e.preventDefault(); copyLastJE(); return;
+    }
+    if (e.key === 'F1') { e.preventDefault(); goTo('calc'); return; }
+    if (e.key === 'F2') { e.preventDefault(); goTo('tape'); return; }
+    if (e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 't' || e.key === 'T')) {
+      e.preventDefault();
+      const cur = document.querySelector('.page.active');
+      if (!cur || cur.id !== 'page-calc') goTo('calc');
+      taxPlus();
+      return;
+    }
+    if (isTyping(e.target) || anyModalOpen()) return;
+    if (e.key === '?' || (e.shiftKey && e.key === '/')) { e.preventDefault(); Keys.open(); return; }
+    if (e.target && e.target.closest && e.target.closest('button, a, [role="button"], summary, label')) return;
     const active = document.querySelector('.page.active');
     if (!active || active.id !== 'page-calc') return;
-    if (e.key >= '0' && e.key <= '9') appendNum(e.key);
-    else if (e.key === '.') appendNum('.');
-    else if (['+','-','*','/'].includes(e.key)) appendOp(e.key);
-    else if (e.key === '(') lparen();
-    else if (e.key === ')') rparen();
-    else if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); evaluate(); }
-    else if (e.key === 'Backspace') backspace();
-    else if (e.key === 'Escape') clearAll();
-    else if (e.key === '%') percent();
-  });
+    const key = normKey(e.key);
+    if (key >= '0' && key <= '9') appendNum(key);
+    else if (key === '.') appendNum('.');
+    else if (['+','-','*','/'].includes(key)) appendOp(key);
+    else if (key === '(') lparen();
+    else if (key === ')') rparen();
+    else if (key === 'Enter' || key === '=') { e.preventDefault(); evaluate(); }
+    else if (key === 'Backspace') backspace();
+    else if (key === '%') percent();
+  }, true);
   setTaxRate(15);
   renderHistory();
   updateDisplay();
@@ -1816,46 +2070,84 @@
   function calcDepr() {
     const cost = parseFloat($('D_cost').value) || 0;
     const salvage = parseFloat($('D_salvage').value) || 0;
-    const life = parseInt($('D_life').value) || 1;
+    const life = Math.max(1, parseInt($('D_life').value, 10) || 1);
     const method = $('D_method').value;
-    const depreciable = cost - salvage;
-    let schedule = [];
-    if (method === 'sl') {
-      const annual = depreciable / life;
-      let book = cost;
-      for (let y = 1; y <= life; y++) { book -= annual; schedule.push({ y, dep: annual, book: Math.max(book, salvage) }); }
-    } else if (method === 'ddb') {
-      const rate = 2 / life;
-      let book = cost;
-      for (let y = 1; y <= life; y++) {
-        let dep = book * rate;
-        if (book - dep < salvage) dep = book - salvage;
-        if (dep < 0) dep = 0;
-        book -= dep;
-        schedule.push({ y, dep, book: Math.max(book, salvage) });
-      }
-    } else if (method === 'syd') {
-      const sumYears = life * (life + 1) / 2;
-      let book = cost;
-      for (let y = 1; y <= life; y++) {
-        const remaining = life - y + 1;
-        const dep = depreciable * (remaining / sumYears);
-        book -= dep;
-        schedule.push({ y, dep, book: Math.max(book, salvage) });
-      }
+    const depreciable = Math.max(cost - salvage, 0);
+
+    // تاريخ الشراء: السنة المالية = السنة الميلادية، وشهر الشراء يُحتسب كاملاً
+    const startEl = $('D_start');
+    if (startEl && !startEl.value) {
+      const d = new Date();
+      startEl.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
     }
-    const total = schedule.reduce((a, b) => a + b.dep, 0);
-    const annual = schedule[0]?.dep || 0;
-    const monthly = annual / 12;
-    $('D_first').textContent = fmt(annual);
+    const raw = String((startEl && startEl.value) || '');
+    const sm = /^(\d{4})-(\d{2})$/.exec(raw);
+    const now = new Date();
+    const startYear = sm ? parseInt(sm[1], 10) : now.getFullYear();
+    const startMonth = sm ? Math.min(12, Math.max(1, parseInt(sm[2], 10))) : 1;
+    const firstMonths = 13 - startMonth;
+
+    // إهلاك كل سنة من عمر الأصل (12 شهراً كاملة)، متسلسلاً على القيمة الدفترية
+    const sumYears = life * (life + 1) / 2;
+    let book = cost;
+    const yearDeps = [];
+    for (let y = 1; y <= life; y++) {
+      let dep;
+      if (method === 'sl') dep = depreciable / life;
+      else if (method === 'ddb') dep = book * (2 / life);
+      else dep = depreciable * ((life - y + 1) / sumYears);
+      dep = Math.min(Math.max(dep, 0), Math.max(book - salvage, 0));
+      yearDeps.push(dep);
+      book -= dep;
+    }
+
+    // جدول شهري: كل شهر من عمر الأصل، موزّعاً على السنوات المالية
+    const schedule = [];
+    let acc = 0, run = cost;
+    const months = life * 12;
+    for (let i = 0; i < months; i++) {
+      const assetYear = Math.floor(i / 12);
+      const abs = startYear * 12 + (startMonth - 1) + i;
+      const fy = Math.floor(abs / 12);
+      const mo = (abs % 12) + 1;
+      let dep = yearDeps[assetYear] / 12;
+      if (i === months - 1) dep = Math.max(run - salvage, 0); // ضبط التقريب في آخر شهر
+      dep = Math.max(dep, 0);
+      acc += dep; run -= dep;
+      schedule.push({ ym: fy + '-' + String(mo).padStart(2, '0'), fy: fy, mo: mo, dep: dep, acc: acc, book: run });
+    }
+
+    const monthly = yearDeps[0] / 12;
+    const first = schedule.filter(s => s.fy === startYear).reduce((a, s) => a + s.dep, 0);
+    const total = schedule.reduce((a, s) => a + s.dep, 0);
+    const endAbs = startYear * 12 + (startMonth - 1) + months - 1;
+    const endY = Math.floor(endAbs / 12), endM = (endAbs % 12) + 1;
+
+    $('D_first').textContent = fmt(first);
     $('D_monthly').textContent = fmt(monthly);
     $('D_total').textContent = fmt(total);
+    $('D_end').textContent = String(endM).padStart(2, '0') + '/' + endY;
+    const hint = $('D_m1hint');
+    if (hint) hint.textContent = firstMonths + ' أشهر إهلاك في ' + startYear + ' (شهر الشراء كامل)';
+
     setJE('D_je', [
       { code: '5200', account: 'مصروف إهلاك الأصول', dr: monthly, cr: null },
       { code: '1510', account: 'مجمع إهلاك الأصول', dr: null, cr: monthly }
     ]);
+
     const tbody = $('D_table').querySelector('tbody');
-    tbody.innerHTML = schedule.map(s => `<tr><td>${s.y}</td><td>${fmt(s.dep)}</td><td>${fmt(s.book)}</td></tr>`).join('');
+    tbody.innerHTML = schedule.map(s =>
+      `<tr${s.fy === startYear ? ' style="background:rgba(245,166,35,.07)"' : ''}>` +
+      `<td>${s.ym}</td><td>${s.fy}</td><td>${fmt(s.dep)}</td><td>${fmt(s.acc)}</td><td>${fmt(s.book)}</td></tr>`
+    ).join('');
+
+    const note = $('D_note');
+    if (note) {
+      note.innerHTML = 'السنة الأولى (' + startYear + '): <b>' + firstMonths + ' شهراً</b> × القسط الشهري ' +
+        fmt(monthly) + ' = <b>' + fmt(first) + '</b> · إجمالي الإهلاك على العمر = <b>' + fmt(total) +
+        '</b> · القيمة الدفترية النهائية = <b>' + fmt(schedule[schedule.length - 1].book) + '</b>' +
+        ' · آخر شهر: ' + String(endM).padStart(2, '0') + '/' + endY;
+    }
   }
 
   function calcBE() {
@@ -1947,9 +2239,19 @@
   function calcAging() {
     const buckets = [parseFloat($('A_b0').value)||0, parseFloat($('A_b1').value)||0, parseFloat($('A_b2').value)||0, parseFloat($('A_b3').value)||0, parseFloat($('A_b4').value)||0];
     const rates = [parseFloat($('A_r0').value)||0, parseFloat($('A_r1').value)||0, parseFloat($('A_r2').value)||0, parseFloat($('A_r3').value)||0, parseFloat($('A_r4').value)||0];
-    const total = buckets.reduce((a,b)=>a+b,0);
+    const labels = ['0-30 يوم', '31-60 يوم', '61-90 يوم', '91-180 يوم', '181+ يوم'];
+    // IFRS 9: عامل تعديل مستقبلي يضرب المخصص كاملاً
+    let flf = parseFloat($('A_flf').value);
+    if (!isFinite(flf) || flf < 0) flf = 1;
+    const total = buckets.reduce((a, b) => a + b, 0);
     let prov = 0;
-    for (let i = 0; i < 5; i++) prov += buckets[i] * rates[i] / 100;
+    const rows = [];
+    for (let i = 0; i < 5; i++) {
+      const p = buckets[i] * rates[i] / 100 * flf;
+      prov += p;
+      rows.push('<tr><td>' + labels[i] + '</td><td>' + fmt(buckets[i]) + '</td><td>' + fmt(rates[i]) + '%</td><td>' + fmt(p) + '</td></tr>');
+    }
+    rows.push('<tr><td><b>الإجمالي</b></td><td><b>' + fmt(total) + '</b></td><td>—</td><td><b>' + fmt(prov) + '</b></td></tr>');
     const overdue90 = buckets[3] + buckets[4];
     const defaultRatio = total > 0 ? (overdue90 / total) * 100 : 0;
     const net = total - prov;
@@ -1957,6 +2259,12 @@
     $('A_prov').textContent = fmt(prov);
     $('A_default').textContent = fmt(defaultRatio) + '%';
     $('A_net').textContent = fmt(net);
+    $('A_table').querySelector('tbody').innerHTML = rows.join('');
+    const note = $('A_note');
+    if (note) {
+      note.innerHTML = 'المخصص = Σ(رصيد × نسبة × عامل) = <b>' + fmt(prov) + '</b> · عامل التعديل المستقبلي المطبّق = <b>×' +
+        fmt(flf) + '</b>' + (flf === 1 ? ' (بلا تعديل)' : '');
+    }
     setJE('A_je', [
       { code: '5300', account: 'مصروف مخصص الديون مشكوك في تحصيلها', dr: prov, cr: null },
       { code: '1310', account: 'مخصص الديون المشكوك في تحصيلها', dr: null, cr: prov }
@@ -2027,9 +2335,68 @@
     const endWAC = (totalQty - sold) * wac;
     const tbody = $('Iv_table').querySelector('tbody');
     tbody.innerHTML = `
-      <tr><td>FIFO</td><td>${fmt(cogsFIFO)}</td><td>${fmt(endFIFO)}</td></tr>
-      <tr><td>LIFO</td><td>${fmt(cogsLIFO)}</td><td>${fmt(endLIFO)}</td></tr>
-      <tr><td>WAC</td><td>${fmt(cogsWAC)}</td><td>${fmt(endWAC)}</td></tr>`;
+      <tr><td>FIFO <span class="std-badge ok">IAS 2 ✓</span></td><td>${fmt(cogsFIFO)}</td><td>${fmt(endFIFO)}</td></tr>
+      <tr><td>LIFO <span class="std-badge red">ممنوع · IAS 2</span></td><td>${fmt(cogsLIFO)}</td><td>${fmt(endLIFO)}</td></tr>
+      <tr><td>WAC <span class="std-badge ok">IAS 2 ✓</span></td><td>${fmt(cogsWAC)}</td><td>${fmt(endWAC)}</td></tr>`;
+  }
+
+  function calcBank() {
+    const bank = parseFloat($('Br_bank').value) || 0;
+    const book = parseFloat($('Br_book').value) || 0;
+    const checks = parseFloat($('Br_checks').value) || 0;
+    const deposits = parseFloat($('Br_deposits').value) || 0;
+    const fees = parseFloat($('Br_fees').value) || 0;
+    const interest = parseFloat($('Br_interest').value) || 0;
+
+    const adjBank = bank + deposits - checks;
+    const adjBook = book + interest - fees;
+    const diff = adjBank - adjBook;
+    const ok = Math.abs(diff) <= 0.005;
+
+    $('Br_adjBank').textContent = fmt(adjBank);
+    $('Br_adjBook').textContent = fmt(adjBook);
+    $('Br_diff').textContent = fmt(diff);
+    $('Br_diff').className = 'val ' + (ok ? 'green' : 'red');
+    $('Br_state').textContent = ok ? 'مطابقة ✓' : 'فرق';
+    $('Br_state').className = 'val ' + (ok ? 'green' : 'red');
+
+    const rows = [
+      ['رصيد كشف البنك', bank],
+      ['+ إيداعات في الطريق', deposits],
+      ['− شيكات معلقة', -checks],
+      ['= الرصيد المعدل للبنك', adjBank],
+      ['رصيد الدفتر', book],
+      ['+ فوائد دائنة غير مسجلة', interest],
+      ['− عمولات بنكية غير مسجلة', -fees],
+      ['= الرصيد المعدل للدفتر', adjBook]
+    ];
+    $('Br_table').querySelector('tbody').innerHTML = rows.map(function (r) {
+      const em = r[0].charAt(0) === '=';
+      const val = fmt(r[1]);
+      return '<tr><td>' + (em ? '<b>' + r[0] + '</b>' : r[0]) + '</td><td>' +
+        (em ? '<b>' + val + '</b>' : val) + '</td></tr>';
+    }).join('');
+
+    const note = $('Br_note');
+    if (note) {
+      note.className = 'std-note' + (ok ? ' ok' : '');
+      note.innerHTML = ok
+        ? '<span class="ico">✓</span><span><b>التسوية مطابقة:</b> الرصيد المعدل للبنك = الرصيد المعدل للدفتر = <b>' + fmt(adjBank) +
+          '</b>. البنود المعلقة تُسوّى في الشهر التالي، والعمولات والفوائد تُثبت بقيد التسوية.</span>'
+        : '<span class="ico">!</span><span><b>فرق غير مفسَّر:</b> ' + fmt(diff) +
+          '. راجع الشيكات المعلقة أو الإيداعات في الطريق أو حركة غير مسجلة قبل الترحيل — لا تُعد التسوية مكتملة حتى يصبح الفرق صفراً.</span>';
+    }
+
+    const lines = [];
+    if (fees > 0) {
+      lines.push({ code: '5600', account: 'مصاريف بنكية', dr: fees, cr: null });
+      lines.push({ code: '1200', account: 'البنك', dr: null, cr: fees });
+    }
+    if (interest > 0) {
+      lines.push({ code: '1200', account: 'البنك', dr: interest, cr: null });
+      lines.push({ code: '4200', account: 'إيرادات فوائد', dr: null, cr: interest });
+    }
+    setJE('Br_je', lines);
   }
 
   // ---- feedback ----
@@ -2639,10 +3006,12 @@
       { code: '2300', name: 'أقساط مستحقة', type: 'liability' },
       { code: '2400', name: 'ذمم ضريبية', type: 'liability' },
       { code: '4100', name: 'الإيرادات', type: 'revenue' },
+      { code: '4200', name: 'إيرادات فوائد', type: 'revenue' },
       { code: '4900', name: 'أرباح فروق عملة', type: 'revenue' },
       { code: '5100', name: 'تكلفة المبيعات', type: 'expense' },
       { code: '5200', name: 'مصروف الإهلاك', type: 'expense' },
       { code: '5300', name: 'خسائر ائتمانية متوقعة', type: 'expense' },
+      { code: '5600', name: 'مصاريف بنكية', type: 'expense' },
       { code: '5900', name: 'خسائر فروق عملة', type: 'expense' }
     ];
     const TYPES = [
@@ -2666,6 +3035,18 @@
       return rows.sort(function (a, b) { return String(a.code).localeCompare(String(b.code)); });
     }
 
+    // إضافة الحسابات الجديدة فقط — لا تلمس أسماء أو أنواع ما عدّله المستخدم
+    function addMissing() {
+      const have = {};
+      (cache || []).forEach(function (a) { have[a.code] = true; });
+      const missing = DEFAULTS.filter(function (a) { return !have[a.code]; });
+      if (!missing.length) return cache;
+      missing.forEach(function (a) { cache.push({ code: a.code, name: a.name, type: a.type }); });
+      return Promise.all(missing.map(function (a) {
+        return SCStore.put('coa', { code: a.code, name: a.name, type: a.type });
+      })).then(function () { sortRows(cache); return cache; });
+    }
+
     function ready() {
       if (opening) return opening;
       opening = SCStore.ready()
@@ -2676,7 +3057,7 @@
             cache = rows || [];
             if (!cache.length) return seed();
             sortRows(cache);
-            return cache;
+            return addMissing();
           });
         })
         .catch(function () {
@@ -3113,7 +3494,7 @@
     const REPLAY = {
       disc: 'calcDiscount', profit: 'calcProfit', vat: 'calcVAT', loan: 'calcLoan',
       interest: 'calcInterest', depr: 'calcDepr', be: 'calcBE', npv: 'calcNPV',
-      ratios: 'calcRatios', aging: 'calcAging', inv: 'calcInv'
+      ratios: 'calcRatios', aging: 'calcAging', inv: 'calcInv', bank: 'calcBank'
     };
     const NO_REPLAY = { fx: 'أسعار العملات تُجلب حيّة', fxrev: 'إعادة التقييم تعتمد سعر صرف حيّ' };
     const KINDS = { 'je-post': 'ترحيل', 'je-reverse': 'عكس', 'je-delete': 'حذف' };
@@ -3547,7 +3928,7 @@
 
   // ---- init ----
   function recalcAll() {
-    ['calcDiscount','calcFx','calcProfit','calcVAT','calcLoan','calcInterest','calcDepr','calcBE','calcNPV','calcRatios','calcAging','calcFxRev','calcInv']
+    ['calcDiscount','calcFx','calcProfit','calcVAT','calcLoan','calcInterest','calcDepr','calcBE','calcNPV','calcRatios','calcAging','calcFxRev','calcInv','calcBank']
       .forEach(function (f) { try { window[f](); } catch (e) {} });
   }
 
