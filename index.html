@@ -11,7 +11,7 @@
     --bg-2: #0f1424;
     --surface: #141827;
     --surface-2: #1a1f33;
-    --border: #1f2537;
+    --border: #2a3350;
     --border-2: #5a6480;
     --text: #e8eaed;
     --muted: #9aa3b8;
@@ -21,11 +21,14 @@
     --amber: #f5a623;
     --green: #3ddc97;
     --red: #ff5e7e;
+    --accent-hover: #2f5fd0;
     --radius: 12px;
     --radius-sm: 8px;
     --shadow: 0 8px 24px rgba(0,0,0,0.35);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  ::selection { background: rgba(79,140,255,0.35); color: #fff; }
+  button, .nav-item, .calc-chip, .ck, input, select, textarea { touch-action: manipulation; }
   html, body { height: 100%; font-family: "Segoe UI", "Tahoma", "Cairo", system-ui, sans-serif;
     background: var(--bg); color: var(--text); overflow: hidden; }
   body { background: radial-gradient(1200px 600px at 80% -10%, rgba(79,140,255,0.08), transparent 60%),
@@ -38,21 +41,25 @@
     display: flex; flex-direction: column; overflow-y: auto; padding: 16px 12px;
   }
   .sidebar::-webkit-scrollbar { width: 6px; }
-  .sidebar::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: var(--radius-sm); }
   .brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 16px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
-  .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
+  .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); }
   .brand .name { font-size: 15px; font-weight: 700; }
   .brand .sub { font-size: 11px; color: var(--muted); }
   .group { margin-bottom: 14px; }
-  .group-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px;
+  .group-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase;
     padding: 6px 8px; margin-bottom: 4px; }
   .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm);
     cursor: pointer; color: var(--text); font-size: 13px; font-weight: 500; transition: background .15s, color .15s;
     border: 1px solid transparent; }
   .nav-item:hover { background: var(--surface-2); }
-  .nav-item.active { background: linear-gradient(135deg, rgba(79,140,255,0.18), rgba(124,92,255,0.12));
-    border-color: rgba(79,140,255,0.3); color: #fff; }
-  .nav-item .ico { font-size: 16px; width: 20px; text-align: center; }
+  .nav-item.active { background: var(--surface-2); border-color: rgba(79,140,255,0.35); color: #fff; position: relative; }
+  .nav-item.active::after { content: ""; position: absolute; inset-block: 6px; inset-inline-end: 0; width: 2px;
+    border-radius: 0; background: var(--accent-2); }
+  .nav-item .ico { font-size: 16px; width: 20px; text-align: center;
+    color: var(--muted); font-weight: 400; line-height: 1; }
+  .nav-item.active .ico { color: var(--accent-ink); }
+  .page-header h1 .ico { color: var(--muted); font-weight: 400; margin-inline-end: 2px; }
   .nav-item .lbl { flex: 1; }
 
   .main { flex: 1; overflow-y: auto; padding: 32px; }
@@ -62,14 +69,15 @@
   .page { display: none; max-width: 900px; margin: 0 auto; }
   #page-calc { max-width: clamp(320px, 90vw, 620px); }
   .page.active { display: block; }
-  .page-header { margin-bottom: 24px; }
-  .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .page-header { margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; text-wrap: balance; }
   .page-header p { font-size: 13px; color: var(--muted); }
 
   /* Cards */
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
-  .card-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    padding: 24px; margin-bottom: 20px; }
+  .card-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border); text-wrap: balance; }
   .card-title .ico { font-size: 18px; }
 
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -85,6 +93,8 @@
   }
   .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
   .field textarea { resize: vertical; min-height: 60px; font-family: "Consolas", monospace; }
+  .field select option { background: var(--surface-2); color: var(--text); }
+  .field input:hover, .field select:hover, .field textarea:hover { border-color: rgba(90,100,128,0.55); }
   .field .hint { font-size: 11px; color: var(--muted-2); }
   .row { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
   .row .field { flex: 1; min-width: 120px; margin-bottom: 0; }
@@ -98,18 +108,20 @@
   .btn.danger { background: var(--red); }
   .btn.green { background: var(--green); color: #0a0e1a; }
   .btn.sm { padding: 6px 12px; font-size: 12px; }
+  .btn:disabled, .ck:disabled, .fb-send:disabled { opacity: .55; cursor: not-allowed; }
   .btn.copy { background: rgba(61,220,151,0.15); color: var(--green); border: 1px solid rgba(61,220,151,0.3); }
 
   /* Result cards */
   .results { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 12px; margin-top: 16px; }
   .rcard { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; min-width: 0; }
-  .rcard .lbl { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .rcard .lbl { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; }
   .rcard .val { font-size: clamp(16px, 5vw, 20px); font-weight: 800; color: var(--text); overflow-wrap: anywhere; }
-  .rcard .val.accent { color: var(--accent); }
+  .rcard .val.accent { color: var(--accent-ink); }
   .rcard .val.amber { color: var(--amber); }
   .rcard .val.green { color: var(--green); }
   .rcard .val.red { color: var(--red); }
   .rcard .sub { font-size: 11px; color: var(--muted-2); margin-top: 4px; }
+  .calc-result, .rcard .val, .calc-chip .v, .calc-history .hr, .je-table .num, .data-table td { font-variant-numeric: tabular-nums; }
 
   /* Journal entry */
   .je { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-top: 12px; }
@@ -127,8 +139,9 @@
   /* Data table */
   .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .data-table th, .data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: center; direction: ltr; }
-  .data-table th { background: var(--surface-2); color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .data-table th { background: var(--surface-2); color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; }
   .data-table thead th { position: sticky; top: 0; z-index: 1; }
+  .data-table tbody tr:hover { background: rgba(255,255,255,0.045); }
   .data-table tr:last-child td { border-bottom: none; }
   .data-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
     overflow: auto; max-height: 280px; margin-top: 12px; position: relative; }
@@ -170,7 +183,7 @@
     padding: clamp(8px, 2vw, 14px) 0; transition: background .15s, border-color .15s; }
   .ck:hover { background: var(--surface); border-color: var(--border-2); }
   .ck:active { background: var(--bg); }
-  .ck.op { background: rgba(79,140,255,0.15); color: var(--accent); border-color: rgba(79,140,255,0.3); }
+  .ck.op { background: rgba(79,140,255,0.15); color: var(--accent-ink); border-color: rgba(79,140,255,0.3); }
   .ck.eq { background: var(--amber); color: #0a0e1a; border-color: var(--amber); }
   .ck.mem { background: rgba(61,220,151,0.15); color: var(--green); border-color: rgba(61,220,151,0.3); }
   .ck.tax { background: rgba(255,94,126,0.15); color: var(--red); border-color: rgba(255,94,126,0.3); }
@@ -209,12 +222,12 @@
   .fx-pin:active { transform: scale(.99); }
   .fx-pin.active { border-color: rgba(79,140,255,0.5); background: rgba(79,140,255,0.10); }
   .fx-pin .fx-fl { font-size: 18px; line-height: 1; }
-  .fx-pin .fx-code { font-size: 10px; font-weight: 800; color: var(--muted); letter-spacing: .6px; margin-top: 4px; }
+  .fx-pin .fx-code { font-size: 11px; font-weight: 800; color: var(--muted); letter-spacing: .6px; margin-top: 4px; }
   .fx-pin .fx-val { font-size: clamp(15px, 4.6vw, 20px); font-weight: 800; direction: ltr; margin-top: 2px;
     font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-  .fx-pin .fx-sub { font-size: 10px; color: var(--muted); direction: ltr; margin-top: 3px; line-height: 1.3;
+  .fx-pin .fx-sub { font-size: 11px; color: var(--muted); direction: ltr; margin-top: 3px; line-height: 1.3;
     overflow-wrap: anywhere; }
-  .fx-hint { font-size: 10px; font-weight: 500; color: var(--muted); margin-inline-start: auto; }
+  .fx-hint { font-size: 11px; font-weight: 500; color: var(--muted); margin-inline-start: auto; }
   .fx-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
   .fx-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: center;
     width: 100%; text-align: right; background: var(--surface-2); border: 1px solid var(--border);
@@ -225,11 +238,11 @@
   .fx-row .fx-fl { font-size: 17px; text-align: center; }
   .fx-row .fx-name { min-width: 0; }
   .fx-row .fx-name b { font-size: 13px; font-weight: 700; display: block; }
-  .fx-row .fx-name small { font-size: 10px; color: var(--muted); display: block; direction: ltr; text-align: right; }
+  .fx-row .fx-name small { font-size: 11px; color: var(--muted); display: block; direction: ltr; text-align: right; }
   .fx-row .fx-amt { font-size: 15px; font-weight: 800; direction: ltr; text-align: left;
     font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .fx-row .fx-amt small { font-size: 10px; color: var(--muted); font-weight: 600; }
-  .fx-row .fx-badge { font-size: 9px; color: var(--green); font-weight: 700; }
+  .fx-row .fx-amt small { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .fx-row .fx-badge { font-size: 11px; color: var(--green); font-weight: 700; }
   @media (max-width: 520px) {
     .fx-toolbar { grid-template-columns: 1fr 1fr; }
     .fx-refresh { grid-column: 1 / -1; width: 100%; }
@@ -242,7 +255,7 @@
     background: var(--accent); color: #fff; border: 1px solid rgba(255,255,255,0.14);
     font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
     box-shadow: 0 10px 26px rgba(0,0,0,0.4); transition: background .15s; }
-  .fb-fab:hover { background: #2f5fd0; }
+  .fb-fab:hover { background: var(--accent-hover); }
   .fb-fab .ico { font-size: 16px; line-height: 1; }
   .fb-panel { position: fixed; left: 20px; bottom: 76px; z-index: 91;
     width: 340px; max-width: calc(100vw - 40px);
@@ -253,7 +266,7 @@
   .fb-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
   .fb-title { font-size: 14px; font-weight: 800; color: var(--text); }
   .fb-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .fb-close { width: 30px; height: 30px; flex: 0 0 30px; border-radius: 8px;
+  .fb-close { width: 30px; height: 30px; flex: 0 0 30px; border-radius: var(--radius-sm);
     border: 1px solid var(--border); background: var(--surface-2); color: var(--muted);
     cursor: pointer; font-size: 13px; display: grid; place-items: center; }
   .fb-close:hover { color: var(--text); border-color: var(--border-2); }
@@ -267,7 +280,7 @@
   .fb-field textarea { resize: vertical; min-height: 96px; max-height: 220px; }
   .fb-field input:focus, .fb-field textarea:focus { outline: none; border-color: var(--accent); }
   .fb-field input[aria-invalid="true"], .fb-field textarea[aria-invalid="true"] { border-color: var(--red); }
-  .fb-count { font-size: 10px; color: var(--muted); text-align: left; direction: ltr; }
+  .fb-count { font-size: 11px; color: var(--muted); text-align: left; direction: ltr; }
   .fb-hp { position: absolute !important; left: -9999px !important; width: 1px !important;
     height: 1px !important; opacity: 0; pointer-events: none; }
   .fb-status { font-size: 11px; color: var(--muted); }
@@ -275,7 +288,7 @@
   .fb-status.ok { color: var(--green); }
   .fb-send { min-height: 42px; border-radius: var(--radius-sm); border: 1px solid transparent;
     background: var(--accent); color: #fff; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
-  .fb-send:hover { background: #2f5fd0; }
+  .fb-send:hover { background: var(--accent-hover); }
   .fb-send:disabled { opacity: .6; cursor: wait; }
   @media (max-width: 520px) {
     .fb-panel { left: 12px; right: 12px; width: auto; max-width: none; bottom: 68px; }
@@ -304,7 +317,7 @@
     .mb-brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green);
       box-shadow: 0 0 8px var(--green); flex: 0 0 auto; }
     .mb-titles { min-width: 0; }
-    .mb-app { font-size: 10px; color: var(--muted); letter-spacing: .3px; }
+    .mb-app { font-size: 11px; color: var(--muted); }
     .mb-current { font-size: 15px; font-weight: 800; color: var(--text); white-space: nowrap;
       overflow: hidden; text-overflow: ellipsis; max-width: 46vw; line-height: 1.3; }
     .mb-menu { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 14px;
@@ -318,7 +331,7 @@
       width: auto; max-width: 560px; margin: 0 auto; max-height: 84vh; max-height: 84dvh;
       padding: 14px 14px calc(16px + env(safe-area-inset-bottom));
       background: var(--surface); border: 0; border-top: 1px solid var(--border-2);
-      border-radius: 18px 18px 0 0; box-shadow: 0 -24px 60px rgba(0,0,0,0.6);
+      border-radius: 0; box-shadow: 0 -24px 60px rgba(0,0,0,0.6);
       overflow-y: auto; overscroll-behavior: contain;
       display: flex; flex-direction: column;
       transform: translateY(105%); visibility: hidden;
@@ -359,7 +372,7 @@
 
     .results { gap: 10px; }
     .rcard { padding: 12px; }
-    .rcard .lbl { font-size: 10px; }
+    .rcard .lbl { font-size: 11px; }
 
     .je { padding: 10px; }
     .je-header { flex-wrap: wrap; gap: 8px; }
@@ -377,7 +390,7 @@
     .calc-status > span > .calc-chip { width: 100%; }
     .calc-chip { min-width: 0; min-height: 44px; padding: 0 8px;
       justify-content: center; gap: 6px; }
-    .calc-chip > span:first-child { font-size: 10px; }
+    .calc-chip > span:first-child { font-size: 11px; }
     .calc-chip .v { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .tax-popover { left: 0; right: 0; width: auto; top: calc(100% + 6px); }
     .calc-display { min-height: 92px; padding: 14px 16px; }
@@ -403,12 +416,57 @@
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   button, input, select, textarea { font-family: inherit; }
   button:active { transform: none !important; }
-  *:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  *:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   button:focus-visible, .ck:focus-visible, .calc-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   html { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   select { background-color: var(--surface-2); color: var(--text); }
   .rcard .val, .data-table td, .je-table td.num { font-variant-numeric: tabular-nums; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  /* ===== دفتر الأستاذ — طبقة تجريبية محلية ===== */
+  :root {
+    --bg: #0B1220;
+    --bg-2: #0E1626;
+    --surface: #101A2B;
+    --surface-2: #16233A;
+    --border: #2A3350;
+    --border-2: #3B4D6C;
+    --text: #E8EDF6;
+    --muted: #96A5BC;
+    --muted-2: #AEBCD2;
+    --total: #E8B04B;
+    --amber: var(--total);
+    --accent-ink: #7EA6FF;
+    --radius: 10px;
+    --radius-sm: 4px;
+  }
+  html, body { background: var(--bg); }
+  body { background-image: none; }
+  .calc-result { color: var(--total); }
+
+  /* النتائج كشريط قراءة على الشاشات الواسعة */
+  @media (min-width: 769px) {
+    .results { gap: 0; border-top: 1px solid var(--border-2); border-bottom: 1px solid var(--border); }
+    .rcard { background: transparent; border: 0; border-inline-start: 1px solid var(--border); padding: 12px 14px; }
+    .rcard:first-child { border-inline-start: 0; padding-inline-start: 0; }
+    .rcard:first-child .val:not(.accent):not(.amber):not(.green):not(.red) { color: var(--total); }
+  }
+
+  /* العملات كأسطر دفتر */
+  .fx-pinned { gap: 0; border-top: 1px solid var(--border-2); border-bottom: 1px solid var(--border); }
+  .fx-pin { background: transparent; border: 0; border-inline-start: 1px solid var(--border);
+    border-radius: 0; padding: 12px; }
+  .fx-pin:first-child { border-inline-start: 0; padding-inline-start: 0; }
+  .fx-pin:hover { background: var(--surface-2); }
+  .fx-pin.active { background: var(--surface-2); }
+  .fx-pin.active .fx-val { color: var(--total); }
+  .fx-list { gap: 0; }
+  .fx-row { background: transparent; border: 0; border-bottom: 1px solid var(--border);
+    border-radius: 0; padding: 9px 6px; }
+  .fx-row:last-child { border-bottom: 0; }
+  .fx-row:hover { background: var(--surface-2); }
+  .fx-row.active { background: var(--surface-2); }
+
 </style>
 </head>
 <body>
@@ -446,29 +504,29 @@
 
       <div class="group">
         <div class="group-title">الأدوات اليومية</div>
-        <div class="nav-item active" data-page="calc"><span class="ico">🧮</span><span class="lbl">حاسبة</span></div>
-        <div class="nav-item" data-page="disc"><span class="ico">💱</span><span class="lbl">خصومات/عملات</span></div>
-        <div class="nav-item" data-page="fx"><span class="ico">🌍</span><span class="lbl">أسعار العملات</span></div>
-        <div class="nav-item" data-page="profit"><span class="ico">💰</span><span class="lbl">ربح/هامش</span></div>
-        <div class="nav-item" data-page="vat"><span class="ico">🧾</span><span class="lbl">VAT</span></div>
+        <div class="nav-item active" data-page="calc"><span class="ico" aria-hidden="true">▣</span><span class="lbl">حاسبة</span></div>
+        <div class="nav-item" data-page="disc"><span class="ico" aria-hidden="true">⇄</span><span class="lbl">خصومات/عملات</span></div>
+        <div class="nav-item" data-page="fx"><span class="ico" aria-hidden="true">¤</span><span class="lbl">أسعار العملات</span></div>
+        <div class="nav-item" data-page="profit"><span class="ico" aria-hidden="true">%</span><span class="lbl">ربح/هامش</span></div>
+        <div class="nav-item" data-page="vat"><span class="ico" aria-hidden="true">ض</span><span class="lbl">VAT</span></div>
       </div>
       <div class="group">
         <div class="group-title">الأصول والتمويل</div>
-        <div class="nav-item" data-page="loan"><span class="ico">🏦</span><span class="lbl">قروض</span></div>
-        <div class="nav-item" data-page="interest"><span class="ico">📈</span><span class="lbl">فائدة FV/PV</span></div>
-        <div class="nav-item" data-page="depr"><span class="ico">📉</span><span class="lbl">إهلاك</span></div>
+        <div class="nav-item" data-page="loan"><span class="ico" aria-hidden="true">◷</span><span class="lbl">قروض</span></div>
+        <div class="nav-item" data-page="interest"><span class="ico" aria-hidden="true">△</span><span class="lbl">فائدة FV/PV</span></div>
+        <div class="nav-item" data-page="depr"><span class="ico" aria-hidden="true">↘</span><span class="lbl">إهلاك</span></div>
       </div>
       <div class="group">
         <div class="group-title">التحليل والاستثمار</div>
-        <div class="nav-item" data-page="be"><span class="ico">⚖️</span><span class="lbl">تعادل</span></div>
-        <div class="nav-item" data-page="npv"><span class="ico">📊</span><span class="lbl">NPV/IRR</span></div>
-        <div class="nav-item" data-page="ratios"><span class="ico">📐</span><span class="lbl">نسب مالية</span></div>
+        <div class="nav-item" data-page="be"><span class="ico" aria-hidden="true">⊙</span><span class="lbl">تعادل</span></div>
+        <div class="nav-item" data-page="npv"><span class="ico" aria-hidden="true">∑</span><span class="lbl">NPV/IRR</span></div>
+        <div class="nav-item" data-page="ratios"><span class="ico" aria-hidden="true">≡</span><span class="lbl">نسب مالية</span></div>
       </div>
       <div class="group">
         <div class="group-title">العمليات والتقييم</div>
-        <div class="nav-item" data-page="aging"><span class="ico">📋</span><span class="lbl">أعمار ديون</span></div>
-        <div class="nav-item" data-page="fxrev"><span class="ico">💱</span><span class="lbl">إعادة تقييم FX</span></div>
-        <div class="nav-item" data-page="inv"><span class="ico">📦</span><span class="lbl">مخزون</span></div>
+        <div class="nav-item" data-page="aging"><span class="ico" aria-hidden="true">◔</span><span class="lbl">أعمار ديون</span></div>
+        <div class="nav-item" data-page="fxrev"><span class="ico" aria-hidden="true">↻</span><span class="lbl">إعادة تقييم FX</span></div>
+        <div class="nav-item" data-page="inv"><span class="ico" aria-hidden="true">▤</span><span class="lbl">مخزون</span></div>
       </div>
     </aside>
 
@@ -476,7 +534,7 @@
       <!-- ============ CALC ============ -->
       <section class="page active" id="page-calc">
         <div class="page-header">
-          <h1>🧮 حاسبة محاسبية</h1>
+          <h1><span class="ico" aria-hidden="true">▣</span> حاسبة محاسبية</h1>
           <p>آلة حاسبة مع ذاكرة، ضريبة، خصم، مجموع كلي، سجل</p>
         </div>
         <div class="card">
@@ -497,8 +555,8 @@
             <div class="calc-result" id="result">0</div>
           </div>
           <div class="calc-toolbar">
-            <button class="btn secondary sm" onclick="toggleHistory()">📜 السجل</button>
-            <button class="btn secondary sm" onclick="copyResult()">📋 نسخ</button>
+            <button class="btn secondary sm" onclick="toggleHistory()">السجل</button>
+            <button class="btn secondary sm" onclick="copyResult()">نسخ</button>
             <button class="btn secondary sm" onclick="round2()">Round 2</button>
             <button class="btn sm" onclick="grandTotal()">GT+</button>
             <button class="btn danger sm" onclick="clearGrandTotal()">CT</button>
@@ -542,11 +600,11 @@
       <!-- ============ DISC ============ -->
       <section class="page" id="page-disc">
         <div class="page-header">
-          <h1>💱 خصومات متتالية وتحويل عملات</h1>
+          <h1><span class="ico" aria-hidden="true">⇄</span> خصومات متتالية وتحويل عملات</h1>
           <p>حساب الخصومات المركبة وتحويل العملات</p>
         </div>
         <div class="card">
-          <div class="card-title">🏷️ خصومات متتالية</div>
+          <div class="card-title">خصومات متتالية</div>
           <div class="row">
             <div class="field"><label>السعر الأصلي</label><input type="number" id="Dc_price" value="1000" oninput="calcDiscount()" /></div>
             <div class="field"><label>خصم 1 %</label><input type="number" id="Dc_d1" value="10" oninput="calcDiscount()" /></div>
@@ -560,7 +618,7 @@
           </div>
         </div>
         <div class="card">
-          <div class="card-title">💱 تحويل عملات</div>
+          <div class="card-title">تحويل عملات</div>
           <div class="row">
             <div class="field"><label>المبلغ</label><input type="number" id="Fx_amount" value="1000" oninput="calcFx()" /></div>
             <div class="field"><label>من</label>
@@ -580,7 +638,7 @@
       <!-- ============ FX RATES ============ -->
       <section class="page" id="page-fx">
         <div class="page-header">
-          <h1>🌍 أسعار العملات العالمية</h1>
+          <h1><span class="ico" aria-hidden="true">¤</span> أسعار العملات العالمية</h1>
           <p>تحويل فوري بين 10 عملات بأسعار محدّثة، وأهم 3 عملات مثبّتة في الأعلى</p>
         </div>
         <div class="card">
@@ -593,19 +651,19 @@
               <label for="fxFrom">من عملة</label>
               <select id="fxFrom" onchange="fxRender()"></select>
             </div>
-            <button class="btn secondary fx-refresh" id="fxRefresh" type="button" onclick="fxFetch(true)">🔄 تحديث الأسعار</button>
+            <button class="btn secondary fx-refresh" id="fxRefresh" type="button" onclick="fxFetch(true)">تحديث الأسعار</button>
           </div>
           <div class="fx-meta">
-            <span class="fx-state" id="fxState"><span class="dot"></span><span id="fxStateText">جارٍ تحميل الأسعار...</span></span>
+            <span class="fx-state" id="fxState"><span class="dot"></span><span id="fxStateText">جارٍ تحميل الأسعار…</span></span>
             <span id="fxUpdated"></span>
           </div>
           <div class="fx-pinned" id="fxPinned" aria-label="أهم ثلاث عملات"></div>
         </div>
         <div class="card">
-          <div class="card-title">💱 جميع العملات <span class="fx-hint">اضغط على أي عملة لتصبح الأساس</span></div>
+          <div class="card-title">جميع العملات <span class="fx-hint">اضغط على أي عملة لتصبح الأساس</span></div>
           <div class="fx-list" id="fxList"></div>
           <div class="table-actions" style="margin-top:12px;">
-            <button class="btn copy sm" type="button" onclick="fxCopy()">📋 نسخ النتائج</button>
+            <button class="btn copy sm" type="button" onclick="fxCopy()">نسخ النتائج</button>
           </div>
         </div>
       </section>
@@ -613,7 +671,7 @@
       <!-- ============ PROFIT ============ -->
       <section class="page" id="page-profit">
         <div class="page-header">
-          <h1>💰 ربح وهامش (التسعير)</h1>
+          <h1><span class="ico" aria-hidden="true">%</span> ربح وهامش (التسعير)</h1>
           <p>تحويل مباشر بين تكلفة، سعر، هامش، و markup</p>
         </div>
         <div class="card">
@@ -648,7 +706,7 @@
       <!-- ============ VAT ============ -->
       <section class="page" id="page-vat">
         <div class="page-header">
-          <h1>🧾 حاسبة VAT</h1>
+          <h1><span class="ico" aria-hidden="true">ض</span> حاسبة VAT</h1>
           <p>حساب الضريبة المستحقة/الاسترداد مع قيد تلقائي</p>
         </div>
         <div class="card">
@@ -662,7 +720,7 @@
             <div class="rcard"><div class="lbl">الحالة</div><div class="val" id="V_status" style="font-size:16px;">—</div></div>
           </div>
           <div class="je">
-            <div class="je-header"><span class="je-title">قيد VAT</span><button class="btn copy sm" onclick="copyJE('V_je')">📋 نسخ القيد</button></div>
+            <div class="je-header"><span class="je-title">قيد VAT</span><button class="btn copy sm" onclick="copyJE('V_je')">نسخ القيد</button></div>
             <div id="V_je"></div>
           </div>
         </div>
@@ -671,7 +729,7 @@
       <!-- ============ LOAN ============ -->
       <section class="page" id="page-loan">
         <div class="page-header">
-          <h1>🏦 قروض (Loan Amortization)</h1>
+          <h1><span class="ico" aria-hidden="true">◷</span> قروض (Loan Amortization)</h1>
           <p>PMT + جدول إطفاء (أول 24 دفعة)</p>
         </div>
         <div class="card">
@@ -691,7 +749,7 @@
             <div class="rcard"><div class="lbl">إجمالي الفائدة</div><div class="val red" id="L_interest">—</div></div>
             <div class="rcard"><div class="lbl">عدد الدفعات</div><div class="val" id="L_n">—</div></div>
           </div>
-          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('L_table')">📋 نسخ CSV</button></div>
+          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('L_table')">نسخ CSV</button></div>
           <div class="data-table-wrap">
             <table class="data-table" id="L_table"><thead><tr><th>#</th><th>دفعة</th><th>فائدة</th><th>أصل</th><th>رصيد</th></tr></thead><tbody></tbody></table>
           </div>
@@ -701,7 +759,7 @@
       <!-- ============ INTEREST ============ -->
       <section class="page" id="page-interest">
         <div class="page-header">
-          <h1>📈 فائدة (FV / PV)</h1>
+          <h1><span class="ico" aria-hidden="true">△</span> فائدة (FV / PV)</h1>
           <p>القيمة المستقبلية/الحالية + DCF</p>
         </div>
         <div class="card">
@@ -730,7 +788,7 @@
       <!-- ============ DEPR ============ -->
       <section class="page" id="page-depr">
         <div class="page-header">
-          <h1>📉 إهلاك الأصول (Depreciation)</h1>
+          <h1><span class="ico" aria-hidden="true">↘</span> إهلاك الأصول (Depreciation)</h1>
           <p>SL / DDB / SYD + قيد تلقائي</p>
         </div>
         <div class="card">
@@ -750,10 +808,10 @@
             <div class="rcard"><div class="lbl">إجمالي الإهلاك</div><div class="val" id="D_total">—</div></div>
           </div>
           <div class="je">
-            <div class="je-header"><span class="je-title">قيد الإهلاك (شهري)</span><button class="btn copy sm" onclick="copyJE('D_je')">📋 نسخ القيد</button></div>
+            <div class="je-header"><span class="je-title">قيد الإهلاك (شهري)</span><button class="btn copy sm" onclick="copyJE('D_je')">نسخ القيد</button></div>
             <div id="D_je"></div>
           </div>
-          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('D_table')">📋 نسخ CSV</button></div>
+          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('D_table')">نسخ CSV</button></div>
           <div class="data-table-wrap">
             <table class="data-table" id="D_table"><thead><tr><th>سنة</th><th>إهلاك</th><th>قيمة دفترية</th></tr></thead><tbody></tbody></table>
           </div>
@@ -763,7 +821,7 @@
       <!-- ============ BE ============ -->
       <section class="page" id="page-be">
         <div class="page-header">
-          <h1>⚖️ نقطة التعادل (Break-Even)</h1>
+          <h1><span class="ico" aria-hidden="true">⊙</span> نقطة التعادل (Break-Even)</h1>
           <p>وحدات/إيراد التعادل + ربح مستهدف</p>
         </div>
         <div class="card">
@@ -788,7 +846,7 @@
       <!-- ============ NPV ============ -->
       <section class="page" id="page-npv">
         <div class="page-header">
-          <h1>📊 NPV / IRR / DCF</h1>
+          <h1><span class="ico" aria-hidden="true">∑</span> NPV / IRR / DCF</h1>
           <p>تقييم استثماري</p>
         </div>
         <div class="card">
@@ -799,7 +857,7 @@
           <div class="field">
             <label>التدفقات (مفصولة بفواصل)</label>
             <input type="text" id="N_cf" value="30000,35000,40000,45000,50000" oninput="calcNPV()" />
-            <div class="hint">السنة 1، 2، 3...</div>
+            <div class="hint">السنة 1، 2، 3…</div>
           </div>
           <div class="results">
             <div class="rcard"><div class="lbl">NPV</div><div class="val accent" id="N_npv">—</div></div>
@@ -813,7 +871,7 @@
       <!-- ============ RATIOS ============ -->
       <section class="page" id="page-ratios">
         <div class="page-header">
-          <h1>📐 نسب مالية</h1>
+          <h1><span class="ico" aria-hidden="true">≡</span> نسب مالية</h1>
           <p>10 نسب رئيسية</p>
         </div>
         <div class="card">
@@ -836,7 +894,7 @@
             <div class="field"><label>الذمم (AR)</label><input type="number" id="R_ar" value="40000" oninput="calcRatios()" /></div>
             <div class="field"><label>الذمم (AP)</label><input type="number" id="R_ap" value="25000" oninput="calcRatios()" /></div>
           </div>
-          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('R_table')">📋 نسخ CSV</button></div>
+          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('R_table')">نسخ CSV</button></div>
           <div class="data-table-wrap">
             <table class="data-table" id="R_table"><thead><tr><th>النسبة</th><th>القيمة</th></tr></thead><tbody></tbody></table>
           </div>
@@ -846,7 +904,7 @@
       <!-- ============ AGING ============ -->
       <section class="page" id="page-aging">
         <div class="page-header">
-          <h1>📋 أعمار الديون + ECL</h1>
+          <h1><span class="ico" aria-hidden="true">◔</span> أعمار الديون + ECL</h1>
           <p>مخصص مشكوك فيها + قيد تلقائي</p>
         </div>
         <div class="card">
@@ -873,7 +931,7 @@
             <div class="rcard"><div class="lbl">صافي الذمم</div><div class="val green" id="A_net">—</div></div>
           </div>
           <div class="je">
-            <div class="je-header"><span class="je-title">قيد المخصص</span><button class="btn copy sm" onclick="copyJE('A_je')">📋 نسخ القيد</button></div>
+            <div class="je-header"><span class="je-title">قيد المخصص</span><button class="btn copy sm" onclick="copyJE('A_je')">نسخ القيد</button></div>
             <div id="A_je"></div>
           </div>
         </div>
@@ -882,7 +940,7 @@
       <!-- ============ FXREV ============ -->
       <section class="page" id="page-fxrev">
         <div class="page-header">
-          <h1>💱 إعادة تقييم FX</h1>
+          <h1><span class="ico" aria-hidden="true">↻</span> إعادة تقييم FX</h1>
           <p>فروق عملات + قيد تلقائي</p>
         </div>
         <div class="card">
@@ -900,7 +958,7 @@
             <div class="rcard"><div class="lbl">ربح/خسارة FX</div><div class="val" id="FxR_gain">—</div></div>
           </div>
           <div class="je">
-            <div class="je-header"><span class="je-title">قيد إعادة التقييم</span><button class="btn copy sm" onclick="copyJE('FxR_je')">📋 نسخ القيد</button></div>
+            <div class="je-header"><span class="je-title">قيد إعادة التقييم</span><button class="btn copy sm" onclick="copyJE('FxR_je')">نسخ القيد</button></div>
             <div id="FxR_je"></div>
           </div>
         </div>
@@ -909,7 +967,7 @@
       <!-- ============ INV ============ -->
       <section class="page" id="page-inv">
         <div class="page-header">
-          <h1>📦 تقييم المخزون</h1>
+          <h1><span class="ico" aria-hidden="true">▤</span> تقييم المخزون</h1>
           <p>FIFO / LIFO / WAC</p>
         </div>
         <div class="card">
@@ -926,7 +984,7 @@
             <div class="field"><label>شراء 2 (تكلفة/وحدة)</label><input type="number" id="Iv_c2" value="12" oninput="calcInv()" /></div>
           </div>
           <div class="field"><label>الوحدات المباعة</label><input type="number" id="Iv_sold" value="150" oninput="calcInv()" /></div>
-          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('Iv_table')">📋 نسخ CSV</button></div>
+          <div class="table-actions"><button class="btn copy sm" onclick="copyTable('Iv_table')">نسخ CSV</button></div>
           <div class="data-table-wrap">
             <table class="data-table" id="Iv_table"><thead><tr><th>الطريقة</th><th>COGS</th><th>مخزون final</th></tr></thead><tbody></tbody></table>
           </div>
@@ -959,7 +1017,7 @@
     </form>
   </div>
   <button class="fb-fab" id="fbFab" type="button" aria-expanded="false" aria-controls="fbPanel" aria-label="فتح صندوق الملاحظات">
-    <span class="ico" aria-hidden="true">💬</span><span>ملاحظة</span>
+    <span class="ico" aria-hidden="true">✉</span><span>ملاحظة</span>
   </button>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1362,7 +1420,7 @@
       if (bal < 0) bal = 0;
       rows += `<tr><td>${i}</td><td>${fmt(pmt)}</td><td>${fmt(intPart)}</td><td>${fmt(prinPart)}</td><td>${fmt(bal)}</td></tr>`;
     }
-    if (n > 24) rows += `<tr><td colspan="5" style="color:var(--muted)">... ${n - 24} دفعة متبقية</td></tr>`;
+    if (n > 24) rows += `<tr><td colspan="5" style="color:var(--muted)">… ${n - 24} دفعة متبقية</td></tr>`;
     tbody.innerHTML = rows;
   }
 
@@ -1764,7 +1822,7 @@
     const base = fxBase(), amount = fxAmount();
     const has = !!FXR.rates;
     fxPinnedEl.innerHTML = FXR.pinned.map(code => {
-      const c = fxByCode(code) || { code: code, name: code, flag: '🏳️' };
+      const c = fxByCode(code) || { code: code, name: code, flag: '¤' };
       const val = has ? fxConvert(amount, base, code) : null;
       const unit = has ? fxConvert(1, base, code) : null;
       return '<button class="fx-pin' + (code === base ? ' active' : '') + '" type="button" data-code="' + code + '" title="اجعل ' + c.name + ' الأساس">' +
@@ -1782,7 +1840,7 @@
       return '<button class="fx-row' + (isBase ? ' active' : '') + '" type="button" data-code="' + c.code + '">' +
         '<span class="fx-fl" aria-hidden="true">' + c.flag + '</span>' +
         '<span class="fx-name"><b>' + c.name +
-          (isBase ? ' <span class="fx-badge">الأساس</span>' : (isPinned ? ' <span class="fx-badge">📌</span>' : '')) +
+          (isBase ? ' <span class="fx-badge">الأساس</span>' : (isPinned ? ' <span class="fx-badge">◉</span>' : '')) +
         '</b><small>1 ' + base + ' = ' + (has ? fxUnit(unit) : '—') + ' ' + c.code + '</small></span>' +
         '<span class="fx-amt">' + (has ? fxMoney(val) : '—') + ' <small>' + c.code + '</small></span>' +
         '</button>';
@@ -1854,7 +1912,7 @@
       } catch (e) {}
     }
     FXR.loading = false;
-    if (fxRefreshBtn) { fxRefreshBtn.disabled = false; fxRefreshBtn.textContent = '🔄 تحديث الأسعار'; }
+    if (fxRefreshBtn) { fxRefreshBtn.disabled = false; fxRefreshBtn.textContent = 'تحديث الأسعار'; }
     if (ok) fxSetState('أسعار محدّثة', '');
     else if (FXR.rates) fxSetState('تعذر التحديث — تُعرض آخر أسعار محفوظة', 'warn');
     else fxSetState('تعذر جلب الأسعار، تحقق من الإنترنت', 'err');
@@ -1875,7 +1933,7 @@
         const fresh = FXR.fetchedAt && Date.now() - FXR.fetchedAt < 3600000;
         fxSetState(fresh ? 'أسعار محدّثة' : 'أسعار محفوظة — جارٍ التحديث...', fresh ? '' : 'warn');
       } else {
-        fxSetState('جارٍ تحميل الأسعار...', 'warn');
+        fxSetState('جارٍ تحميل الأسعار…', 'warn');
       }
     }
     fxRender();
@@ -1892,6 +1950,17 @@
     });
     copyText(lines.join('\n'));
   }
+
+  // accessible names for symbol-only keys
+  const ckLabels = { '÷': 'قسمة', '×': 'ضرب', '−': 'طرح', '+': 'جمع', '=': 'يساوي', '%': 'نسبة مئوية',
+    '±': 'تغيير الإشارة', '⌫': 'مسح رقم', '(': 'قوس فتح', ')': 'قوس إغلاق', '.': 'فاصلة عشرية', 'C': 'مسح الكل' };
+  document.querySelectorAll('.ck').forEach(b => {
+    const t = b.textContent.trim();
+    if (ckLabels[t] && !b.hasAttribute('aria-label')) b.setAttribute('aria-label', ckLabels[t]);
+  });
+  document.querySelectorAll('input[type="number"]').forEach(el => {
+    if (!el.getAttribute('autocomplete')) el.setAttribute('autocomplete', 'off');
+  });
 
   // ---- init ----
   setTaxRate(15);
