@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#0a0e1a" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B1220'/%3E%3Crect x='7' y='7' width='6' height='18' rx='2' fill='%23E8B04B'/%3E%3Crect x='19' y='7' width='6' height='11' rx='2' fill='%237EA6FF'/%3E%3C/svg%3E" />
 <title>مجموعة أدوات محاسبية متقدمة</title>
 <style>
   :root {
@@ -467,6 +468,123 @@
   .fx-row:hover { background: var(--surface-2); }
   .fx-row.active { background: var(--surface-2); }
 
+  /* الحفظ المحلي — تذييل القائمة */
+  .side-foot { margin-top: auto; display: flex; align-items: center; gap: 8px;
+    padding: 12px 8px 6px; border-top: 1px solid var(--border); color: var(--muted);
+    font-size: 11px; line-height: 1.4; }
+  .side-foot .sf-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+    flex: 0 0 auto; transition: background .2s; }
+  .side-foot.saving .sf-dot { background: var(--total); }
+  .side-foot.error .sf-dot { background: var(--red); }
+  .side-foot .sf-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; }
+  .side-foot .sf-clear { border: 0; background: transparent; color: var(--muted); font: inherit;
+    font-size: 11px; padding: 2px 4px; cursor: pointer; border-radius: var(--radius-sm); }
+  .side-foot .sf-clear:hover { color: var(--red); background: var(--surface-2); }
+  /* ===== محرك القيود ===== */
+  .je-code { display: block; font-size: 11px; color: var(--muted); font-weight: 600;
+    direction: ltr; text-align: right; letter-spacing: .3px; margin-top: 2px; }
+  .je-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+    padding-top: 10px; margin-top: 4px; border-top: 1px solid var(--border); }
+  .je-no { font-size: 11px; color: var(--muted); direction: ltr; }
+  .je-flag { font-size: 11px; font-weight: 700; }
+  .je-flag.ok { color: var(--green); }
+  .je-flag.bad { color: var(--red); }
+  .je-bar .sp { flex: 1; }
+  .je-acts { display: flex; align-items: center; gap: 6px; }
+  .je-btn { border: 1px solid var(--border); background: var(--surface-2); color: var(--muted);
+    font: inherit; font-size: 11px; font-weight: 700; padding: 4px 8px; cursor: pointer;
+    border-radius: var(--radius-sm); direction: ltr; }
+  .je-btn:hover { color: var(--text); border-color: var(--border-2); }
+  .je-btn.post { background: var(--accent); border-color: var(--accent); color: #fff; direction: rtl; }
+  .je-btn[disabled] { opacity: .45; cursor: not-allowed; }
+
+  /* ===== دليل الحسابات ===== */
+  body.modal-open { overflow: hidden; }
+  .coa-backdrop { position: fixed; inset: 0; background: rgba(4,8,16,0.66); z-index: 120; display: none; }
+  .coa-backdrop.open { display: block; }
+  .coa-modal { position: fixed; z-index: 121; inset-inline: 0; top: 8vh; margin: 0 auto;
+    width: min(640px, calc(100vw - 32px)); max-height: 78vh; display: none; flex-direction: column;
+    background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--radius); }
+  .coa-modal.open { display: flex; }
+  .coa-head { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .coa-title { font-size: 15px; font-weight: 700; }
+  .coa-x { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 16px;
+    cursor: pointer; padding: 2px 6px; border-radius: var(--radius-sm); }
+  .coa-x:hover { color: var(--text); background: var(--surface-2); }
+  .coa-body { overflow-y: auto; padding: 12px 16px; }
+  .coa-row { display: grid; grid-template-columns: 64px 1fr 96px 28px; gap: 8px; align-items: center;
+    padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .coa-row input, .coa-row select { width: 100%; background: var(--surface-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 8px; font: inherit;
+    font-size: 12px; }
+  .coa-row input:focus, .coa-row select:focus { outline: none; border-color: var(--accent); }
+  .coa-row .code { direction: ltr; text-align: center; font-variant-numeric: tabular-nums; }
+  .coa-del { border: 0; background: transparent; color: var(--muted); font-size: 14px; cursor: pointer;
+    padding: 2px; border-radius: var(--radius-sm); }
+  .coa-del:hover { color: var(--red); background: var(--surface-2); }
+  .coa-foot { display: flex; align-items: center; gap: 8px; padding: 12px 16px;
+    border-top: 1px solid var(--border); flex-wrap: wrap; }
+  .coa-hint { flex: 1; font-size: 11px; color: var(--muted); }
+  .copy-modal { top: 10vh; }
+  .copy-ta { width: 100%; height: 240px; resize: vertical; background: var(--bg-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px;
+    font-family: ui-monospace, Consolas, "Courier New", monospace; font-size: 12px; line-height: 1.55;
+    direction: ltr; text-align: left; white-space: pre; }
+  @media (max-width: 520px) {
+    .coa-row { grid-template-columns: 64px 1fr 28px; grid-template-areas: "code tp del" "nm nm nm";
+      row-gap: 6px; }
+    .coa-row .code { grid-area: code; }
+    .coa-row .nm { grid-area: nm; }
+    .coa-row .tp { grid-area: tp; }
+    .coa-row .coa-del { grid-area: del; }
+    .je-bar { row-gap: 8px; }
+    .je-bar .sp { display: none; }
+    .je-acts { flex: 1 1 100%; justify-content: center; }
+  }
+
+  /* ===== السجل واللقطات ===== */
+  .tape-sum { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); }
+  .tape-sum b { color: var(--text); direction: ltr; font-variant-numeric: tabular-nums; }
+  .tape-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .tape-row { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .tape-row.sup { opacity: .55; }
+  .tape-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tape-page { font-size: 12px; font-weight: 700; color: var(--amber); }
+  .tape-ts { font-size: 11px; color: var(--muted); direction: ltr; flex: 0 0 auto;
+    font-variant-numeric: tabular-nums; }
+  .tape-out { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+  .tape-chip { font-size: 11px; background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 3px 8px; color: var(--muted); max-width: 100%;
+    overflow-wrap: anywhere; }
+  .tape-chip b { color: var(--text); font-weight: 700; direction: ltr; unicode-bidi: isolate; }
+  .tape-note { width: 100%; background: var(--bg-2); border: 1px solid var(--border); color: var(--text);
+    border-radius: var(--radius-sm); padding: 7px 9px; font: inherit; font-size: 12px; }
+  .tape-note:focus { outline: none; border-color: var(--accent); }
+  .tape-acts { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .tape-empty { text-align: center; color: var(--muted); font-size: 12px; padding: 14px 8px; }
+  .tape-badge { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px;
+    border: 1px solid var(--border); color: var(--muted); direction: ltr; flex: 0 0 auto; }
+  .tape-badge.ok { color: var(--green); border-color: rgba(61,220,151,.35); background: rgba(61,220,151,.1); }
+  .tape-badge.rev { color: var(--red); border-color: rgba(255,94,126,.35); background: rgba(255,94,126,.1); }
+  .tape-badge.rep { color: var(--amber); border-color: rgba(245,166,35,.35); background: rgba(245,166,35,.1); }
+  .je-log { display: flex; flex-direction: column; margin-top: 10px; }
+  .je-log .lg { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap;
+    padding: 9px 2px; border-bottom: 1px solid var(--border); font-size: 12px; min-width: 0; }
+  .je-log .lg:last-child { border-bottom: 0; }
+  .je-log .lg-k { font-weight: 700; direction: ltr; flex: 0 0 auto;
+    font-variant-numeric: tabular-nums; }
+  .je-log .lg-n { color: var(--muted); flex: 1 1 180px; min-width: 0; overflow-wrap: anywhere; }
+  .je-log .lg-n b { color: var(--text); }
+  .rev-label { display: block; font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+  .rev-ta { width: 100%; min-height: 84px; resize: vertical; background: var(--bg-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px;
+    font: inherit; font-size: 13px; }
+  .rev-ta:focus { outline: none; border-color: var(--accent); }
+  .rev-block { margin-bottom: 14px; }
+  #revErr { color: var(--red); }
 </style>
 </head>
 <body>
@@ -490,7 +608,7 @@
       <div class="sheet-head">
         <div>
           <div class="sheet-title">كل الأدوات</div>
-          <div class="sheet-sub">14 أداة محاسبية</div>
+          <div class="sheet-sub">15 أداة محاسبية</div>
         </div>
         <button class="sheet-close" id="sheetClose" type="button" aria-label="إغلاق القائمة">✕</button>
       </div>
@@ -527,6 +645,16 @@
         <div class="nav-item" data-page="aging"><span class="ico" aria-hidden="true">◔</span><span class="lbl">أعمار ديون</span></div>
         <div class="nav-item" data-page="fxrev"><span class="ico" aria-hidden="true">↻</span><span class="lbl">إعادة تقييم FX</span></div>
         <div class="nav-item" data-page="inv"><span class="ico" aria-hidden="true">▤</span><span class="lbl">مخزون</span></div>
+      </div>
+      <div class="group">
+        <div class="group-title">السجل والتدقيق</div>
+        <div class="nav-item" data-page="tape"><span class="ico" aria-hidden="true">▦</span><span class="lbl">السجل والقيود</span></div>
+      </div>
+      <div class="side-foot" id="sideFoot" title="الحفظ التلقائي">
+        <span class="sf-dot" aria-hidden="true"></span>
+        <span class="sf-text" id="saveState">محفوظ محلياً</span>
+        <button class="sf-clear" id="coaOpen" type="button" title="دليل الحسابات">دليل</button>
+        <button class="sf-clear" id="clearStore" type="button" title="مسح البيانات المحفوظة">مسح</button>
       </div>
     </aside>
 
@@ -720,7 +848,7 @@
             <div class="rcard"><div class="lbl">الحالة</div><div class="val" id="V_status" style="font-size:16px;">—</div></div>
           </div>
           <div class="je">
-            <div class="je-header"><span class="je-title">قيد VAT</span><button class="btn copy sm" onclick="copyJE('V_je')">نسخ القيد</button></div>
+            <div class="je-header"><span class="je-title">قيد VAT</span></div>
             <div id="V_je"></div>
           </div>
         </div>
@@ -808,7 +936,7 @@
             <div class="rcard"><div class="lbl">إجمالي الإهلاك</div><div class="val" id="D_total">—</div></div>
           </div>
           <div class="je">
-            <div class="je-header"><span class="je-title">قيد الإهلاك (شهري)</span><button class="btn copy sm" onclick="copyJE('D_je')">نسخ القيد</button></div>
+            <div class="je-header"><span class="je-title">قيد الإهلاك (شهري)</span></div>
             <div id="D_je"></div>
           </div>
           <div class="table-actions"><button class="btn copy sm" onclick="copyTable('D_table')">نسخ CSV</button></div>
@@ -931,7 +1059,7 @@
             <div class="rcard"><div class="lbl">صافي الذمم</div><div class="val green" id="A_net">—</div></div>
           </div>
           <div class="je">
-            <div class="je-header"><span class="je-title">قيد المخصص</span><button class="btn copy sm" onclick="copyJE('A_je')">نسخ القيد</button></div>
+            <div class="je-header"><span class="je-title">قيد المخصص</span></div>
             <div id="A_je"></div>
           </div>
         </div>
@@ -958,7 +1086,7 @@
             <div class="rcard"><div class="lbl">ربح/خسارة FX</div><div class="val" id="FxR_gain">—</div></div>
           </div>
           <div class="je">
-            <div class="je-header"><span class="je-title">قيد إعادة التقييم</span><button class="btn copy sm" onclick="copyJE('FxR_je')">نسخ القيد</button></div>
+            <div class="je-header"><span class="je-title">قيد إعادة التقييم</span></div>
             <div id="FxR_je"></div>
           </div>
         </div>
@@ -990,6 +1118,36 @@
           </div>
         </div>
       </section>
+
+      <!-- ============ TAPE ============ -->
+      <section class="page" id="page-tape">
+        <div class="page-header">
+          <h1><span class="ico" aria-hidden="true">▦</span> السجل والقيود</h1>
+          <p>لقطات قابلة لإعادة التشغيل · القيود المرحّلة · سجل تدقيق دائم</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ico" aria-hidden="true">◷</span> لقطات الحساب</div>
+          <div class="tape-sum" id="tapeSum"></div>
+          <div class="tape-acts" style="margin-top:10px">
+            <button class="btn secondary sm" id="tapeRefresh" type="button">تحديث</button>
+            <button class="btn secondary sm" id="tapeClear" type="button">مسح اللقطات</button>
+            <span class="coa-hint">تُسجَّل تلقائياً عند تغيير أي مدخل في أي أداة (آخر 40 لقطة)</span>
+          </div>
+          <div class="tape-list" id="tapeList"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ico" aria-hidden="true">▤</span> القيود المرحّلة</div>
+          <div class="tape-sum">العكس يُنشئ قيداً معاكساً ويُبقي الأصل · الحذف نهائي مع نسخة في سجل التدقيق</div>
+          <div class="je-log" id="tapeJE"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ico" aria-hidden="true">⌛</span> سجل التدقيق</div>
+          <div class="je-log" id="tapeAudit"></div>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -1019,6 +1177,56 @@
   <button class="fb-fab" id="fbFab" type="button" aria-expanded="false" aria-controls="fbPanel" aria-label="فتح صندوق الملاحظات">
     <span class="ico" aria-hidden="true">✉</span><span>ملاحظة</span>
   </button>
+
+  <div class="coa-backdrop" id="coaBackdrop"></div>
+  <div class="coa-modal" id="coaModal" role="dialog" aria-modal="true" aria-labelledby="coaTitle">
+    <div class="coa-head">
+      <div class="coa-title" id="coaTitle">دليل الحسابات</div>
+      <button class="coa-x" id="coaClose" type="button" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="coa-body" id="coaBody"></div>
+    <div class="coa-foot">
+      <button class="btn secondary sm" id="coaAdd" type="button">+ حساب</button>
+      <span class="coa-hint">الأسماء المعدّلة تظهر في القيود الجديدة</span>
+      <button class="btn sm" id="coaSave" type="button">حفظ</button>
+    </div>
+  </div>
+
+  <div class="coa-backdrop" id="copyBackdrop"></div>
+  <div class="coa-modal copy-modal" id="copyBox" role="dialog" aria-modal="true" aria-labelledby="copyTitle">
+    <div class="coa-head">
+      <div class="coa-title" id="copyTitle">نسخ يدوي</div>
+      <button class="coa-x" id="copyClose" type="button" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="coa-body">
+      <textarea id="copyText" class="copy-ta" readonly aria-label="النص المطلوب نسخه" spellcheck="false"></textarea>
+    </div>
+    <div class="coa-foot">
+      <span class="coa-hint">المتصفح منع النسخ التلقائي — النص محدَّد، انسخه من الحقل</span>
+      <button class="btn sm" id="copyDone" type="button">تم</button>
+    </div>
+  </div>
+
+  <div class="coa-backdrop" id="revBackdrop"></div>
+  <div class="coa-modal" id="revBox" role="dialog" aria-modal="true" aria-labelledby="revTitle">
+    <div class="coa-head">
+      <div class="coa-title" id="revTitle">عكس القيد</div>
+      <button class="coa-x" id="revClose" type="button" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="coa-body">
+      <div class="rev-block"><div class="tape-sum" id="revInfo"></div></div>
+      <div class="rev-block">
+        <label class="rev-label" for="revReason">السبب (يُحفظ في سجل التدقيق) *</label>
+        <textarea class="rev-ta" id="revReason" maxlength="300" placeholder="مثال: خطأ في مبلغ الضريبة"></textarea>
+      </div>
+      <div class="coa-hint" id="revHint"></div>
+    </div>
+    <div class="coa-foot">
+      <span class="coa-hint" id="revErr" role="alert"></span>
+      <button class="btn secondary sm" id="revCancel" type="button">إلغاء</button>
+      <button class="btn sm" id="revGo" type="button">تأكيد</button>
+    </div>
+  </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1058,6 +1266,8 @@
     }
     if (mainEl) mainEl.scrollTop = 0;
     if (page === 'fx') fxInit();
+    if (page === 'tape' && window.SCTape) SCTape.render();
+    if (window.Persist && window.Persist.touch) window.Persist.touch(page);
     if (window.innerWidth <= 768) setNavOpen(false);
   }
 
@@ -1081,9 +1291,40 @@
   });
 
   // ---- Copy helpers ----
+  function legacyCopy(txt) {
+    const prev = document.activeElement;
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:-9999px;opacity:0;';
+    document.body.appendChild(ta);
+    const sel = window.getSelection ? window.getSelection() : null;
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    if (ta.parentNode) ta.parentNode.removeChild(ta);
+    if (sel) sel.removeAllRanges();
+    if (prev && prev.focus && prev !== document.body) { try { prev.focus(); } catch (e) {} }
+    return ok;
+  }
+  function manualCopy(txt, ret) {
+    if (typeof window.__openCopyBox === 'function') {
+      window.__openCopyBox(txt, ret);
+      toast('حدّد النص وانسخه يدوياً');
+      return;
+    }
+    toast('تعذر النسخ');
+  }
   async function copyText(txt) {
-    try { await navigator.clipboard.writeText(txt); toast('تم النسخ'); }
-    catch (e) { toast('تعذر النسخ'); }
+    const text = String(txt == null ? '' : txt);
+    if (!text) { toast('لا يوجد نص للنسخ'); return; }
+    const ret = document.activeElement;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try { await navigator.clipboard.writeText(text); toast('تم النسخ'); return; } catch (e) {}
+    }
+    if (legacyCopy(text)) { toast('تم النسخ'); return; }
+    manualCopy(text, ret);
   }
   function copyJE(id) {
     const el = $(id);
@@ -1106,20 +1347,101 @@
     catch (e) { toast('تعذر النسخ'); }
   }
 
+  const JE_FMT = ['erp', 'tsv', 'json'];
+
+  function jeMeta(el) {
+    const page = el.closest('.page');
+    const block = el.closest('.je');
+    const title = block ? block.querySelector('.je-title') : null;
+    return {
+      src: page ? page.id.replace('page-', '') : '',
+      memo: title ? title.textContent.trim() : ''
+    };
+  }
+
+  function jeBar(entry) {
+    const state = entry.posted ? ('مرحّل · ' + entry.posted) : ('مسودة · ' + entry.date);
+    let flag = '';
+    if (!entry.balanced) flag = '<span class="je-flag bad">غير متوازن ' + fmt(Math.abs(entry.dr - entry.cr)) + '</span>';
+    else if (entry.total > 0) flag = '<span class="je-flag ok">متوازن</span>';
+    const post = entry.posted
+      ? '<button class="je-btn" type="button" data-je="newpost" title="ترحيل نسخة جديدة من هذا القيد">قيد جديد</button>'
+      : '<button class="je-btn post" type="button" data-je="post"' + (entry.balanced && entry.total > 0 ? '' : ' disabled') + '>ترحيل</button>';
+    return '<div class="je-bar"><span class="je-no">' + state + '</span>' + flag + '<span class="sp"></span>' +
+      '<div class="je-acts">' +
+      '<button class="je-btn" type="button" data-je="erp" title="نص جاهز لأنظمة ERP">ERP</button>' +
+      '<button class="je-btn" type="button" data-je="tsv" title="لصق مباشر في Excel">TSV</button>' +
+      '<button class="je-btn" type="button" data-je="json" title="JSON للتكامل البرمجي">JSON</button>' + post +
+      '</div></div>';
+  }
+
+  function renderJE(el, entry) {
+    let html = '<table class="je-table"><thead><tr><th>الحساب</th><th>مدين (Dr)</th><th>دائن (Cr)</th></tr></thead><tbody>';
+    if (!entry.lines.length) {
+      html += '<tr><td class="acct" colspan="3" style="color:var(--muted);text-align:center;">لا توجد مبالغ</td></tr>';
+    }
+    entry.lines.forEach(function (l) {
+      const dr = l.debit ? fmt(l.debit) : '';
+      const cr = l.credit ? fmt(l.credit) : '';
+      const code = l.code ? '<span class="je-code">' + l.code + '</span>' : '';
+      html += '<tr><td class="acct">' + l.name + ' ' + code + '</td>' +
+        '<td class="num ' + (l.debit ? 'dr' : '') + '">' + dr + '</td>' +
+        '<td class="num ' + (l.credit ? 'cr' : '') + '">' + cr + '</td></tr>';
+    });
+    html += '</tbody></table>' + jeBar(entry);
+    el.innerHTML = html;
+    el.dataset.text = window.SCJE ? SCJE.format(entry, 'erp') : '';
+  }
+
   function setJE(id, rows) {
     const el = $(id);
-    let html = '<table class="je-table"><thead><tr><th>الحساب</th><th>مدين (Dr)</th><th>دائن (Cr)</th></tr></thead><tbody>';
-    let txtLines = [];
-    rows.forEach(r => {
-      const dr = r.dr != null ? fmt(r.dr) : '';
-      const cr = r.cr != null ? fmt(r.cr) : '';
-      html += `<tr><td class="acct">${r.account}</td><td class="num ${r.dr!=null?'dr':''}">${dr}</td><td class="num ${r.cr!=null?'cr':''}">${cr}</td></tr>`;
-      const amt = r.dr != null ? dr : cr;
-      txtLines.push((r.dr != null ? 'Dr' : 'Cr') + '  ' + r.account + ' ........ ' + amt);
+    if (!el) return;
+    const meta = jeMeta(el);
+    const lines = rows.map(function (r) {
+      const code = r.code || '';
+      return {
+        code: code,
+        name: window.SCCOA ? SCCOA.name(code, r.account || '') : (r.account || ''),
+        debit: Number(r.dr) || 0,
+        credit: Number(r.cr) || 0
+      };
     });
-    html += '</tbody></table>';
-    el.innerHTML = html;
-    el.dataset.text = txtLines.join('\n');
+    const entry = window.SCJE
+      ? SCJE.build(meta, lines)
+      : { lines: lines, dr: 0, cr: 0, balanced: true, total: 0, date: '', memo: meta.memo, src: meta.src, posted: '' };
+    if (window.SCJE) {
+      const pid = SCJE.postedId(entry);
+      if (pid) entry.posted = pid;
+    }
+    el.__je = entry;
+    renderJE(el, entry);
+    if (!el.__jeWired) {
+      el.__jeWired = true;
+      el.addEventListener('click', function (ev) {
+        const b = ev.target.closest('[data-je]');
+        if (!b) return;
+        const cur = el.__je;
+        const kind = b.getAttribute('data-je');
+        if (!cur) return;
+        if (kind === 'post') {
+          SCJE.post(cur).then(function (saved) {
+            cur.posted = saved.id;
+            renderJE(el, cur);
+            toast('تم ترحيل القيد ' + saved.id);
+          }).catch(function () { toast('لا يمكن ترحيل قيد غير متوازن'); });
+          return;
+        }
+        if (kind === 'newpost') {
+          SCJE.forget(cur).then(function () {
+            cur.posted = '';
+            renderJE(el, cur);
+            toast('جاهز لترحيل قيد جديد');
+          });
+          return;
+        }
+        copyText(SCJE.format(cur, kind));
+      });
+    }
   }
 
   // ---- calculator ----
@@ -1128,6 +1450,42 @@
   const historyEl = $('history');
   let expression = '', justCalculated = false, memory = 0, grandTotalVal = 0, taxRate = 0.15, history = [], lastResult = 0, lastExpr = '';
   const chipM = $('chipM'), chipGT = $('chipGT'), chipTax = $('chipTax');
+
+  // جسر الحالة: يسمح لطبقة الحفظ بقراءة/كتابة حالة الحاسبة دون كسر عزلها
+  window.__calcState = {
+    get: function () {
+      return {
+        expression: expression,
+        justCalculated: justCalculated,
+        memory: memory,
+        grandTotalVal: grandTotalVal,
+        taxRate: taxRate,
+        history: history.slice(0, 30).map(function (h) {
+          return { expr: String((h && h.expr) || ''), res: String((h && h.res) || '') };
+        }),
+        lastResult: lastResult,
+        lastExpr: lastExpr
+      };
+    },
+    set: function (st) {
+      if (!st || typeof st !== 'object') return;
+      const num = function (v, d) { return typeof v === 'number' && isFinite(v) ? v : d; };
+      expression = typeof st.expression === 'string' ? st.expression.slice(0, 240) : '';
+      justCalculated = !!st.justCalculated;
+      memory = num(st.memory, 0);
+      grandTotalVal = num(st.grandTotalVal, 0);
+      taxRate = num(st.taxRate, 0.15);
+      if (!(taxRate >= 0 && taxRate <= 1)) taxRate = 0.15;
+      lastResult = num(st.lastResult, 0);
+      lastExpr = typeof st.lastExpr === 'string' ? st.lastExpr.slice(0, 120) : '';
+      history = Array.isArray(st.history) ? st.history.slice(0, 30).map(function (h) {
+        return { expr: String((h && h.expr) || ''), res: String((h && h.res) || '') };
+      }) : [];
+      if (taxVal) taxVal.textContent = (taxRate * 100).toFixed(1).replace(/\.0$/, '') + '%';
+      const ti = document.getElementById('taxRateInput');
+      if (ti) ti.value = (taxRate * 100).toFixed(1).replace(/\.0$/, '');
+    }
+  };
 
   function updateDisplay() {
     exprEl.textContent = justCalculated ? (lastExpr ? lastExpr + ' =' : expression) : expression;
@@ -1145,6 +1503,7 @@
     gtVal.textContent = fmt(grandTotalVal);
     chipM.classList.toggle('active', memory !== 0);
     chipGT.classList.toggle('active', grandTotalVal !== 0);
+    if (window.Persist && window.Persist.calcChanged) window.Persist.calcChanged();
   }
   function appendNum(n) {
     if (justCalculated) { expression = ''; lastExpr = ''; justCalculated = false; }
@@ -1210,6 +1569,7 @@
     history.unshift({ expr: expression, res: formatted });
     if (history.length > 30) history.pop();
     renderHistory();
+    if (window.SCTape) SCTape.logCalc(lastExpr, formatted);
     lastResult = val;
     expression = String(val);
     justCalculated = true;
@@ -1221,7 +1581,7 @@
   function mr() { if (justCalculated) { expression = ''; lastExpr = ''; justCalculated = false; } expression += memory.toString(); updateDisplay(); }
   function mplus() { const v = safeEval(justCalculated ? (expression || lastResult.toString()) : expression); if (!isNaN(v)) { memory += v; updateDisplay(); toast('M+ ' + fmt(memory)); } }
   function mminus() { const v = safeEval(justCalculated ? (expression || lastResult.toString()) : expression); if (!isNaN(v)) { memory -= v; updateDisplay(); toast('M- ' + fmt(memory)); } }
-  function setTaxRate(v) { taxRate = (parseFloat(v) || 0) / 100; taxVal.textContent = (taxRate*100).toFixed(1).replace(/\.0$/,'') + '%'; toast('ضريبة ' + taxVal.textContent); }
+  function setTaxRate(v, silent) { taxRate = (parseFloat(v) || 0) / 100; taxVal.textContent = (taxRate*100).toFixed(1).replace(/\.0$/,'') + '%'; const ti = $('taxRateInput'); if (ti) ti.value = (taxRate*100).toFixed(1).replace(/\.0$/,''); if (!silent) toast('ضريبة ' + taxVal.textContent); }
   function taxPlus() {
     const base = justCalculated ? lastResult : safeEval(expression); if (isNaN(base)) return;
     const val = base * (1 + taxRate);
@@ -1382,13 +1742,13 @@
     $('V_status').textContent = net >= 0 ? 'مستحق للدفع' : 'استرداد';
     if (net >= 0) {
       setJE('V_je', [
-        { account: 'ضريبة المبيعات', dr: Math.abs(net), cr: null },
-        { account: 'ذمم ضريبية دائنة', dr: null, cr: Math.abs(net) }
+        { code: '2200', account: 'ضريبة المبيعات', dr: Math.abs(net), cr: null },
+        { code: '2400', account: 'ذمم ضريبية دائنة', dr: null, cr: Math.abs(net) }
       ]);
     } else {
       setJE('V_je', [
-        { account: 'ذمم ضريبية مدينة', dr: Math.abs(net), cr: null },
-        { account: 'ضريبة المشتريات', dr: null, cr: Math.abs(net) }
+        { code: '2400', account: 'ذمم ضريبية مدينة', dr: Math.abs(net), cr: null },
+        { code: '2210', account: 'ضريبة المشتريات', dr: null, cr: Math.abs(net) }
       ]);
     }
   }
@@ -1491,8 +1851,8 @@
     $('D_monthly').textContent = fmt(monthly);
     $('D_total').textContent = fmt(total);
     setJE('D_je', [
-      { account: 'مصروف إهلاك الأصول', dr: monthly, cr: null },
-      { account: 'مجمع إهلاك الأصول', dr: null, cr: monthly }
+      { code: '5200', account: 'مصروف إهلاك الأصول', dr: monthly, cr: null },
+      { code: '1510', account: 'مجمع إهلاك الأصول', dr: null, cr: monthly }
     ]);
     const tbody = $('D_table').querySelector('tbody');
     tbody.innerHTML = schedule.map(s => `<tr><td>${s.y}</td><td>${fmt(s.dep)}</td><td>${fmt(s.book)}</td></tr>`).join('');
@@ -1598,8 +1958,8 @@
     $('A_default').textContent = fmt(defaultRatio) + '%';
     $('A_net').textContent = fmt(net);
     setJE('A_je', [
-      { account: 'مصروف مخصص الديون مشكوك في تحصيلها', dr: prov, cr: null },
-      { account: 'مخصص الديون المشكوك في تحصيلها', dr: null, cr: prov }
+      { code: '5300', account: 'مصروف مخصص الديون مشكوك في تحصيلها', dr: prov, cr: null },
+      { code: '1310', account: 'مخصص الديون المشكوك في تحصيلها', dr: null, cr: prov }
     ]);
   }
 
@@ -1617,13 +1977,13 @@
     const ccy = $('FxR_ccy').value;
     if (isGain) {
       setJE('FxR_je', [
-        { account: ccy + ' (حساب)', dr: Math.abs(gain), cr: null },
-        { account: 'أرباح فروق تقييم عملات', dr: null, cr: Math.abs(gain) }
+        { code: '1150', account: 'حسابات بعملات أجنبية', dr: Math.abs(gain), cr: null },
+        { code: '4900', account: 'أرباح فروق تقييم عملات', dr: null, cr: Math.abs(gain) }
       ]);
     } else {
       setJE('FxR_je', [
-        { account: 'خسائر فروق تقييم عملات', dr: Math.abs(gain), cr: null },
-        { account: ccy + ' (حساب)', dr: null, cr: Math.abs(gain) }
+        { code: '5900', account: 'خسائر فروق تقييم عملات', dr: Math.abs(gain), cr: null },
+        { code: '1150', account: 'حسابات بعملات أجنبية', dr: null, cr: Math.abs(gain) }
       ]);
     }
   }
@@ -1962,12 +2322,1252 @@
     if (!el.getAttribute('autocomplete')) el.setAttribute('autocomplete', 'off');
   });
 
+  // ================= الحفظ المحلي · SCStore =================
+  const SCStore = (function () {
+    const DB_NAME = 'supercalc', DB_VERSION = 1;
+    const SPEC = {
+      kv: { keyPath: 'k' },
+      journal: { keyPath: 'id' },
+      audit: { keyPath: 'id', autoIncrement: true },
+      coa: { keyPath: 'code' },
+      sessions: { keyPath: 'id' }
+    };
+    const LS_KEY = 'sc:fallback';
+    let db = null, mode = 'ls', memory = null, seq = 1, opening = null;
+
+    function loadFallback() {
+      if (memory) return memory;
+      memory = { kv: {}, journal: {}, coa: {}, sessions: {}, audit: [] };
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (raw) {
+          const o = JSON.parse(raw) || {};
+          ['kv', 'journal', 'coa', 'sessions'].forEach(function (n) {
+            if (o[n] && typeof o[n] === 'object') memory[n] = o[n];
+          });
+          if (Array.isArray(o.audit)) memory.audit = o.audit;
+          seq = typeof o.seq === 'number' && o.seq > 0 ? o.seq : memory.audit.length + 1;
+        }
+      } catch (e) {}
+      return memory;
+    }
+
+    function saveFallback() {
+      try {
+        memory.seq = seq;
+        localStorage.setItem(LS_KEY, JSON.stringify(memory));
+      } catch (e) {}
+    }
+
+    function open() {
+      if (opening) return opening;
+      opening = new Promise(function (resolve) {
+        let done = false;
+        const finish = function (v) { if (!done) { done = true; resolve(v); } };
+        if (!('indexedDB' in window) || !window.indexedDB) { finish(null); return; }
+        let req;
+        try { req = window.indexedDB.open(DB_NAME, DB_VERSION); } catch (e) { finish(null); return; }
+        req.onupgradeneeded = function () {
+          const d = req.result;
+          Object.keys(SPEC).forEach(function (n) {
+            if (!d.objectStoreNames.contains(n)) d.createObjectStore(n, SPEC[n]);
+          });
+        };
+        req.onsuccess = function () { finish(req.result); };
+        req.onerror = function () { finish(null); };
+        req.onblocked = function () { finish(null); };
+        setTimeout(function () { finish(null); }, 2000);
+      });
+      return opening;
+    }
+
+    function ready() {
+      if (!opening) {
+        open().then(function (d) {
+          if (d) { db = d; mode = 'idb'; } else { mode = 'ls'; loadFallback(); }
+        });
+      }
+      return open().then(function () { return mode; });
+    }
+
+    function idb(store, txMode, fn) {
+      return new Promise(function (resolve, reject) {
+        let t;
+        try { t = db.transaction(store, txMode); } catch (e) { reject(e); return; }
+        let req;
+        try { req = fn(t.objectStore(store)); } catch (e) { reject(e); return; }
+        t.oncomplete = function () {
+          resolve(req && typeof req === 'object' && 'result' in req ? req.result : undefined);
+        };
+        t.onerror = function () { reject(t.error || new Error('idb-error')); };
+        t.onabort = function () { reject(t.error || new Error('idb-abort')); };
+      });
+    }
+
+    function degrade() { mode = 'ls'; db = null; loadFallback(); }
+
+    function get(name, key) {
+      if (mode === 'idb' && db) {
+        return idb(name, 'readonly', function (st) { return st.get(key); })
+          .catch(function () { degrade(); return get(name, key); });
+      }
+      const m = loadFallback();
+      if (name === 'audit') {
+        for (let i = 0; i < m.audit.length; i++) {
+          if (String(m.audit[i].id) === String(key)) return Promise.resolve(m.audit[i]);
+        }
+        return Promise.resolve(undefined);
+      }
+      return Promise.resolve(m[name][String(key)]);
+    }
+
+    function all(name) {
+      if (mode === 'idb' && db) {
+        return idb(name, 'readonly', function (st) { return st.getAll(); })
+          .catch(function () { degrade(); return all(name); });
+      }
+      const m = loadFallback();
+      if (name === 'audit') return Promise.resolve(m.audit.slice());
+      return Promise.resolve(Object.keys(m[name]).map(function (k) { return m[name][k]; }));
+    }
+
+    function put(name, value) {
+      if (mode === 'idb' && db) {
+        return idb(name, 'readwrite', function (st) { return st.put(value); })
+          .catch(function () { degrade(); return put(name, value); });
+      }
+      const m = loadFallback();
+      if (name === 'audit') {
+        if (value.id == null) value.id = seq++;
+        let found = false;
+        for (let i = 0; i < m.audit.length; i++) {
+          if (m.audit[i].id === value.id) { m.audit[i] = value; found = true; }
+        }
+        if (!found) m.audit.push(value);
+      } else {
+        m[name][String(value[SPEC[name].keyPath])] = value;
+      }
+      saveFallback();
+      return Promise.resolve(true);
+    }
+
+    function del(name, key) {
+      if (mode === 'idb' && db) {
+        return idb(name, 'readwrite', function (st) { return st.delete(key); })
+          .catch(function () { degrade(); return del(name, key); });
+      }
+      const m = loadFallback();
+      if (name === 'audit') m.audit = m.audit.filter(function (x) { return String(x.id) !== String(key); });
+      else delete m[name][String(key)];
+      saveFallback();
+      return Promise.resolve(true);
+    }
+
+    function clearAll() {
+      if (mode === 'idb' && db) {
+        return Promise.all(Object.keys(SPEC).map(function (n) {
+          return idb(n, 'readwrite', function (st) { return st.clear(); });
+        })).catch(function () { degrade(); return clearAll(); });
+      }
+      memory = null;
+      try { localStorage.removeItem(LS_KEY); } catch (e) {}
+      loadFallback();
+      return Promise.resolve(true);
+    }
+
+    return {
+      ready: ready,
+      get mode() { return mode; },
+      get: get, put: put, del: del, all: all, clearAll: clearAll,
+      kvGet: function (k) { return get('kv', k).then(function (r) { return r ? r.v : undefined; }); },
+      kvSet: function (k, v) { return put('kv', { k: k, v: v }); },
+      kvDel: function (k) { return del('kv', k); }
+    };
+  })();
+  window.SCStore = SCStore;
+
+  // ================= الحفظ المحلي · Persist =================
+  const Persist = (function () {
+    const K_INPUTS = 'inputs', K_CALC = 'calc', K_PAGE = 'lastPage';
+    let booted = false, timer = 0, chipEl = null, footEl = null;
+    let lastPage = 'calc', pendingFx = '';
+    let saving = false, queued = false;
+
+    function fields() {
+      return Array.prototype.slice.call(document.querySelectorAll('.page input, .page select, .page textarea'))
+        .filter(function (el) { return el.id && el.type !== 'file'; });
+    }
+    function stamp() {
+      const d = new Date();
+      const p = function (n) { return String(n).padStart(2, '0'); };
+      return p(d.getHours()) + ':' + p(d.getMinutes());
+    }
+    function chip(text, cls) {
+      if (chipEl) chipEl.textContent = text;
+      if (footEl) {
+        footEl.classList.remove('saving', 'error');
+        if (cls) footEl.classList.add(cls);
+      }
+    }
+    function markSaved() { chip('محفوظ محلياً · ' + stamp()); }
+    function markSaving() { chip('جارٍ الحفظ…', 'saving'); }
+
+    function snapshotInputs() {
+      const out = {};
+      fields().forEach(function (el) {
+        out[el.id] = el.type === 'checkbox' ? (el.checked ? 1 : 0) : el.value;
+      });
+      return out;
+    }
+    function applyInputs(saved) {
+      if (!saved || typeof saved !== 'object') return;
+      fields().forEach(function (el) {
+        if (el.id === 'fxFrom') return;
+        if (!Object.prototype.hasOwnProperty.call(saved, el.id)) return;
+        const v = saved[el.id];
+        if (el.type === 'checkbox') el.checked = !!v;
+        else if (v !== null && v !== undefined) el.value = String(v);
+      });
+      if (typeof saved.fxFrom === 'string' && saved.fxFrom) pendingFx = saved.fxFrom;
+    }
+
+    // عملة الأساس تُبنى خياراتها عند أول فتح لصفحة العملات، لذا تُطبَّق لاحقاً
+    function applyPendingFx() {
+      if (!pendingFx) return;
+      const sel = document.getElementById('fxFrom');
+      if (!sel || !sel.options.length) return;
+      sel.value = pendingFx;
+      pendingFx = '';
+      if (typeof fxRender === 'function') fxRender();
+    }
+    function applyCalc(c) {
+      if (window.__calcState && c && typeof c === 'object') window.__calcState.set(c);
+    }
+
+    function schedule() {
+      if (!booted) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(function () { timer = 0; flush(); }, 400);
+    }
+
+    function flush() {
+      if (!booted) return Promise.resolve();
+      if (saving) { queued = true; return Promise.resolve(); }
+      saving = true;
+      queued = false;
+      markSaving();
+      const inputs = snapshotInputs();
+      const calc = window.__calcState ? window.__calcState.get() : null;
+      return Promise.all([
+        SCStore.kvSet(K_INPUTS, inputs),
+        calc ? SCStore.kvSet(K_CALC, calc) : Promise.resolve(true),
+        SCStore.kvSet(K_PAGE, lastPage)
+      ]).then(function () {
+        saving = false;
+        markSaved();
+        if (queued) schedule();
+      }).catch(function () {
+        saving = false;
+        chip('تعذّر الحفظ', 'error');
+      });
+    }
+
+    function touch(page) { if (page) lastPage = page; applyPendingFx(); schedule(); }
+    function calcChanged() { schedule(); }
+
+    function confirmClear() {
+      const ok = window.confirm('سيتم مسح كل البيانات المحفوظة في هذا المتصفح: مدخلات الأدوات، حالة الحاسبة، وآخر صفحة. لا يمكن التراجع. هل تريد المتابعة؟');
+      if (!ok) return;
+      SCStore.clearAll().then(function () { location.reload(); });
+    }
+
+    function init() {
+      footEl = document.getElementById('sideFoot');
+      chipEl = document.getElementById('saveState');
+      const clearBtn = document.getElementById('clearStore');
+      if (clearBtn) clearBtn.addEventListener('click', confirmClear);
+      fields().forEach(function (el) {
+        el.addEventListener('input', schedule);
+        el.addEventListener('change', schedule);
+      });
+      return SCStore.ready().then(function () {
+        return Promise.all([SCStore.kvGet(K_INPUTS), SCStore.kvGet(K_CALC), SCStore.kvGet(K_PAGE)]);
+      }).then(function (res) {
+        applyInputs(res[0]);
+        applyCalc(res[1]);
+        if (footEl) {
+          footEl.title = 'الحفظ التلقائي — ' + (SCStore.mode === 'idb' ? 'IndexedDB' : 'localStorage (بديل)');
+        }
+        booted = true;
+        const page = res[2];
+        if (page && document.getElementById('page-' + page)) lastPage = page;
+        goTo(lastPage);
+        applyPendingFx();
+        markSaved();
+        return SCStore.mode;
+      }).catch(function () {
+        booted = true;
+        markSaved();
+        return SCStore.mode;
+      });
+    }
+
+    return {
+      init: init,
+      touch: touch,
+      calcChanged: calcChanged,
+      flush: flush,
+      mode: function () { return SCStore.mode; }
+    };
+  })();
+  window.Persist = Persist;
+
+  // ================= دليل الحسابات · SCCOA =================
+  const SCCOA = (function () {
+    const DEFAULTS = [
+      { code: '1100', name: 'النقدية', type: 'asset' },
+      { code: '1150', name: 'حسابات بعملات أجنبية', type: 'asset' },
+      { code: '1200', name: 'البنك', type: 'asset' },
+      { code: '1300', name: 'المدينون', type: 'asset' },
+      { code: '1310', name: 'مخصص الديون المشكوك في تحصيلها', type: 'asset' },
+      { code: '1400', name: 'المخزون', type: 'asset' },
+      { code: '1500', name: 'أصول ثابتة', type: 'asset' },
+      { code: '1510', name: 'مجمع إهلاك الأصول', type: 'asset' },
+      { code: '2100', name: 'الدائنون', type: 'liability' },
+      { code: '2200', name: 'ضريبة المخرجات', type: 'liability' },
+      { code: '2210', name: 'ضريبة المدخلات', type: 'asset' },
+      { code: '2300', name: 'أقساط مستحقة', type: 'liability' },
+      { code: '2400', name: 'ذمم ضريبية', type: 'liability' },
+      { code: '4100', name: 'الإيرادات', type: 'revenue' },
+      { code: '4900', name: 'أرباح فروق عملة', type: 'revenue' },
+      { code: '5100', name: 'تكلفة المبيعات', type: 'expense' },
+      { code: '5200', name: 'مصروف الإهلاك', type: 'expense' },
+      { code: '5300', name: 'خسائر ائتمانية متوقعة', type: 'expense' },
+      { code: '5900', name: 'خسائر فروق عملة', type: 'expense' }
+    ];
+    const TYPES = [
+      { id: 'asset', label: 'أصول' },
+      { id: 'liability', label: 'التزامات' },
+      { id: 'equity', label: 'حقوق ملكية' },
+      { id: 'revenue', label: 'إيرادات' },
+      { id: 'expense', label: 'مصروفات' }
+    ];
+    let cache = null;
+    let opening = null;
+
+    function seed() {
+      cache = DEFAULTS.map(function (a) { return { code: a.code, name: a.name, type: a.type }; });
+      return Promise.all(cache.map(function (a) { return SCStore.put('coa', a); }))
+        .then(function () { return SCStore.kvSet('coaSeeded', true); })
+        .then(function () { return cache; });
+    }
+
+    function sortRows(rows) {
+      return rows.sort(function (a, b) { return String(a.code).localeCompare(String(b.code)); });
+    }
+
+    function ready() {
+      if (opening) return opening;
+      opening = SCStore.ready()
+        .then(function () { return SCStore.kvGet('coaSeeded'); })
+        .then(function (seeded) {
+          if (!seeded) return seed();
+          return SCStore.all('coa').then(function (rows) {
+            cache = rows || [];
+            if (!cache.length) return seed();
+            sortRows(cache);
+            return cache;
+          });
+        })
+        .catch(function () {
+          cache = DEFAULTS.map(function (a) { return { code: a.code, name: a.name, type: a.type }; });
+          return cache;
+        });
+      return opening;
+    }
+
+    function list() {
+      return (cache || []).map(function (a) { return { code: a.code, name: a.name, type: a.type }; });
+    }
+    function name(code, fallback) {
+      const hit = (cache || []).filter(function (x) { return x.code === code; })[0];
+      return hit ? hit.name : (fallback || code || '');
+    }
+    function replace(rows) {
+      const next = rows.map(function (r) {
+        return { code: String(r.code).trim(), name: String(r.name).trim(), type: r.type || 'asset' };
+      }).filter(function (r) { return r.code && r.name; });
+      const keep = {};
+      next.forEach(function (r) { keep[r.code] = true; });
+      const removed = (cache || []).map(function (a) { return a.code; })
+        .filter(function (c) { return !keep[c]; });
+      return Promise.all(
+        next.map(function (r) { return SCStore.put('coa', r); })
+          .concat(removed.map(function (c) { return SCStore.del('coa', c); }))
+      ).then(function () {
+        cache = sortRows(next);
+        return cache;
+      });
+    }
+    return { ready: ready, list: list, name: name, replace: replace, TYPES: TYPES, DEFAULTS: DEFAULTS };
+  })();
+  window.SCCOA = SCCOA;
+
+  // ================= محرك القيود · SCJE =================
+  const SCJE = (function () {
+    let seqCache = null;
+
+    function today() {
+      const d = new Date();
+      const p = function (n) { return String(n).padStart(2, '0'); };
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+    }
+    function monthKey(date) { return String(date || today()).slice(0, 7).replace('-', ''); }
+    function r3(n) { return Math.round((Number(n) || 0) * 1000) / 1000; }
+
+    function normalize(lines) {
+      return (lines || []).map(function (l) {
+        return {
+          code: String(l.code || ''),
+          name: String(l.name || ''),
+          debit: r3(l.debit),
+          credit: r3(l.credit)
+        };
+      }).filter(function (l) { return l.debit !== 0 || l.credit !== 0; });
+    }
+
+    function totals(lines) {
+      let dr = 0, cr = 0;
+      lines.forEach(function (l) { dr += l.debit; cr += l.credit; });
+      return { dr: r3(dr), cr: r3(cr) };
+    }
+
+    function build(meta, lines) {
+      const ls = normalize(lines);
+      const t = totals(ls);
+      return {
+        id: '',
+        date: (meta && meta.date) || today(),
+        memo: (meta && meta.memo) || '',
+        src: (meta && meta.src) || '',
+        lines: ls,
+        dr: t.dr,
+        cr: t.cr,
+        balanced: Math.abs(t.dr - t.cr) <= 0.005,
+        total: r3(Math.max(t.dr, t.cr)),
+        posted: '',
+        ts: 0
+      };
+    }
+
+    function nextNumber(date) {
+      const key = monthKey(date);
+      const load = seqCache ? Promise.resolve(seqCache) : SCStore.kvGet('jeSeq').then(function (v) { seqCache = v || {}; return seqCache; });
+      return load.then(function (seq) {
+        const n = (Number(seq[key]) || 0) + 1;
+        seq[key] = n;
+        return SCStore.kvSet('jeSeq', seq).then(function () {
+          return 'JE-' + key + '-' + String(n).padStart(4, '0');
+        });
+      });
+    }
+
+    function money(v) {
+      return Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function format(entry, kind) {
+      const f = kind || 'erp';
+      if (f === 'json') {
+        return JSON.stringify({
+          id: entry.posted || null,
+          date: entry.date,
+          memo: entry.memo,
+          source: entry.src,
+          lines: entry.lines.map(function (l) {
+            return { code: l.code, account: l.name, debit: l.debit, credit: l.credit };
+          }),
+          totals: { debit: entry.dr, credit: entry.cr }
+        }, null, 2);
+      }
+      if (f === 'tsv') {
+        const rows = ['الحساب\tمدين\tدائن'];
+        entry.lines.forEach(function (l) {
+          rows.push((l.code ? l.code + ' ' : '') + l.name + '\t' + (l.debit ? l.debit.toFixed(2) : '') + '\t' + (l.credit ? l.credit.toFixed(2) : ''));
+        });
+        rows.push('المجموع\t' + entry.dr.toFixed(2) + '\t' + entry.cr.toFixed(2));
+        return rows.join('\n');
+      }
+      const out = [(entry.posted || 'مسودة') + '  ·  ' + entry.date + (entry.memo ? '  ·  ' + entry.memo : '')];
+      entry.lines.forEach(function (l) {
+        const side = l.debit ? 'Dr' : 'Cr';
+        out.push(side + '  ' + (l.code ? l.code + ' ' : '') + l.name + ' .... ' + money(l.debit || l.credit));
+      });
+      out.push('المجموع  Dr ' + money(entry.dr) + '   |   Cr ' + money(entry.cr));
+      return out.join('\n');
+    }
+
+    // بصمة القيد: تمنع ترحيل نفس الحساب مرتين عند إعادة الحساب
+    function fingerprint(entry) {
+      if (!entry || !entry.src) return '';
+      const body = entry.lines.map(function (l) {
+        return l.code + ':' + r3(l.debit) + ':' + r3(l.credit);
+      }).join(';');
+      return entry.src + '|' + monthKey(entry.date) + '|' + entry.memo + '|' + body;
+    }
+
+    let postedMap = null, postedLoad = null;
+    function loadPosted() {
+      if (postedMap) return Promise.resolve(postedMap);
+      if (postedLoad) return postedLoad;
+      postedLoad = SCStore.kvGet('jePosted').then(function (v) {
+        postedMap = (v && typeof v === 'object') ? v : {};
+        return postedMap;
+      }).catch(function () { postedMap = postedMap || {}; return postedMap; });
+      return postedLoad;
+    }
+
+    function postedId(entry) {
+      const fp = fingerprint(entry);
+      if (!fp || !postedMap) return '';
+      return postedMap[fp] || '';
+    }
+
+    function forget(entry) {
+      const fp = fingerprint(entry);
+      if (!fp) return Promise.resolve(false);
+      return loadPosted().then(function (map) {
+        if (map[fp]) delete map[fp];
+        return SCStore.kvSet('jePosted', map).then(function () { return true; });
+      });
+    }
+
+    function post(entry) {
+      if (!entry || !entry.balanced || entry.total <= 0) return Promise.reject(new Error('unbalanced'));
+      return nextNumber(entry.date).then(function (id) {
+        const saved = {
+          id: id,
+          no: Number(id.slice(-4)),
+          date: entry.date,
+          memo: entry.memo,
+          src: entry.src,
+          lines: entry.lines,
+          dr: entry.dr,
+          cr: entry.cr,
+          ts: Date.now()
+        };
+        const fp = entry.noFp ? '' : fingerprint(entry);
+        saved.fp = fp;
+        return SCStore.put('journal', saved)
+          .then(function () {
+            return SCStore.put('audit', { ts: saved.ts, kind: 'je-post', je: id, note: entry.memo || '', amt: saved.dr });
+          })
+          .then(function () { return loadPosted(); })
+          .then(function (map) {
+            if (fp) map[fp] = id;
+            return SCStore.kvSet('jePosted', map);
+          })
+          .then(function () { return saved; });
+      });
+    }
+
+    function recent(limit) {
+      return SCStore.all('journal').then(function (rows) {
+        return (rows || []).slice().sort(function (a, b) { return b.ts - a.ts; }).slice(0, limit || 20);
+      });
+    }
+
+    function getEntry(id) { return SCStore.get('journal', id); }
+
+    function allEntries() {
+      return SCStore.all('journal').then(function (rows) {
+        return (rows || []).slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+      });
+    }
+
+    function auditLog(limit) {
+      return SCStore.all('audit').then(function (rows) {
+        return (rows || []).slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }).slice(0, limit || 40);
+      });
+    }
+
+    // عكس قيد مرحّل: يبقى الأصل ويُنشأ قيد معاكس مرتبط به
+    function reverse(id, reason) {
+      const why = String(reason || '').slice(0, 300);
+      return SCStore.get('journal', id).then(function (orig) {
+        if (!orig) return Promise.reject(new Error('notfound'));
+        if (orig.reversed) return Promise.reject(new Error('already'));
+        const lines = orig.lines.map(function (l) {
+          return { code: l.code, name: l.name, debit: l.credit, credit: l.debit };
+        });
+        const entry = build({ date: today(), memo: 'عكس ' + (orig.memo || orig.id), src: 'reverse' }, lines);
+        entry.noFp = true;
+        return post(entry).then(function (saved) {
+          saved.reverses = orig.id;
+          return SCStore.put('journal', saved)
+            .then(function () { return SCStore.get('journal', id); })
+            .then(function (fresh) {
+              const row = fresh || orig;
+              row.reversed = saved.id;
+              row.revReason = why;
+              return SCStore.put('journal', row);
+            })
+            .then(function () {
+              return SCStore.put('audit', {
+                ts: Date.now(), kind: 'je-reverse', je: saved.id, ref: orig.id, note: why, amt: saved.dr
+              });
+            })
+            .then(function () { return forget(orig); })
+            .then(function () { return saved; });
+        });
+      });
+    }
+
+    // حذف نهائي مع لقطة كاملة في سجل التدقيق
+    function deleteJE(id, reason) {
+      const why = String(reason || '').slice(0, 300);
+      return SCStore.get('journal', id).then(function (orig) {
+        if (!orig) return Promise.reject(new Error('notfound'));
+        if (orig.reversed) return Promise.reject(new Error('has-reversal'));
+        const snap = JSON.stringify({
+          id: orig.id, date: orig.date, memo: orig.memo, src: orig.src,
+          dr: orig.dr, cr: orig.cr, lines: orig.lines,
+          reversed: orig.reversed || '', reverses: orig.reverses || ''
+        });
+        const fp = orig.fp || fingerprint(orig);
+        return SCStore.put('audit', {
+          ts: Date.now(), kind: 'je-delete', je: id, note: why, amt: orig.dr, snap: snap
+        }).then(function () { return SCStore.del('journal', id); })
+          .then(function () {
+            if (!orig.reverses) return null;
+            return SCStore.get('journal', orig.reverses).then(function (o) {
+              if (!o) return null;
+              o.reversed = '';
+              delete o.revReason;
+              return SCStore.put('journal', o);
+            });
+          })
+          .then(function () {
+            if (!fp) return null;
+            return loadPosted().then(function (map) {
+              if (map[fp]) delete map[fp];
+              return SCStore.kvSet('jePosted', map);
+            });
+          })
+          .then(function () { return true; });
+      });
+    }
+
+    return { today: today, build: build, format: format, post: post, recent: recent, totals: totals, nextNumber: nextNumber,
+      loadPosted: loadPosted, postedId: postedId, forget: forget, fingerprint: fingerprint,
+      getEntry: getEntry, allEntries: allEntries, auditLog: auditLog, reverse: reverse, deleteJE: deleteJE };
+  })();
+  window.SCJE = SCJE;
+
+  // ================= شاشة دليل الحسابات =================
+  (function initCOA() {
+    const modal = $('coaModal'), backdrop = $('coaBackdrop'), body = $('coaBody');
+    const openBtn = $('coaOpen'), closeBtn = $('coaClose'), addBtn = $('coaAdd'), saveBtn = $('coaSave');
+    if (!modal || !body) return;
+    let rows = [];
+    let returnTo = null;
+
+    function esc(t) {
+      return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    }
+    function rowHTML(r, i) {
+      const types = SCCOA.TYPES.map(function (t) {
+        return '<option value="' + t.id + '"' + (t.id === r.type ? ' selected' : '') + '>' + t.label + '</option>';
+      }).join('');
+      return '<div class="coa-row" data-i="' + i + '">' +
+        '<input class="code" maxlength="8" value="' + esc(r.code) + '" aria-label="رمز الحساب" />' +
+        '<input class="nm" maxlength="60" value="' + esc(r.name) + '" aria-label="اسم الحساب" />' +
+        '<select class="tp" aria-label="نوع الحساب">' + types + '</select>' +
+        '<button class="coa-del" type="button" title="حذف" aria-label="حذف الحساب">✕</button>' +
+        '</div>';
+    }
+    function draw() { body.innerHTML = rows.map(rowHTML).join(''); }
+    function read() {
+      const out = [];
+      body.querySelectorAll('.coa-row').forEach(function (el) {
+        out.push({
+          code: el.querySelector('.code').value.trim(),
+          name: el.querySelector('.nm').value.trim(),
+          type: el.querySelector('.tp').value
+        });
+      });
+      return out;
+    }
+    function open() {
+      returnTo = document.activeElement;
+      SCCOA.ready().then(function () {
+        rows = SCCOA.list();
+        draw();
+        modal.classList.add('open');
+        backdrop.classList.add('open');
+        document.body.classList.add('modal-open');
+        if (closeBtn) closeBtn.focus();
+      });
+    }
+    function close() {
+      modal.classList.remove('open');
+      backdrop.classList.remove('open');
+      document.body.classList.remove('modal-open');
+      if (returnTo && returnTo.focus) { try { returnTo.focus(); } catch (e) {} }
+      returnTo = null;
+    }
+    modal.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      const list = Array.prototype.filter.call(
+        modal.querySelectorAll('button, input, select, textarea'),
+        function (el) { return !el.disabled && el.offsetParent !== null; });
+      if (!list.length) return;
+      const first = list[0], last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+
+    if (openBtn) openBtn.addEventListener('click', open);
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (backdrop) backdrop.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal.classList.contains('open')) close();
+    });
+    if (addBtn) addBtn.addEventListener('click', function () {
+      rows = read();
+      rows.push({ code: '', name: '', type: 'asset' });
+      draw();
+      body.scrollTop = body.scrollHeight;
+      const codes = body.querySelectorAll('.coa-row .code');
+      if (codes.length) codes[codes.length - 1].focus();
+    });
+    body.addEventListener('click', function (e) {
+      if (!e.target.classList.contains('coa-del')) return;
+      const row = e.target.closest('.coa-row');
+      if (!row) return;
+      rows = read();
+      rows.splice(Number(row.dataset.i), 1);
+      draw();
+    });
+    if (saveBtn) saveBtn.addEventListener('click', function () {
+      const next = read();
+      if (next.some(function (r) { return !r.code || !r.name; })) { toast('أكمل رمز واسم كل حساب'); return; }
+      const seen = {};
+      for (let i = 0; i < next.length; i++) {
+        if (seen[next[i].code]) { toast('رمز مكرر: ' + next[i].code); return; }
+        seen[next[i].code] = true;
+      }
+      SCCOA.replace(next).then(function () {
+        close();
+        recalcAll();
+        toast('تم حفظ دليل الحسابات');
+      });
+    });
+  })();
+
+  // ================= نافذة النسخ اليدوي =================
+  (function initCopyBox() {
+    const box = $('copyBox'), backdrop = $('copyBackdrop');
+    if (!box) return;
+    let returnTo = null;
+    function close() {
+      box.classList.remove('open');
+      const bd = $('copyBackdrop');
+      if (bd) bd.classList.remove('open');
+      document.body.classList.remove('modal-open');
+      if (returnTo && returnTo.focus) { try { returnTo.focus(); } catch (e) {} }
+      returnTo = null;
+    }
+    function open(txt, ret) {
+      returnTo = ret || document.activeElement;
+      const ta = $('copyText');
+      ta.value = txt;
+      box.classList.add('open');
+      if (backdrop) backdrop.classList.add('open');
+      document.body.classList.add('modal-open');
+      ta.focus();
+      ta.select();
+    }
+    ['copyClose', 'copyDone'].forEach(function (id) {
+      const b = $(id);
+      if (b) b.addEventListener('click', close);
+    });
+    if (backdrop) backdrop.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && box.classList.contains('open')) close();
+      if (e.key !== 'Tab' || !box.classList.contains('open')) return;
+      const list = Array.prototype.filter.call(
+        box.querySelectorAll('button, textarea'),
+        function (el) { return !el.disabled && el.offsetParent !== null; });
+      if (!list.length) return;
+      const first = list[0], last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    window.__openCopyBox = open;
+  })();
+
+  // ================= السجل واللقطات · SCTape =================
+  const SCTape = (function () {
+    const MAX = 40;
+    const REPLAY = {
+      disc: 'calcDiscount', profit: 'calcProfit', vat: 'calcVAT', loan: 'calcLoan',
+      interest: 'calcInterest', depr: 'calcDepr', be: 'calcBE', npv: 'calcNPV',
+      ratios: 'calcRatios', aging: 'calcAging', inv: 'calcInv'
+    };
+    const NO_REPLAY = { fx: 'أسعار العملات تُجلب حيّة', fxrev: 'إعادة التقييم تعتمد سعر صرف حيّ' };
+    const KINDS = { 'je-post': 'ترحيل', 'je-reverse': 'عكس', 'je-delete': 'حذف' };
+    let snapMap = {}, booted = false, suppress = false, seq = 0, jeCount = 0;
+    let revMode = '', revTarget = '', revReturn = null;
+
+    function esc(t) {
+      return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function hash(str) {
+      let h = 2166136261;
+      for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+      return (h >>> 0).toString(36);
+    }
+    function uid() { seq += 1; return 'T' + Date.now().toString(36) + seq.toString(36); }
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function stamp(ts) {
+      const d = new Date(ts || Date.now());
+      return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' · ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+    function pageRoot(page) { return document.getElementById('page-' + page); }
+    function visible() {
+      const el = pageRoot('tape');
+      return !!(el && el.classList.contains('active'));
+    }
+    function pageLabel(page) {
+      const n = navItems.filter(function (x) { return x.dataset.page === page; })[0];
+      const l = n ? n.querySelector('.lbl') : null;
+      return l ? l.textContent.trim() : page;
+    }
+
+    function inputsOf(page) {
+      const out = {}, root = pageRoot(page);
+      if (!root) return out;
+      root.querySelectorAll('input, select').forEach(function (el) {
+        if (!el.id || el.type === 'file' || el.type === 'checkbox' || el.type === 'radio') return;
+        out[el.id] = el.value;
+      });
+      return out;
+    }
+
+    // مستخرج الملخّص: بطاقات النتائج، وإلا أول صفوف الجدول
+    function outsOf(page) {
+      const out = [], root = pageRoot(page);
+      if (!root) return out;
+      root.querySelectorAll('.rcard').forEach(function (c) {
+        const l = c.querySelector('.lbl'), v = c.querySelector('.val');
+        if (!l || !v) return;
+        out.push({ lbl: l.textContent.trim(), val: v.textContent.trim() });
+      });
+      if (!out.length) {
+        const tb = root.querySelector('.data-table tbody');
+        if (tb) {
+          Array.prototype.slice.call(tb.querySelectorAll('tr'), 0, 4).forEach(function (tr) {
+            const cells = tr.querySelectorAll('td');
+            if (cells.length < 2) return;
+            const lbl = cells[0].textContent.trim();
+            const val = Array.prototype.slice.call(cells, 1).map(function (c) { return c.textContent.trim(); }).join(' · ');
+            if (lbl && val) out.push({ lbl: lbl, val: val });
+          });
+        }
+      }
+      return out.slice(0, 5);
+    }
+
+    function prune() {
+      return SCStore.all('sessions').then(function (rows) {
+        const extra = (rows || []).slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }).slice(MAX);
+        if (!extra.length) return true;
+        return Promise.all(extra.map(function (r) { return SCStore.del('sessions', r.id); }))
+          .then(function () { return true; });
+      }).catch(function () { return false; });
+    }
+
+    function save(rec) {
+      return SCStore.put('sessions', rec)
+        .then(function () { return prune(); })
+        .then(function () { if (visible()) render(); return rec; });
+    }
+
+    function capture(page) {
+      if (!booted || suppress || !page || page === 'tape') return Promise.resolve(null);
+      if (!REPLAY[page] && !NO_REPLAY[page]) return Promise.resolve(null);
+      const outs = outsOf(page);
+      if (!outs.length) return Promise.resolve(null);
+      const inputs = inputsOf(page);
+      const sig = hash(page + '|' + JSON.stringify(inputs));
+      if (snapMap[page] === sig) return Promise.resolve(null);
+      snapMap[page] = sig;
+      return save({
+        id: uid(), page: page, ts: Date.now(), inputs: inputs, outs: outs,
+        note: '', sig: sig, src: 'auto', superseded: '', replayOf: ''
+      });
+    }
+
+    function logCalc(expr, res) {
+      const text = String(expr || '').trim();
+      if (!text) return;
+      const sig = hash('calc|' + text);
+      if (snapMap.calc === sig) return;
+      snapMap.calc = sig;
+      save({
+        id: uid(), page: 'calc', ts: Date.now(), inputs: { expr: text },
+        outs: [{ lbl: 'التعبير', val: text }, { lbl: 'الناتج', val: String(res || '') }],
+        note: '', sig: sig, src: 'calc', superseded: '', replayOf: ''
+      });
+    }
+
+    function findSession(id) {
+      return SCStore.all('sessions').then(function (rows) {
+        return (rows || []).filter(function (r) { return r.id === id; })[0] || null;
+      });
+    }
+
+    function setNote(id, note) {
+      return findSession(id).then(function (r) {
+        if (!r) return null;
+        r.note = String(note || '').slice(0, 160);
+        return SCStore.put('sessions', r);
+      });
+    }
+
+    function delSession(id) {
+      return SCStore.del('sessions', id).then(function () { render(); });
+    }
+
+    function sessionText(r) {
+      const out = [pageLabel(r.page) + ' · ' + stamp(r.ts)];
+      Object.keys(r.inputs || {}).forEach(function (k) { out.push('- ' + k + ': ' + r.inputs[k]); });
+      (r.outs || []).forEach(function (o) { out.push('* ' + o.lbl + ': ' + o.val); });
+      if (r.note) out.push('ملاحظة: ' + r.note);
+      return out.join('\n');
+    }
+
+    function replay(id) {
+      findSession(id).then(function (rec) {
+        if (!rec) { toast('اللقطة غير موجودة'); return null; }
+        if (rec.page === 'calc') {
+          goTo('calc');
+          if (window.__calcState) {
+            window.__calcState.set({ expression: String(rec.inputs.expr || ''), justCalculated: false });
+          }
+          if (typeof updateDisplay === 'function') updateDisplay();
+          toast('استُعيد التعبير — اضغط = للحساب');
+          return null;
+        }
+        const fn = REPLAY[rec.page];
+        if (!fn || typeof window[fn] !== 'function') { toast('هذه الأداة لا تقبل إعادة التشغيل'); return null; }
+        goTo(rec.page);
+        suppress = true;
+        Object.keys(rec.inputs).forEach(function (k) {
+          const el = document.getElementById(k);
+          if (!el) return;
+          el.value = rec.inputs[k];
+          try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+          try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+        });
+        try { window[fn](); } catch (e) {}
+        suppress = false;
+        const outs = outsOf(rec.page);
+        const next = {
+          id: uid(), page: rec.page, ts: Date.now(), inputs: rec.inputs, outs: outs,
+          note: '', sig: hash(rec.page + '|' + JSON.stringify(rec.inputs)),
+          src: 'replay', superseded: '', replayOf: rec.id
+        };
+        rec.superseded = next.id;
+        return SCStore.put('sessions', next)
+          .then(function () { return SCStore.put('sessions', rec); })
+          .then(function () { snapMap[rec.page] = next.sig; return prune(); })
+          .then(function () { render(); toast('أُعيد تشغيل لقطة: ' + pageLabel(rec.page)); });
+      }).catch(function () { toast('تعذّرت إعادة التشغيل'); });
+    }
+
+    // ---- العرض ----
+    function render() {
+      if (!pageRoot('tape')) return;
+      renderSessions();
+      renderJE();
+      renderAudit();
+    }
+
+    function renderSessions() {
+      const box = $('tapeList');
+      if (!box) return;
+      SCStore.all('sessions').then(function (rows) {
+        const list = (rows || []).slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }).slice(0, MAX);
+        const sum = $('tapeSum');
+        if (sum) {
+          sum.innerHTML = '<span>لقطات محفوظة: <b>' + list.length + '</b> من ' + MAX + '</span>' +
+            '<span>قيود مرحّلة: <b id="tapeJECount">' + (jeCount || '—') + '</b></span>';
+        }
+        if (!list.length) {
+          box.innerHTML = '<div class="tape-empty">لا توجد لقطات بعد — غيّر أي مدخل في إحدى الأدوات ليُسجَّل تلقائياً.</div>';
+          return;
+        }
+        box.innerHTML = list.map(function (r) {
+          const can = r.page === 'calc' || !!REPLAY[r.page];
+          const why = NO_REPLAY[r.page] || 'غير قابلة لإعادة التشغيل';
+          const outs = (r.outs || []).map(function (o) {
+            return '<span class="tape-chip">' + esc(o.lbl) + ': <b>' + esc(o.val) + '</b></span>';
+          }).join('');
+          const badges = (r.src === 'calc' ? '<span class="tape-badge">حاسبة</span>' : '') +
+            (r.replayOf ? '<span class="tape-badge rep">إعادة تشغيل</span>' : '') +
+            (r.superseded ? '<span class="tape-badge rev">مُستبدلة</span>' : '');
+          const rep = can
+            ? '<button class="je-btn" type="button" data-tape="replay" data-id="' + esc(r.id) + '">إعادة تشغيل</button>'
+            : '<button class="je-btn" type="button" disabled title="' + esc(why) + '">إعادة تشغيل</button>';
+          return '<div class="tape-row' + (r.superseded ? ' sup' : '') + '">' +
+            '<div class="tape-top"><span class="tape-page">' + esc(pageLabel(r.page)) + '</span>' +
+            '<span class="tape-ts">' + esc(stamp(r.ts)) + '</span>' + badges + '</div>' +
+            '<div class="tape-out">' + (outs || '<span class="tape-chip">لا نتائج مسجلة</span>') + '</div>' +
+            '<input class="tape-note" type="text" maxlength="160" data-note="' + esc(r.id) + '" aria-label="ملاحظة على اللقطة" placeholder="ملاحظة على هذه اللقطة..." value="' + esc(r.note || '') + '" />' +
+            '<div class="tape-acts">' + rep +
+            '<button class="je-btn" type="button" data-tape="copy" data-id="' + esc(r.id) + '">نسخ</button>' +
+            '<button class="je-btn" type="button" data-tape="del" data-id="' + esc(r.id) + '">حذف</button>' +
+            '</div></div>';
+        }).join('');
+      }).catch(function () {});
+    }
+
+    function renderJE() {
+      const box = $('tapeJE');
+      if (!box) return;
+      SCJE.allEntries().then(function (rows) {
+        jeCount = rows.length;
+        const cnt = $('tapeJECount');
+        if (cnt) cnt.textContent = String(jeCount);
+        if (!rows.length) {
+          box.innerHTML = '<div class="tape-empty">لا توجد قيود مرحّلة — رحّل قيداً من أي أداة وسيظهر هنا.</div>';
+          return;
+        }
+        box.innerHTML = rows.slice(0, 40).map(function (r) {
+          let badge = '<span class="tape-badge ok">مرحّل</span>';
+          if (r.reversed) badge = '<span class="tape-badge rev">ملغى بالعكس</span>';
+          else if (r.reverses) badge = '<span class="tape-badge rep">قيد عكسي</span>';
+          const sub = [];
+          if (r.memo) sub.push(esc(r.memo));
+          if (r.revReason) sub.push('السبب: ' + esc(r.revReason));
+          if (r.reverses) sub.push('يعكس ' + esc(r.reverses));
+          if (r.reversed) sub.push('عُكس بـ ' + esc(r.reversed));
+          return '<div class="lg">' +
+            '<span class="tape-ts">' + esc(r.date || '') + '</span>' +
+            '<span class="lg-k">' + esc(r.id || '') + '</span>' +
+            '<span class="lg-n">' + (sub.join(' · ') || '—') + ' · <b>' + fmt(r.dr || 0) + '</b></span>' +
+            badge +
+            '<span class="tape-acts">' +
+            '<button class="je-btn" type="button" data-jeact="copy" data-id="' + esc(r.id) + '">نسخ</button>' +
+            (r.reversed ? '' : '<button class="je-btn" type="button" data-jeact="reverse" data-id="' + esc(r.id) + '">عكس</button>') +
+            (r.reversed ? '' : '<button class="je-btn" type="button" data-jeact="delete" data-id="' + esc(r.id) + '">حذف</button>') +
+            '</span></div>';
+        }).join('');
+      }).catch(function () {});
+    }
+
+    function renderAudit() {
+      const box = $('tapeAudit');
+      if (!box) return;
+      SCJE.auditLog(40).then(function (rows) {
+        if (!rows.length) { box.innerHTML = '<div class="tape-empty">سجل التدقيق فارغ.</div>'; return; }
+        box.innerHTML = rows.map(function (a) {
+          const kind = KINDS[a.kind] || a.kind || '—';
+          const cls = a.kind === 'je-delete' ? 'rev' : (a.kind === 'je-reverse' ? 'rep' : 'ok');
+          return '<div class="lg">' +
+            '<span class="tape-ts">' + esc(stamp(a.ts)) + '</span>' +
+            '<span class="tape-badge ' + cls + '">' + esc(kind) + '</span>' +
+            '<span class="lg-n">' + (a.je ? '<b>' + esc(a.je) + '</b>' : '') +
+            (a.note ? ' — ' + esc(a.note) : '') + '</span></div>';
+        }).join('');
+      }).catch(function () {});
+    }
+
+    // ---- نافذة العكس/الحذف ----
+    function openRev(mode, id, ret) {
+      const box = $('revBox'), bd = $('revBackdrop');
+      if (!box) return;
+      revMode = mode; revTarget = id; revReturn = ret || document.activeElement;
+      const title = $('revTitle'), hint = $('revHint'), go = $('revGo'), ta = $('revReason');
+      if ($('revErr')) $('revErr').textContent = '';
+      if (ta) ta.value = '';
+      if (title) title.textContent = mode === 'reverse' ? 'عكس القيد' : 'حذف القيد';
+      if (go) { go.textContent = mode === 'reverse' ? 'إنشاء القيد العكسي' : 'حذف نهائي'; go.disabled = false; }
+      if (hint) {
+        hint.textContent = mode === 'reverse'
+          ? 'يبقى القيد الأصلي ويُنشأ قيد جديد بمبالغ مدين/دائن معكوسة مرتبط به. تُحرَّر بصمة الأداة ليعود أصل القيد مسودة.'
+          : 'يُحذف القيد من دفتر اليومية نهائياً، وتُحفظ نسخة كاملة منه داخل سجل التدقيق.';
+      }
+      box.classList.add('open');
+      if (bd) bd.classList.add('open');
+      document.body.classList.add('modal-open');
+      SCJE.getEntry(id).then(function (r) {
+        const info = $('revInfo');
+        if (!info) return;
+        info.innerHTML = r
+          ? '<span>القيد: <b>' + esc(r.id) + '</b></span><span>التاريخ: <b>' + esc(r.date) + '</b></span>' +
+            '<span>المبلغ: <b>' + fmt(r.dr || 0) + '</b></span>' + (r.memo ? '<span>' + esc(r.memo) + '</span>' : '')
+          : '<span>القيد غير موجود</span>';
+      });
+      setTimeout(function () { if (ta) ta.focus(); }, 60);
+    }
+
+    function closeRev() {
+      const box = $('revBox'), bd = $('revBackdrop');
+      if (box) box.classList.remove('open');
+      if (bd) bd.classList.remove('open');
+      document.body.classList.remove('modal-open');
+      const ret = revReturn;
+      revReturn = null;
+      if (ret && ret.focus) { try { ret.focus(); } catch (e) {} }
+    }
+
+    function submitRev() {
+      const reason = String(($('revReason') || {}).value || '').trim();
+      if (reason.length < 3) { $('revErr').textContent = 'اكتب سبباً موجزاً (3 أحرف على الأقل).'; return; }
+      const go = $('revGo');
+      if (go) go.disabled = true;
+      const mode = revMode, id = revTarget;
+      (mode === 'reverse' ? SCJE.reverse(id, reason) : SCJE.deleteJE(id, reason))
+        .then(function () {
+          closeRev();
+          toast(mode === 'reverse' ? 'أُنشئ القيد العكسي' : 'حُذف القيد');
+          if (typeof recalcAll === 'function') recalcAll();
+          if (window.Persist) Persist.touch();
+          render();
+        })
+        .catch(function (e) {
+          if (go) go.disabled = false;
+          const m = e && e.message;
+          $('revErr').textContent = m === 'already' ? 'هذا القيد معكوس مسبقاً.'
+            : (m === 'has-reversal' ? 'هذا القيد معكوس — احذف القيد العكسي أولاً ثم احذف الأصل.'
+            : (m === 'notfound' ? 'القيد غير موجود.' : 'تعذّر إتمام العملية.'));
+        });
+    }
+
+    function wire() {
+      const list = $('tapeList');
+      if (list) {
+        list.addEventListener('click', function (ev) {
+          const b = ev.target.closest('[data-tape]');
+          if (!b) return;
+          const id = b.getAttribute('data-id'), act = b.getAttribute('data-tape');
+          if (act === 'replay') replay(id);
+          else if (act === 'del') delSession(id);
+          else if (act === 'copy') {
+            findSession(id).then(function (r) { if (r) copyText(sessionText(r)); });
+          }
+        });
+        list.addEventListener('change', function (ev) {
+          const inp = ev.target.closest('[data-note]');
+          if (inp) setNote(inp.getAttribute('data-note'), inp.value);
+        });
+      }
+      const jb = $('tapeJE');
+      if (jb) {
+        jb.addEventListener('click', function (ev) {
+          const b = ev.target.closest('[data-jeact]');
+          if (!b) return;
+          const id = b.getAttribute('data-id'), act = b.getAttribute('data-jeact');
+          if (act === 'copy') {
+            SCJE.getEntry(id).then(function (r) {
+              if (!r) return;
+              const full = { id: r.id, posted: r.id, date: r.date, memo: r.memo, src: r.src, lines: r.lines, dr: r.dr, cr: r.cr };
+              copyText(SCJE.format(full, 'erp'));
+            });
+          } else if (act === 'reverse') openRev('reverse', id, b);
+          else if (act === 'delete') openRev('delete', id, b);
+        });
+      }
+      const rf = $('tapeRefresh');
+      if (rf) rf.addEventListener('click', function () { render(); toast('تم التحديث'); });
+      const clr = $('tapeClear');
+      if (clr) {
+        clr.addEventListener('click', function () {
+          if (!window.confirm('سيتم مسح كل لقطات الحساب المحفوظة. القيود وسجل التدقيق تبقى كما هي. هل تريد المتابعة؟')) return;
+          SCStore.all('sessions').then(function (rows) {
+            return Promise.all((rows || []).map(function (r) { return SCStore.del('sessions', r.id); }));
+          }).then(function () { snapMap = {}; render(); toast('تم مسح اللقطات'); });
+        });
+      }
+      ['revClose', 'revCancel'].forEach(function (id) {
+        const b = $(id);
+        if (b) b.addEventListener('click', closeRev);
+      });
+      const bd = $('revBackdrop');
+      if (bd) bd.addEventListener('click', closeRev);
+      const go = $('revGo');
+      if (go) go.addEventListener('click', submitRev);
+      document.addEventListener('keydown', function (e) {
+        const box = $('revBox');
+        if (!box || !box.classList.contains('open')) return;
+        if (e.key === 'Escape') { e.preventDefault(); closeRev(); return; }
+        if (e.key !== 'Tab') return;
+        const f = Array.prototype.filter.call(box.querySelectorAll('button, textarea'),
+          function (el) { return !el.disabled && el.offsetParent !== null; });
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      });
+      document.addEventListener('change', function (ev) {
+        if (!booted || suppress) return;
+        const el = ev.target;
+        if (!el || !el.closest) return;
+        const pageEl = el.closest('.page');
+        if (!pageEl) return;
+        const page = pageEl.id.replace('page-', '');
+        setTimeout(function () { capture(page); }, 0);
+      });
+    }
+
+    function ready() {
+      return SCStore.all('sessions').then(function (rows) {
+        snapMap = {};
+        const last = {};
+        (rows || []).forEach(function (r) {
+          if (!r || r.superseded) return;
+          if (!last[r.page] || (r.ts || 0) > (last[r.page].ts || 0)) last[r.page] = r;
+        });
+        Object.keys(last).forEach(function (p) { snapMap[p] = last[p].sig; });
+        booted = true;
+        if (visible()) render();
+        return true;
+      }).catch(function () { booted = true; return false; });
+    }
+
+    wire();
+
+    return { ready: ready, render: render, capture: capture, logCalc: logCalc, replay: replay };
+  })();
+  window.SCTape = SCTape;
+
   // ---- init ----
-  setTaxRate(15);
-  renderHistory();
-  updateDisplay();
-  // auto-calc all tools on load
-  ['calcDiscount','calcFx','calcProfit','calcVAT','calcLoan','calcInterest','calcDepr','calcBE','calcNPV','calcRatios','calcAging','calcFxRev','calcInv'].forEach(f => { try { window[f](); } catch(e){} });
+  function recalcAll() {
+    ['calcDiscount','calcFx','calcProfit','calcVAT','calcLoan','calcInterest','calcDepr','calcBE','calcNPV','calcRatios','calcAging','calcFxRev','calcInv']
+      .forEach(function (f) { try { window[f](); } catch (e) {} });
+  }
+
+  function bootApp() {
+    Promise.resolve(Persist.init())
+      .then(function () { return window.SCCOA ? SCCOA.ready() : null; })
+      .then(function () { return window.SCJE ? SCJE.loadPosted() : null; })
+      .then(function () { return window.SCTape ? SCTape.ready() : null; })
+      .then(function () {
+        recalcAll();
+        renderHistory();
+        updateDisplay();
+      }).catch(function () {
+        recalcAll();
+        renderHistory();
+        updateDisplay();
+      });
+  }
+
+  bootApp();
 </script>
 </body>
 </html>
