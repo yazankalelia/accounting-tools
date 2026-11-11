@@ -628,6 +628,42 @@
   .rep-bar .rep-meta { flex: 1 1 160px; min-width: 0; font-size: 11px; color: var(--muted);
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
   .table-actions { gap: 6px; }
+
+  /* ===== النسخ الاحتياطي والفلترة (المرحلة 7) ===== */
+  .bk-card { display: flex; flex-direction: column; gap: 10px; }
+  .bk-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .bk-row .btn { padding: 6px 10px; font-size: 12px; }
+  .bk-note { font-size: 11px; color: var(--muted); line-height: 1.7; }
+  .bk-note b { color: var(--text); }
+  .bk-meta { display: flex; flex-wrap: wrap; gap: 5px 14px; align-items: center;
+    font-size: 11px; color: var(--muted); }
+  .bk-meta b { color: var(--text); direction: ltr; font-variant-numeric: tabular-nums; }
+  .bk-meta .je-btn { margin-inline-start: auto; }
+  #bkMeta { flex: 1 1 100%; }
+  .bk-warn { color: var(--amber); }
+  .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px; align-items: end; margin-top: 10px; }
+  .filters .fld { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .filters .fld.q { grid-column: span 2; }
+  .filters label { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .filters input, .filters select { background: var(--bg-2); border: 1px solid var(--border); color: var(--text);
+    border-radius: var(--radius-sm); padding: 8px 10px; font: inherit; font-size: 12px;
+    min-width: 0; width: 100%; }
+  .filters input[type="search"] { -webkit-appearance: none; appearance: none; }
+  .filters input:focus, .filters select:focus { outline: none; border-color: var(--accent); }
+  .filters .flt-reset { align-self: end; }
+  .flt-count { grid-column: 1 / -1; font-size: 11px; color: var(--muted); line-height: 1.7; }
+  .flt-count b { color: var(--text); direction: ltr; font-variant-numeric: tabular-nums; }
+  @media (min-width: 768px) { .flt-count { grid-column: span 3; align-self: center; } }
+  @media (max-width: 480px) { .filters .fld.q { grid-column: 1 / -1; } }
+  .logo-row { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+  .logo-prev { width: 132px; height: 48px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--bg-2); display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex: 0 0 auto; }
+  .logo-prev img { max-width: 100%; max-height: 100%; display: block; }
+  .logo-prev span { font-size: 11px; color: var(--muted); }
+  .logo-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+  label.btn { cursor: pointer; }
   #printRoot { display: none; }
   @media print {
     @page { size: A4; margin: 14mm 12mm; }
@@ -636,7 +672,13 @@
     body > *:not(#printRoot) { display: none !important; }
     .layout, .mobile-bar, .fb-fab, .fb-panel, .toast, .coa-modal, .coa-backdrop, .nav-backdrop { display: none !important; }
     #printRoot { display: block !important; color: #000; font-size: 11pt; }
-    #printRoot .print-head { border-bottom: 2px solid #111; padding-bottom: 8px; margin-bottom: 12px; }
+    #printRoot .print-head { display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 14px; border-bottom: 2px solid #111; padding-bottom: 8px; margin-bottom: 12px; }
+    #printRoot .ph-main { flex: 1 1 auto; min-width: 0; }
+    #printRoot .ph-logo { flex: 0 0 auto; }
+    #printRoot .ph-logo:empty { display: none; }
+    #printRoot .ph-logo img { max-width: 42mm; max-height: 18mm; object-fit: contain; display: block; }
+    #printRoot .no-print { display: none !important; }
     #printRoot .ph-org { font-size: 15pt; font-weight: 800; }
     #printRoot .ph-title { font-size: 12.5pt; font-weight: 700; margin-top: 2px; }
     #printRoot .ph-meta { display: flex; justify-content: space-between; gap: 12px;
@@ -774,6 +816,7 @@
             <span><kbd>Esc</kbd> تصفير</span>
             <span><kbd>⌫</kbd> حذف</span>
             <span><kbd>F2</kbd> السجل</span>
+            <span><kbd>/</kbd> بحث</span>
             <span><kbd>Alt</kbd>+<kbd>T</kbd> ضريبة</span>
             <button class="keys-open" id="keysOpenCalc" type="button" aria-haspopup="dialog">كل الاختصارات</button>
           </div>
@@ -1272,6 +1315,48 @@
           <p>لقطات قابلة لإعادة التشغيل · القيود المرحّلة · سجل تدقيق دائم</p>
         </div>
 
+        <div class="card bk-card no-print" id="bkCard">
+          <div class="card-title"><span class="ico" aria-hidden="true">⛁</span> النسخ الاحتياطي والسيادة على البيانات</div>
+          <div class="bk-row">
+            <button class="btn sm" id="bkDownload" type="button" title="نسخة كاملة تشمل القيود وسجل التدقيق ودليل الحسابات واللقطات">⤓ نسخة احتياطية كاملة</button>
+            <button class="btn secondary sm" id="bkRestore" type="button" title="استعادة نسخة على هذا الجهاز أو أي جهاز آخر">⟲ استعادة من ملف JSON</button>
+            <input type="file" id="bkFile" accept=".json,application/json" hidden />
+            <span class="bk-meta" id="bkMeta">—</span>
+          </div>
+          <div class="bk-note">نسخة واحدة كاملة تشمل <b>القيود، سجل التدقيق، دليل الحسابات، اللقطات، رأس التقرير والشعار</b>. تُنزَّل كملف JSON على جهازك، وتُستعاد فوراً على أي متصفح آخر دون أي خادم.</div>
+          <div class="bk-meta" id="bkAuto"></div>
+        </div>
+
+        <div class="card no-print">
+          <div class="card-title"><span class="ico" aria-hidden="true">⌕</span> بحث وفلترة الأرشيف</div>
+          <div class="filters">
+            <div class="fld q"><label for="fltQ">بحث فوري</label>
+              <input id="fltQ" type="search" autocomplete="off" placeholder="رقم القيد، البيان، الحساب، السبب..." /></div>
+            <div class="fld"><label for="fltType">النوع</label>
+              <select id="fltType">
+                <option value="">كل الأنواع</option>
+                <option value="depr">إهلاك</option>
+                <option value="vat">ضريبة</option>
+                <option value="bank">تسوية بنكية</option>
+                <option value="prov">مخصصات</option>
+                <option value="other">أخرى</option>
+              </select></div>
+            <div class="fld"><label for="fltState">الحالة</label>
+              <select id="fltState">
+                <option value="">كل الحالات</option>
+                <option value="posted">مرحّل / نشط</option>
+                <option value="reversed">ملغى بالعكس</option>
+                <option value="reversal">قيد عكسي</option>
+                <option value="deleted">محذوف (تدقيق)</option>
+                <option value="superseded">لقطة مُستبدلة</option>
+              </select></div>
+            <div class="fld"><label for="fltFrom">من تاريخ</label><input id="fltFrom" type="date" /></div>
+            <div class="fld"><label for="fltTo">إلى تاريخ</label><input id="fltTo" type="date" /></div>
+            <button class="btn secondary sm flt-reset" id="fltReset" type="button">تصفير</button>
+            <div class="flt-count" id="fltCount"></div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-title"><span class="ico" aria-hidden="true">◷</span> لقطات الحساب</div>
           <div class="tape-sum" id="tapeSum"></div>
@@ -1374,6 +1459,23 @@
     </div>
   </div>
 
+  <div class="coa-backdrop" id="bkBackdrop"></div>
+  <div class="coa-modal" id="bkBox" role="dialog" aria-modal="true" aria-labelledby="bkTitle">
+    <div class="coa-head">
+      <div class="coa-title" id="bkTitle">استعادة نسخة احتياطية</div>
+      <button class="coa-x" id="bkClose" type="button" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="coa-body">
+      <div class="tape-sum" id="bkInfo"></div>
+      <p class="table-note" style="color:var(--red);margin-top:12px;">سيتم استبدال كل البيانات الحالية في هذا المتصفح بمحتوى النسخة. لا يمكن التراجع — يُنصح بتنزيل نسخة احتياطية من الوضع الحالي أولاً.</p>
+    </div>
+    <div class="coa-foot">
+      <span class="coa-hint" id="bkErr" role="alert"></span>
+      <button class="btn secondary sm" id="bkCancel" type="button">إلغاء</button>
+      <button class="btn sm" id="bkGo" type="button">استعادة واستبدال</button>
+    </div>
+  </div>
+
   <div class="coa-backdrop" id="keysBackdrop"></div>
   <div class="coa-modal keys-modal" id="keysBox" role="dialog" aria-modal="true" aria-labelledby="keysTitle">
     <div class="coa-head">
@@ -1401,7 +1503,15 @@
         <input type="text" id="repOrg" maxlength="60" placeholder="مثال: مؤسسة النخبة للمحاسبة" /></div>
       <div class="field" style="margin-top:12px;"><label for="repPeriod">الفترة (اختياري)</label>
         <input type="text" id="repPeriod" maxlength="60" placeholder="مثال: يناير – نوفمبر 2026" /></div>
-      <p class="table-note">يظهر الاسم والفترة في أعلى ورقة الطباعة/PDF وفي ملف CSV. يُحفظ محلياً على هذا الجهاز.</p>
+      <div class="logo-row">
+        <div class="logo-prev" id="repLogoPrev"><span>لا شعار</span></div>
+        <div class="logo-acts">
+          <label class="btn secondary sm" for="repLogo">اختيار شعار المؤسسة</label>
+          <input type="file" id="repLogo" accept="image/png,image/jpeg,image/webp" hidden />
+          <button class="btn secondary sm" id="repLogoDel" type="button">إزالة</button>
+        </div>
+      </div>
+      <p class="table-note">يظهر الاسم والفترة والشعار في أعلى ورقة الطباعة/PDF وفي ملف CSV. يُصغَّر الشعار تلقائياً ويُحفظ محلياً على هذا الجهاز.</p>
     </div>
     <div class="coa-foot">
       <span class="coa-hint" id="repHint" role="alert"></span>
@@ -1412,9 +1522,12 @@
 
   <div id="printRoot" aria-hidden="true">
     <div class="print-head">
-      <div class="ph-org" id="phOrg">مؤسستي</div>
-      <div class="ph-title" id="phTitle">تقرير</div>
-      <div class="ph-meta"><span id="phPeriod"></span><span id="phDate"></span></div>
+      <div class="ph-main">
+        <div class="ph-org" id="phOrg">مؤسستي</div>
+        <div class="ph-title" id="phTitle">تقرير</div>
+        <div class="ph-meta"><span id="phPeriod"></span><span id="phDate"></span></div>
+      </div>
+      <div class="ph-logo" id="phLogo"></div>
     </div>
     <div id="printArea"></div>
     <div class="print-foot">أُعدّ بواسطة أدوات محاسبية · Pro Suite — <span id="phFoot"></span></div>
@@ -1862,7 +1975,7 @@
     return tag === 'input' || tag === 'textarea' || tag === 'select' || el.isContentEditable === true;
   }
   function anyModalOpen() {
-    return ['coaModal', 'revBox', 'copyBox', 'keysBox'].some(function (id) {
+    return ['coaModal', 'revBox', 'copyBox', 'keysBox', 'repBox', 'bkBox'].some(function (id) {
       const el = $(id);
       return !!el && el.classList.contains('open');
     });
@@ -1901,6 +2014,8 @@
       { k: ['F2'], t: 'الانتقال إلى السجل والقيود' },
       { k: ['Ctrl','P'], t: 'طباعة / PDF للصفحة الحالية' },
       { k: ['Alt','E'], t: 'تصدير جدول الصفحة CSV' },
+      { k: ['Alt','B'], t: 'نسخة احتياطية كاملة (JSON)' },
+      { k: ['/'], t: 'بحث فوري في أرشيف السجل' },
       { k: ['?'], t: 'فتح قائمة الاختصارات' }
     ];
     function draw() {
@@ -1985,6 +2100,11 @@
       if (window.SCReport) SCReport.exportPage();
       return;
     }
+    if (e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 'b' || e.key === 'B')) {
+      e.preventDefault();
+      if (window.SCBackup) SCBackup.exportFile();
+      return;
+    }
     if (e.ctrlKey && e.shiftKey && !e.altKey && (e.key === 'C' || e.key === 'c')) {
       e.preventDefault(); copyLastJE(); return;
     }
@@ -1998,6 +2118,18 @@
       return;
     }
     if (isTyping(e.target) || anyModalOpen()) return;
+    if (!e.ctrlKey && !e.altKey && !e.metaKey && e.key === '/') {
+      const act = document.querySelector('.page.active');
+      if (act && act.id !== 'page-calc') {
+        e.preventDefault();
+        goTo('tape');
+        setTimeout(function () {
+          const q = $('fltQ');
+          if (q) { q.focus(); q.select(); }
+        }, 80);
+        return;
+      }
+    }
     if (e.key === '?' || (e.shiftKey && e.key === '/')) { e.preventDefault(); Keys.open(); return; }
     if (e.target && e.target.closest && e.target.closest('button, a, [role="button"], summary, label')) return;
     const active = document.querySelector('.page.active');
@@ -3333,6 +3465,9 @@
             return SCStore.kvSet('jePosted', map);
           })
           .then(function () { return saved; });
+      }).then(function (saved) {
+        if (window.SCBackup) SCBackup.schedule();
+        return saved;
       });
     }
 
@@ -3385,6 +3520,9 @@
             .then(function () { return forget(orig); })
             .then(function () { return saved; });
         });
+      }).then(function (saved) {
+        if (window.SCBackup) SCBackup.schedule();
+        return saved;
       });
     }
 
@@ -3420,6 +3558,9 @@
             });
           })
           .then(function () { return true; });
+      }).then(function (v) {
+        if (window.SCBackup) SCBackup.schedule();
+        return v;
       });
     }
 
@@ -3526,6 +3667,7 @@
         close();
         recalcAll();
         toast('تم حفظ دليل الحسابات');
+        if (window.SCBackup) SCBackup.schedule();
       });
     });
   })();
@@ -3584,6 +3726,7 @@
     const KINDS = { 'je-post': 'ترحيل', 'je-reverse': 'عكس', 'je-delete': 'حذف' };
     let snapMap = {}, booted = false, suppress = false, seq = 0, jeCount = 0;
     let revMode = '', revTarget = '', revReturn = null;
+    let flt = { q: '', type: '', state: '', from: '', to: '' }, fltStats = {}, fltTimer = 0;
 
     function esc(t) {
       return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -3609,6 +3752,114 @@
       const n = navItems.filter(function (x) { return x.dataset.page === page; })[0];
       const l = n ? n.querySelector('.lbl') : null;
       return l ? l.textContent.trim() : page;
+    }
+
+    // ---- الفلترة والبحث ----
+    function norm(v) { return String(v == null ? '' : v).toLowerCase(); }
+    function isoOf(v) {
+      if (v == null || v === '') return '';
+      if (typeof v === 'number' || /^\d{10,}$/.test(String(v))) {
+        const d = new Date(Number(v));
+        if (!isNaN(d.getTime())) return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+      }
+      const m = String(v).match(/(\d{4})-(\d{2})-(\d{2})/);
+      return m ? m[1] + '-' + m[2] + '-' + m[3] : '';
+    }
+    function fltActive() { return !!(flt.q || flt.type || flt.state || flt.from || flt.to); }
+    function typeOfText(t) {
+      const s = norm(t);
+      if (/مخصص|provision/.test(s)) return 'prov';
+      if (/إهلاك|اهلاك|deprec/.test(s)) return 'depr';
+      if (/ضريبة|vat|tax/.test(s)) return 'vat';
+      if (/تسوية|بنك|bank/.test(s)) return 'bank';
+      return 'other';
+    }
+    function jeText(e) {
+      const parts = [e && e.id, e && e.date, e && e.memo, e && e.src, e && e.revReason,
+        e && e.reverses, e && e.reversed, e && e.posted];
+      ((e && e.lines) || []).forEach(function (l) { parts.push(l.code, l.name); });
+      return norm(parts.join(' '));
+    }
+    function jeType(e) {
+      const src = String((e && e.src) || '');
+      if (src === 'depr' || src === 'vat' || src === 'bank') return src;
+      return typeOfText(jeText(e));
+    }
+    function jeState(e) {
+      if (e && e.reversed) return 'reversed';
+      if (e && e.reverses) return 'reversal';
+      return 'posted';
+    }
+    function sessionType(r) {
+      const page = String((r && r.page) || '');
+      if (page === 'depr' || page === 'vat' || page === 'bank') return page;
+      return typeOfText(sessionText(r));
+    }
+    function auditType(a) {
+      if (!a) return 'other';
+      const snap = a.snap ? String(a.snap).slice(0, 1200) : '';
+      return typeOfText(norm(a.note || '') + ' ' + snap);
+    }
+    function auditState(a) {
+      if (!a) return '';
+      if (a.kind === 'je-delete') return 'deleted';
+      if (a.kind === 'je-reverse') return 'reversal';
+      return 'posted';
+    }
+    function matchCommon(text, iso, type, state) {
+      const t = norm(text);
+      if (flt.q) {
+        const words = norm(flt.q).split(/\s+/).filter(Boolean);
+        for (let i = 0; i < words.length; i++) {
+          if (t.indexOf(words[i]) < 0) return false;
+        }
+      }
+      if (flt.type && type !== flt.type) return false;
+      if (flt.state && state !== flt.state) return false;
+      if (flt.from && (!iso || iso < flt.from)) return false;
+      if (flt.to && (!iso || iso > flt.to)) return false;
+      return true;
+    }
+    function updateCount() {
+      const el = $('fltCount');
+      if (!el) return;
+      if (!fltActive()) {
+        el.innerHTML = 'يُطبَّق البحث والفلترة على القيود واللقطات وسجل التدقيق معاً.';
+        return;
+      }
+      const part = function (label, st) {
+        return st ? label + ' <b>' + st[0] + '</b>/' + st[1] : '';
+      };
+      const bits = [part('قيود', fltStats.je), part('تدقيق', fltStats.audit), part('لقطات', fltStats.sessions)]
+        .filter(Boolean);
+      el.innerHTML = 'المطابق — ' + (bits.join(' · ') || 'لا شيء');
+    }
+    function applyFilters() {
+      flt = {
+        q: String(($('fltQ') || {}).value || '').trim(),
+        type: String(($('fltType') || {}).value || ''),
+        state: String(($('fltState') || {}).value || ''),
+        from: String(($('fltFrom') || {}).value || ''),
+        to: String(($('fltTo') || {}).value || '')
+      };
+      fltStats = {};
+      render();
+    }
+    function resetFilters() {
+      ['fltQ', 'fltType', 'fltState', 'fltFrom', 'fltTo'].forEach(function (id) {
+        const el = $(id);
+        if (el) el.value = '';
+      });
+      applyFilters();
+    }
+    function filteredEntries() {
+      return SCJE.allEntries().then(function (rows) {
+        rows = rows || [];
+        if (!fltActive()) return rows;
+        return rows.filter(function (e) {
+          return matchCommon(jeText(e), isoOf(e.date), jeType(e), jeState(e));
+        });
+      });
     }
 
     function inputsOf(page) {
@@ -3765,14 +4016,25 @@
       const box = $('tapeList');
       if (!box) return;
       SCStore.all('sessions').then(function (rows) {
-        const list = (rows || []).slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }).slice(0, MAX);
+        const all = (rows || []).slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }).slice(0, MAX);
+        const list = all.filter(function (r) {
+          return matchCommon(sessionText(r), isoOf(r.ts), sessionType(r),
+            r.superseded ? 'superseded' : 'posted');
+        });
+        fltStats.sessions = [list.length, all.length];
+        updateCount();
         const sum = $('tapeSum');
         if (sum) {
-          sum.innerHTML = '<span>لقطات محفوظة: <b>' + list.length + '</b> من ' + MAX + '</span>' +
-            '<span>قيود مرحّلة: <b id="tapeJECount">' + (jeCount || '—') + '</b></span>';
+          sum.innerHTML = '<span>لقطات محفوظة: <b>' + all.length + '</b> من ' + MAX + '</span>' +
+            '<span>قيود مرحّلة: <b id="tapeJECount">' + (jeCount || '—') + '</b></span>' +
+            (fltActive() ? '<span>لقطات مطابقة: <b>' + list.length + '</b></span>' : '');
+        }
+        if (!all.length) {
+          box.innerHTML = '<div class="tape-empty">لا توجد لقطات بعد — غيّر أي مدخل في إحدى الأدوات ليُسجَّل تلقائياً.</div>';
+          return;
         }
         if (!list.length) {
-          box.innerHTML = '<div class="tape-empty">لا توجد لقطات بعد — غيّر أي مدخل في إحدى الأدوات ليُسجَّل تلقائياً.</div>';
+          box.innerHTML = '<div class="tape-empty">لا توجد لقطات مطابقة لبحثك — جرّب توسيع الفترة أو تصفير الفلاتر.</div>';
           return;
         }
         box.innerHTML = list.map(function (r) {
@@ -3804,14 +4066,24 @@
       const box = $('tapeJE');
       if (!box) return;
       SCJE.allEntries().then(function (rows) {
-        jeCount = rows.length;
+        const all = rows || [];
+        jeCount = all.length;
         const cnt = $('tapeJECount');
         if (cnt) cnt.textContent = String(jeCount);
-        if (!rows.length) {
+        const list = all.filter(function (e) {
+          return matchCommon(jeText(e), isoOf(e.date), jeType(e), jeState(e));
+        });
+        fltStats.je = [list.length, all.length];
+        updateCount();
+        if (!all.length) {
           box.innerHTML = '<div class="tape-empty">لا توجد قيود مرحّلة — رحّل قيداً من أي أداة وسيظهر هنا.</div>';
           return;
         }
-        box.innerHTML = rows.slice(0, 40).map(function (r) {
+        if (!list.length) {
+          box.innerHTML = '<div class="tape-empty">لا توجد قيود مطابقة لبحثك — جرّب توسيع الفترة أو تصفير الفلاتر.</div>';
+          return;
+        }
+        box.innerHTML = list.slice(0, fltActive() ? 100 : 40).map(function (r) {
           let badge = '<span class="tape-badge ok">مرحّل</span>';
           if (r.reversed) badge = '<span class="tape-badge rev">ملغى بالعكس</span>';
           else if (r.reverses) badge = '<span class="tape-badge rep">قيد عكسي</span>';
@@ -3837,9 +4109,20 @@
     function renderAudit() {
       const box = $('tapeAudit');
       if (!box) return;
-      SCJE.auditLog(40).then(function (rows) {
-        if (!rows.length) { box.innerHTML = '<div class="tape-empty">سجل التدقيق فارغ.</div>'; return; }
-        box.innerHTML = rows.map(function (a) {
+      SCJE.auditLog(400).then(function (rows) {
+        const all = rows || [];
+        const list = all.filter(function (a) {
+          return matchCommon(norm((a.note || '') + ' ' + (a.je || '') + ' ' + (a.kind || '')),
+            isoOf(a.ts), auditType(a), auditState(a));
+        });
+        fltStats.audit = [list.length, all.length];
+        updateCount();
+        if (!all.length) { box.innerHTML = '<div class="tape-empty">سجل التدقيق فارغ.</div>'; return; }
+        if (!list.length) {
+          box.innerHTML = '<div class="tape-empty">لا توجد أحداث تدقيق مطابقة لبحثك.</div>';
+          return;
+        }
+        box.innerHTML = list.slice(0, fltActive() ? 100 : 60).map(function (a) {
           const kind = KINDS[a.kind] || a.kind || '—';
           const cls = a.kind === 'je-delete' ? 'rev' : (a.kind === 'je-reverse' ? 'rep' : 'ok');
           return '<div class="lg">' +
@@ -3958,6 +4241,22 @@
           }).then(function () { snapMap = {}; render(); toast('تم مسح اللقطات'); });
         });
       }
+      const fltQ = $('fltQ');
+      if (fltQ) {
+        fltQ.addEventListener('input', function () {
+          clearTimeout(fltTimer);
+          fltTimer = setTimeout(applyFilters, 130);
+        });
+        fltQ.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') { e.preventDefault(); fltQ.value = ''; applyFilters(); }
+        });
+      }
+      ['fltType', 'fltState', 'fltFrom', 'fltTo'].forEach(function (id) {
+        const el = $(id);
+        if (el) el.addEventListener('change', applyFilters);
+      });
+      const fltReset = $('fltReset');
+      if (fltReset) fltReset.addEventListener('click', resetFilters);
       ['revClose', 'revCancel'].forEach(function (id) {
         const b = $(id);
         if (b) b.addEventListener('click', closeRev);
@@ -4006,7 +4305,8 @@
 
     wire();
 
-    return { ready: ready, render: render, capture: capture, logCalc: logCalc, replay: replay };
+    return { ready: ready, render: render, capture: capture, logCalc: logCalc, replay: replay,
+      filteredEntries: filteredEntries, applyFilters: applyFilters };
   })();
   window.SCTape = SCTape;
 
@@ -4017,7 +4317,8 @@
       L_table: 'جدول-الأقساط', D_table: 'جدول-الإهلاك', R_table: 'النسب-المالية',
       A_table: 'أعمار-الديون', Iv_table: 'المخزون', Br_table: 'التسوية-البنكية'
     };
-    let head = { org: 'مؤسستي', period: '' };
+    let head = { org: 'مؤسستي', period: '', logo: '' };
+    let pendingLogo = '';
     let returnTo = null;
 
     function pad(n) { return (n < 10 ? '0' : '') + n; }
@@ -4102,8 +4403,11 @@
       return download(rows, name || TBL_NAMES[tableId] || (tableId || 'جدول'));
     }
     function exportJournal() {
-      if (!window.SCJE || typeof SCJE.allEntries !== 'function') { toast('لا توجد قيود للتصدير'); return false; }
-      return SCJE.allEntries().then(function (rows) {
+      const source = (window.SCTape && typeof SCTape.filteredEntries === 'function')
+        ? SCTape.filteredEntries()
+        : (window.SCJE && typeof SCJE.allEntries === 'function' ? SCJE.allEntries() : null);
+      if (!source) { toast('لا توجد قيود للتصدير'); return false; }
+      return source.then(function (rows) {
         const items = [['رقم القيد', 'التاريخ', 'البيان', 'رمز الحساب', 'الحساب', 'مدين', 'دائن', 'الحالة']];
         (rows || []).forEach(function (e) {
           (e.lines || []).forEach(function (l) {
@@ -4142,6 +4446,8 @@
       $('phPeriod').textContent = head.period ? ('الفترة: ' + head.period) : ('كما في ' + dateStr());
       $('phDate').textContent = 'تاريخ الإصدار: ' + dateStr();
       $('phFoot').textContent = d.toLocaleString('en-GB');
+      const logo = $('phLogo');
+      if (logo) logo.innerHTML = head.logo ? '<img alt="شعار المؤسسة" src="' + head.logo + '" />' : '';
     }
     function buildClone(page) {
       const clone = page.cloneNode(true);
@@ -4170,7 +4476,7 @@
       });
       ['.btn', 'button', '.table-actions', '.keys-hint', '.keys-open', '.calc-keys', '.calc-toolbar',
        '.calc-history', '.calc-status', '.rep-bar', '.tape-acts', '.je-acts', '.je-btn',
-       '.page-header', '.tax-popover', '.hint', '.coa-hint', '.card-title .ico'].forEach(function (sel) {
+       '.page-header', '.tax-popover', '.hint', '.coa-hint', '.card-title .ico', '.no-print'].forEach(function (sel) {
         Array.prototype.forEach.call(clone.querySelectorAll(sel), function (el) {
           if (el.parentNode) el.parentNode.removeChild(el);
         });
@@ -4202,6 +4508,54 @@
       return true;
     }
 
+    // ---------- الشعار ----------
+    function paintLogo(src) {
+      const prev = $('repLogoPrev');
+      if (!prev) return;
+      prev.innerHTML = src
+        ? '<img alt="معاينة شعار المؤسسة" src="' + src + '" />'
+        : '<span>لا شعار</span>';
+    }
+    function acceptLogo(file) {
+      if (!file) return;
+      const hint = $('repHint');
+      if (!/^image\/(png|jpe?g|webp)$/i.test(file.type || '')) {
+        if (hint) hint.textContent = 'اختر صورة PNG أو JPG أو WebP.';
+        return;
+      }
+      if (file.size > 3 * 1024 * 1024) {
+        if (hint) hint.textContent = 'حجم الصورة كبير — الحد الأقصى 3 ميجابايت.';
+        return;
+      }
+      const fr = new FileReader();
+      fr.onload = function () {
+        const img = new Image();
+        img.onload = function () {
+          const maxW = 360, maxH = 120;
+          let w = img.width || maxW, h = img.height || maxH;
+          const scale = Math.min(1, maxW / w, maxH / h);
+          w = Math.max(1, Math.round(w * scale));
+          h = Math.max(1, Math.round(h * scale));
+          const cv = document.createElement('canvas');
+          cv.width = w; cv.height = h;
+          const ctx = cv.getContext('2d');
+          if (!ctx) { if (hint) hint.textContent = 'تعذّر معالجة الصورة.'; return; }
+          ctx.clearRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          let out = '';
+          try { out = cv.toDataURL('image/png'); } catch (e) { out = ''; }
+          if (!out) { if (hint) hint.textContent = 'تعذّر قراءة الصورة.'; return; }
+          pendingLogo = out;
+          paintLogo(out);
+          if (hint) hint.textContent = '';
+        };
+        img.onerror = function () { if (hint) hint.textContent = 'صورة غير صالحة.'; };
+        img.src = String(fr.result || '');
+      };
+      fr.onerror = function () { if (hint) hint.textContent = 'تعذّر قراءة الملف.'; };
+      fr.readAsDataURL(file);
+    }
+
     // ---------- رأس التقرير ----------
     const box = $('repBox'), backdrop = $('repBackdrop');
     function openHead() {
@@ -4210,6 +4564,8 @@
       $('repOrg').value = head.org || '';
       $('repPeriod').value = head.period || '';
       $('repHint').textContent = '';
+      pendingLogo = head.logo || '';
+      paintLogo(pendingLogo);
       box.classList.add('open');
       if (backdrop) backdrop.classList.add('open');
       document.body.classList.add('modal-open');
@@ -4226,7 +4582,7 @@
     function saveHead() {
       const org = ($('repOrg').value || '').trim().slice(0, 60);
       if (!org) { $('repHint').textContent = 'اسم المؤسسة مطلوب'; $('repOrg').focus(); return; }
-      head = { org: org, period: ($('repPeriod').value || '').trim().slice(0, 60) };
+      head = { org: org, period: ($('repPeriod').value || '').trim().slice(0, 60), logo: pendingLogo || '' };
       refreshMeta();
       closeHead();
       toast('حُفظ رأس التقرير');
@@ -4251,6 +4607,20 @@
     if ($('repSave')) $('repSave').addEventListener('click', saveHead);
     if ($('repOrg')) $('repOrg').addEventListener('keydown', function (e) {
       if (e.key === 'Enter') { e.preventDefault(); saveHead(); }
+    });
+    if ($('repPeriod')) $('repPeriod').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); saveHead(); }
+    });
+    const repLogo = $('repLogo');
+    if (repLogo) repLogo.addEventListener('change', function () {
+      acceptLogo(repLogo.files && repLogo.files[0]);
+      try { repLogo.value = ''; } catch (e) {}
+    });
+    if ($('repLogoDel')) $('repLogoDel').addEventListener('click', function () {
+      pendingLogo = '';
+      paintLogo('');
+      const h = $('repHint');
+      if (h) h.textContent = '';
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && box && box.classList.contains('open')) closeHead();
@@ -4298,7 +4668,13 @@
 
     function init() {
       return SCStore.kvGet(K_HEAD).then(function (v) {
-        if (v && typeof v === 'object') head = { org: v.org || 'مؤسستي', period: v.period || '' };
+        if (v && typeof v === 'object') {
+          head = {
+            org: v.org || 'مؤسستي',
+            period: v.period || '',
+            logo: typeof v.logo === 'string' ? v.logo : ''
+          };
+        }
       }).catch(function () {}).then(function () {
         buildBars();
         wireTableButtons();
@@ -4313,6 +4689,278 @@
   })();
   window.SCReport = SCReport;
 
+  // ===== النسخ الاحتياطي والاستعادة (المرحلة 7) =====
+  const SCBackup = (function () {
+    const K_LAST = 'lastBk', K_AUTO = 'autoBk';
+    const STORES = ['kv', 'journal', 'audit', 'coa', 'sessions'];
+    let booted = false, busy = false, autoTimer = 0, pending = null, autoSnap = null;
+
+    function pad2(n) { return String(n).padStart(2, '0'); }
+    function stampFile() {
+      const d = new Date();
+      return d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) + '-' +
+        pad2(d.getHours()) + pad2(d.getMinutes()) + pad2(d.getSeconds());
+    }
+    function when(ts) {
+      if (!ts) return '—';
+      const d = new Date(ts);
+      if (isNaN(d.getTime())) return '—';
+      return pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' +
+        pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+    }
+    function kb(n) {
+      n = Number(n) || 0;
+      if (n < 1024) return n + ' B';
+      if (n < 1048576) return Math.round(n / 1024) + ' KB';
+      return (Math.round(n / 1048576 * 10) / 10) + ' MB';
+    }
+    function escText(t) {
+      return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function counts(d) {
+      const out = {};
+      STORES.forEach(function (n) { out[n] = (d && Array.isArray(d[n])) ? d[n].length : 0; });
+      return out;
+    }
+    function validRow(n, row) {
+      if (!row || typeof row !== 'object') return false;
+      if (n === 'kv') return !!row.k;
+      if (n === 'journal' || n === 'sessions') return !!row.id;
+      if (n === 'coa') return !!row.code;
+      return true;
+    }
+    function collect() {
+      const data = {};
+      return Promise.all(STORES.map(function (n) {
+        return SCStore.all(n).then(function (rows) { data[n] = rows || []; })
+          .catch(function () { data[n] = []; });
+      })).then(function () {
+        return { app: 'accounting-tools-pro', schema: 1, createdAt: new Date().toISOString(), data: data };
+      });
+    }
+    function download(obj) {
+      const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const name = 'supercalc-backup-' + stampFile() + '.json';
+      a.href = url; a.download = name; a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () {
+        URL.revokeObjectURL(url);
+        if (a.parentNode) a.parentNode.removeChild(a);
+      }, 1500);
+      return { name: name, bytes: blob.size };
+    }
+    function paintMeta() {
+      return Promise.all([
+        SCStore.kvGet(K_LAST).catch(function () {}),
+        SCStore.kvGet(K_AUTO).catch(function () {})
+      ]).then(function (res) {
+        const last = res[0], auto = res[1];
+        autoSnap = auto || null;
+        const meta = $('bkMeta');
+        if (meta) {
+          meta.innerHTML = (last && last.ts)
+            ? '<span>آخر نسخة: <b>' + when(last.ts) + '</b></span><span>الحجم: <b>' + kb(last.bytes) + '</b></span>'
+            : '<span class="bk-warn">لم تُنشئ نسخة بعد</span>';
+        }
+        const autoEl = $('bkAuto');
+        if (autoEl) {
+          if (auto && auto.ts && auto.data) {
+            const c = auto.counts || counts(auto.data);
+            autoEl.innerHTML = '<span>لقطة تلقائية: <b>' + when(auto.ts) + '</b></span>' +
+              '<span>قيود: <b>' + (c.journal || 0) + '</b> · تدقيق: <b>' + (c.audit || 0) +
+              '</b> · لقطات: <b>' + (c.sessions || 0) + '</b></span>' +
+              '<button class="je-btn" type="button" data-bk="auto">استعادة اللقطة التلقائية</button>';
+          } else {
+            autoEl.innerHTML = SCStore.mode === 'idb'
+              ? '<span>اللقطة التلقائية: ستُنشأ بعد أول ترحيل أو تعديل على البيانات.</span>'
+              : '<span>اللقطة التلقائية: غير متاحة على هذا المتصفح (تُستخدم عند التخزين عبر IndexedDB).</span>';
+          }
+        }
+        return true;
+      });
+    }
+    function exportFile() {
+      if (busy) return false;
+      busy = true;
+      toast('جارٍ تجهيز النسخة الاحتياطية…');
+      return collect().then(function (obj) {
+        const out = download(obj);
+        const c = counts(obj.data);
+        return SCStore.kvSet(K_LAST, { ts: Date.now(), bytes: out.bytes, counts: c, name: out.name })
+          .then(paintMeta)
+          .then(function () {
+            toast('نُزّلت النسخة: ' + out.name);
+            return true;
+          });
+      }).catch(function () {
+        toast('تعذّر إنشاء النسخة الاحتياطية');
+        return false;
+      }).then(function (v) { busy = false; return v; });
+    }
+    function snapshot() {
+      if (!booted || SCStore.mode !== 'idb') return Promise.resolve(false);
+      return collect().then(function (obj) {
+        const raw = JSON.stringify(obj.data);
+        if (raw.length > 4500000) return false;
+        const payload = { ts: Date.now(), bytes: raw.length, counts: counts(obj.data), data: obj.data };
+        return SCStore.kvSet(K_AUTO, payload).then(function () {
+          autoSnap = payload;
+          return paintMeta();
+        }).then(function () { return true; });
+      }).catch(function () { return false; });
+    }
+    function schedule() {
+      if (!booted) return;
+      clearTimeout(autoTimer);
+      autoTimer = setTimeout(function () { autoTimer = 0; snapshot(); }, 3500);
+    }
+    function normalize(text) {
+      let obj;
+      try { obj = JSON.parse(text); } catch (e) { return null; }
+      if (!obj || typeof obj !== 'object') return null;
+      const d = obj.data || obj.stores || null;
+      if (!d || typeof d !== 'object') return null;
+      const ok = STORES.some(function (n) { return Array.isArray(d[n]); });
+      if (!ok) return null;
+      return { data: d, createdAt: obj.createdAt || '', app: obj.app || '' };
+    }
+    function openRestore(payload, label) {
+      const box = $('bkBox'), bd = $('bkBackdrop');
+      if (!box || !payload) return;
+      pending = payload;
+      const c = counts(payload.data);
+      const info = $('bkInfo');
+      if (info) {
+        info.innerHTML =
+          '<span>المصدر: <b>' + escText(label || 'ملف JSON') + '</b></span>' +
+          (payload.createdAt ? '<span>تاريخ النسخة: <b>' + escText(when(Date.parse(payload.createdAt))) + '</b></span>' : '') +
+          '<span>قيود: <b>' + c.journal + '</b></span><span>تدقيق: <b>' + c.audit + '</b></span>' +
+          '<span>حسابات: <b>' + c.coa + '</b></span><span>لقطات: <b>' + c.sessions + '</b></span>' +
+          '<span>مفاتيح: <b>' + c.kv + '</b></span>';
+      }
+      const err = $('bkErr');
+      if (err) err.textContent = '';
+      const go = $('bkGo');
+      if (go) { go.disabled = false; go.textContent = 'استعادة واستبدال'; }
+      box.classList.add('open');
+      if (bd) bd.classList.add('open');
+      document.body.classList.add('modal-open');
+      setTimeout(function () { if (go) go.focus(); }, 60);
+    }
+    function closeBox() {
+      const box = $('bkBox'), bd = $('bkBackdrop');
+      if (box) box.classList.remove('open');
+      if (bd) bd.classList.remove('open');
+      document.body.classList.remove('modal-open');
+    }
+    function applyRestore() {
+      if (!pending) return;
+      const go = $('bkGo'), err = $('bkErr'), d = pending.data;
+      if (go) go.disabled = true;
+      let queued = 0;
+      STORES.forEach(function (n) {
+        if (!Array.isArray(d[n])) return;
+        d[n].forEach(function (row) {
+          if (!validRow(n, row)) return;
+          if (n === 'kv' && (row.k === K_AUTO || row.k === K_LAST)) return;
+          queued += 1;
+        });
+      });
+      if (!queued) {
+        if (err) err.textContent = 'النسخة لا تحتوي بيانات قابلة للاستعادة.';
+        if (go) go.disabled = false;
+        return;
+      }
+      let total = 0;
+      SCStore.clearAll().then(function () {
+        const tasks = [];
+        STORES.forEach(function (n) {
+          if (!Array.isArray(d[n])) return;
+          d[n].forEach(function (row) {
+            if (!validRow(n, row)) return;
+            if (n === 'kv' && (row.k === K_AUTO || row.k === K_LAST)) return;
+            tasks.push(SCStore.put(n, row));
+            total += 1;
+          });
+        });
+        return Promise.all(tasks);
+      }).then(function () {
+        try { sessionStorage.setItem('sc:restored', String(total)); } catch (e) {}
+        closeBox();
+        pending = null;
+        location.reload();
+      }).catch(function () {
+        if (go) go.disabled = false;
+        if (err) err.textContent = 'تعذّرت الاستعادة — الملف تالف أو التخزين غير متاح.';
+      });
+    }
+    function onFile(ev) {
+      const inp = ev.target;
+      const file = inp.files && inp.files[0];
+      try { inp.value = ''; } catch (e) {}
+      if (!file) return;
+      if (file.size > 60 * 1024 * 1024) { toast('الملف كبير جداً (الحد 60 ميجابايت)'); return; }
+      const fr = new FileReader();
+      fr.onload = function () {
+        const parsed = normalize(String(fr.result || ''));
+        if (!parsed) { toast('ملف غير صالح — اختر نسخة JSON صادرة من هذه المنصة'); return; }
+        openRestore(parsed, file.name || 'ملف JSON');
+      };
+      fr.onerror = function () { toast('تعذّر قراءة الملف'); };
+      fr.readAsText(file);
+    }
+    function init() {
+      booted = true;
+      const dl = $('bkDownload');
+      if (dl) dl.addEventListener('click', function () { exportFile(); });
+      const rs = $('bkRestore');
+      if (rs) rs.addEventListener('click', function () { const f = $('bkFile'); if (f) f.click(); });
+      const fi = $('bkFile');
+      if (fi) fi.addEventListener('change', onFile);
+      const card = $('bkCard');
+      if (card) card.addEventListener('click', function (e) {
+        const b = e.target.closest ? e.target.closest('[data-bk]') : null;
+        if (!b || b.getAttribute('data-bk') !== 'auto') return;
+        if (autoSnap && autoSnap.data) {
+          openRestore({
+            data: autoSnap.data,
+            createdAt: new Date(autoSnap.ts).toISOString(),
+            app: 'auto'
+          }, 'اللقطة التلقائية');
+        }
+      });
+      ['bkClose', 'bkCancel'].forEach(function (id) {
+        const b = $(id);
+        if (b) b.addEventListener('click', closeBox);
+      });
+      const bd = $('bkBackdrop');
+      if (bd) bd.addEventListener('click', closeBox);
+      const go = $('bkGo');
+      if (go) go.addEventListener('click', applyRestore);
+      const box = $('bkBox');
+      if (box) box.addEventListener('keydown', function (e) {
+        if (e.key !== 'Tab') return;
+        const items = Array.prototype.filter.call(box.querySelectorAll('button, input, select, textarea'),
+          function (el) { return !el.disabled && el.offsetParent !== null; });
+        if (!items.length) return;
+        const first = items[0], last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && box && box.classList.contains('open')) { e.preventDefault(); closeBox(); }
+      });
+      return paintMeta().then(function () { return true; }).catch(function () { return false; });
+    }
+
+    return { init: init, exportFile: exportFile, schedule: schedule, snapshot: snapshot };
+  })();
+  window.SCBackup = SCBackup;
+
   // ---- init ----
   function recalcAll() {
     ['calcDiscount','calcFx','calcProfit','calcVAT','calcLoan','calcInterest','calcDepr','calcBE','calcNPV','calcRatios','calcAging','calcFxRev','calcInv','calcBank']
@@ -4325,10 +4973,18 @@
       .then(function () { return window.SCJE ? SCJE.loadPosted() : null; })
       .then(function () { return window.SCTape ? SCTape.ready() : null; })
       .then(function () { return window.SCReport ? SCReport.init() : null; })
+      .then(function () { return window.SCBackup ? SCBackup.init() : null; })
       .then(function () {
         recalcAll();
         renderHistory();
         updateDisplay();
+        try {
+          const n = sessionStorage.getItem('sc:restored');
+          if (n) {
+            sessionStorage.removeItem('sc:restored');
+            setTimeout(function () { toast('استُعيدت النسخة الاحتياطية · ' + n + ' سجل'); }, 900);
+          }
+        } catch (e) {}
       }).catch(function () {
         recalcAll();
         renderHistory();
