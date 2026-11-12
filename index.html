@@ -671,6 +671,18 @@
   .tape-badge.ok { color: var(--green); border-color: rgba(61,220,151,.35); background: rgba(61,220,151,.1); }
   .tape-badge.rev { color: var(--red); border-color: rgba(255,94,126,.35); background: rgba(255,94,126,.1); }
   .tape-badge.rep { color: var(--amber); border-color: rgba(245,166,35,.35); background: rgba(245,166,35,.1); }
+
+  /* ===== التقارير المالية (ميزان المراجعة وقائمة الدخل) ===== */
+  .fin-note { font-size: 11.5px; color: var(--muted); line-height: 1.8; margin-bottom: 10px; }
+  .fin-status { font-size: 12px; color: var(--muted); padding: 8px 0; }
+  .fin-cols { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; margin-top: 12px; }
+  .fin-box { min-width: 0; }
+  .fin-sub { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .fin-table td.acct { text-align: right; }
+  .fin-table td.num { text-align: center; direction: ltr; font-weight: 600; }
+  .fin-table td.empty { text-align: center; color: var(--muted); }
+  .fin-empty { margin-top: 10px; font-size: 12px; color: var(--muted); text-align: center; padding: 10px; }
+  @media (max-width: 768px) { .fin-cols { grid-template-columns: 1fr; } }
   .je-log { display: flex; flex-direction: column; margin-top: 10px; }
   .je-log .lg { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap;
     padding: 9px 2px; border-bottom: 1px solid var(--border); font-size: 12px; min-width: 0; }
@@ -1479,6 +1491,41 @@
             <button class="btn secondary sm flt-reset" id="fltReset" type="button">تصفير</button>
             <div class="flt-count" id="fltCount"></div>
           </div>
+        </div>
+
+        <div class="card" id="Fin_card">
+          <div class="card-title"><span class="ico" aria-hidden="true">⊞</span> ميزان المراجعة وقائمة الدخل</div>
+          <div class="fin-note">يُحسب من القيود <b>المرحّلة</b> فقط ضمن تاريحي «من/إلى» أعلاه، وتُثنَى القيود الملغاة بالعكس. تُعرض الأرصدة في الطرف الطبيعي لكل حساب.</div>
+          <div class="fin-status" id="Fin_status"></div>
+          <div class="results">
+            <div class="rcard"><div class="lbl">إجمالي المدين</div><div class="val" id="Fin_dr">—</div></div>
+            <div class="rcard"><div class="lbl">إجمالي الدائن</div><div class="val" id="Fin_cr">—</div></div>
+            <div class="rcard"><div class="lbl">الفرق</div><div class="val" id="Fin_diff">—</div></div>
+            <div class="rcard"><div class="lbl">صافي الدخل</div><div class="val" id="Fin_net">—</div></div>
+          </div>
+          <div class="table-actions"><button class="btn copy sm" type="button" onclick="copyTable('Fin_table')">نسخ CSV للميزان</button></div>
+          <div class="fin-cols">
+            <div class="fin-box">
+              <div class="fin-sub">ميزان المراجعة</div>
+              <div class="data-table-wrap">
+                <table class="data-table fin-table" id="Fin_table">
+                  <thead><tr><th scope="col">الحساب</th><th scope="col">مدين</th><th scope="col">دائن</th><th scope="col">الرصيد</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="fin-box">
+              <div class="fin-sub">قائمة الدخل</div>
+              <div class="data-table-wrap">
+                <table class="data-table fin-table" id="Fin_income">
+                  <thead><tr><th scope="col">البند</th><th scope="col">القيمة</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="fin-empty" id="Fin_empty" hidden>لا توجد قيود مرحّلة ضمن هذه الفترة — رحّل قيداً من أي أداة ليظهر هنا.</div>
+          <div class="fin-note" id="Fin_note" style="margin-top:10px;"></div>
         </div>
 
         <div class="card">
@@ -2341,10 +2388,10 @@
     },
     tape: {
       title: 'السجل والقيود',
-      about: 'سجل مركزي للقطات الحساب والقيود المرحّلة وسجل التدقيق مع بحث وفلترة ونسخ احتياطي.',
+      about: 'سجل مركزي للقطات الحساب والقيود المرحّلة وسجل التدقيق مع بحث وفلترة ونسخ احتياطي، وميزان مراجعة وقائمة دخل من القيود المرحّلة.',
       inputs: ['بحث فوري ونوع وحالة ونطاق تاريخ', 'ملف JSON لاستعادة نسخة احتياطية'],
-      outputs: ['لقطات قابلة لإعادة التشغيل', 'قيود مرحّلة قابلة للنسخ أو العكس أو الحذف', 'تصدير CSV ونسخة احتياطية كاملة'],
-      tip: 'الفلاتر تؤثر على تصدير CSV للقيود؛ صفّرها لتصدير كل القيود.'
+      outputs: ['لقطات قابلة لإعادة التشغيل', 'قيود مرحّلة قابلة للنسخ أو العكس أو الحذف', 'ميزان مراجعة وقائمة دخل من القيود المرحّلة', 'تصدير CSV ونسخة احتياطية كاملة'],
+      tip: 'الميزان وقائمة الدخل يحسبان من القيود المرحّلة فقط ضمن تاريحي «من/إلى»، وتُثنَى القيود الملغاة بالعكس. صفّر الفلاتر لعرض كل القيود.'
     }
   };
 
@@ -4029,6 +4076,125 @@
   })();
   window.SCJE = SCJE;
 
+  // ================= التقارير المالية من القيود المرحّلة · SCFin =================
+  const SCFin = (function () {
+    const R = (n) => Math.round((Number(n) || 0) * 100) / 100;
+    function inRange(date, from, to) {
+      return (!from || date >= from) && (!to || date <= to);
+    }
+    // القيد العكسي والأصل الملغى يدخلان معًا فيلغي أحدهما الآخر، والمسودات لا تدخل
+    function usable(e) {
+      return !!e && (!!e.posted || !!e.reverses || !!e.reversed || !!SCJE.postedId(e));
+    }
+    function ready() {
+      return (SCJE.loadPosted ? SCJE.loadPosted() : Promise.resolve()).then(function () { return true; });
+    }
+    function aggregate(rows, from, to) {
+      const map = {};
+      let posted = 0;
+      (rows || []).forEach(function (e) {
+        if (!usable(e) || !inRange(e.date, from, to)) return;
+        posted++;
+        (e.lines || []).forEach(function (l) {
+          const code = String(l.code || '');
+          if (!code) return;
+          const m = map[code] = map[code] || { code: code, name: l.name || '', dr: 0, cr: 0 };
+          m.dr += Number(l.debit) || 0;
+          m.cr += Number(l.credit) || 0;
+        });
+      });
+      return { map: map, posted: posted };
+    }
+    function coaIndex() {
+      const out = {};
+      (window.SCCOA ? SCCOA.list() : []).forEach(function (a) { out[a.code] = a; });
+      return out;
+    }
+    // كل حساب يوضع صافي رصيده في طرفه الطبيعي، فيتوازن الميزان دائمًا
+    function trial(from, to) {
+      return ready().then(function () { return SCJE.allEntries(); }).then(function (rows) {
+        const agg = aggregate(rows, from, to);
+        const coa = coaIndex();
+        const out = [];
+        let tdr = 0, tcr = 0;
+        Object.keys(agg.map).sort().forEach(function (code) {
+          const m = agg.map[code];
+          const dr = R(m.dr), cr = R(m.cr), bal = R(dr - cr);
+          if (bal === 0) return;
+          const acct = coa[code] || { name: m.name, type: '' };
+          const debit = bal > 0 ? bal : 0, credit = bal < 0 ? -bal : 0;
+          tdr += debit; tcr += credit;
+          out.push({ code: code, name: acct.name || m.name, type: acct.type || '', dr: debit, cr: credit });
+        });
+        return { rows: out, dr: R(tdr), cr: R(tcr), posted: agg.posted };
+      });
+    }
+    function income(from, to) {
+      return ready().then(function () { return SCJE.allEntries(); }).then(function (rows) {
+        const agg = aggregate(rows, from, to);
+        const coa = coaIndex();
+        let rev = 0, exp = 0;
+        Object.keys(agg.map).forEach(function (code) {
+          const m = agg.map[code];
+          const acct = coa[code] || { type: '' };
+          const credit = R(m.cr - m.dr);
+          if (acct.type === 'revenue') rev += credit;
+          else if (acct.type === 'expense') exp += -credit;
+        });
+        return { revenue: R(rev), expense: R(exp), net: R(rev - exp), posted: agg.posted };
+      });
+    }
+    function render(box, from, to) {
+      if (!box) return;
+      const st = $('Fin_status');
+      if (st) st.textContent = 'جاري حساب التقرير…';
+      Promise.all([trial(from, to), income(from, to)]).then(function (res) {
+        const t = res[0], inc = res[1];
+        const set = function (id, v, cls) {
+          const el = $(id);
+          if (!el) return;
+          el.textContent = v;
+          if (cls) el.className = 'val ' + cls;
+        };
+        set('Fin_dr', fmt(t.dr));
+        set('Fin_cr', fmt(t.cr));
+        const diff = R(t.dr - t.cr);
+        set('Fin_diff', fmt(diff), Math.abs(diff) < 0.005 ? 'green' : 'red');
+        set('Fin_net', fmt(inc.net), inc.net >= 0 ? 'green' : 'red');
+        const tb = $('Fin_table');
+        if (tb) {
+          tb.querySelector('tbody').innerHTML = t.rows.length ? t.rows.map(function (r) {
+            return '<tr><td class="acct">' + escHtml(r.code + ' ' + r.name) + '</td>' +
+              '<td class="num">' + (r.dr ? fmt(r.dr) : '') + '</td>' +
+              '<td class="num">' + (r.cr ? fmt(r.cr) : '') + '</td>' +
+              '<td class="num ' + ((r.type === 'asset' || r.type === 'expense') ? 'dr' : 'cr') + '">' + fmt(r.dr || r.cr) + '</td></tr>';
+          }).join('') : '<tr><td colspan="4" class="empty">لا توجد أرصدة</td></tr>';
+        }
+        const ib = $('Fin_income');
+        if (ib) {
+          ib.querySelector('tbody').innerHTML =
+            '<tr><td class="acct">إيرادات</td><td class="num">' + fmt(inc.revenue) + '</td></tr>' +
+            '<tr><td class="acct">مصروفات</td><td class="num">' + fmt(inc.expense) + '</td></tr>' +
+            '<tr><td class="acct"><b>صافي الدخل</b></td><td class="num ' + (inc.net >= 0 ? 'cr' : 'dr') + '">' + fmt(inc.net) + '</td></tr>';
+        }
+        const empty = $('Fin_empty');
+        if (empty) {
+          empty.hidden = t.posted !== 0;
+          empty.textContent = t.posted === 0
+            ? 'لا توجد قيود مرحّلة ضمن هذه الفترة — رحّل قيداً من أي أداة ليظهر هنا.'
+            : '';
+        }
+        const note = $('Fin_note');
+        if (note) note.textContent = 'قيود مرحّلة ضمن الفترة: ' + t.posted + ' · من ' + (from || 'البداية') + ' إلى ' + (to || 'اليوم');
+        if (st) st.textContent = '';
+      }).catch(function () {
+        if (st) st.textContent = 'تعذّر حساب التقرير';
+      });
+    }
+    return { trial: trial, income: income, render: render };
+  })();
+  window.SCFin = SCFin;
+
   // ================= شاشة دليل الحسابات =================
   (function initCOA() {
     const modal = $('coaModal'), backdrop = $('coaBackdrop'), body = $('coaBody');
@@ -4470,6 +4636,10 @@
       renderSessions();
       renderJE();
       renderAudit();
+      renderFin();
+    }
+    function renderFin() {
+      if (window.SCFin) SCFin.render($('Fin_card'), flt.from, flt.to);
     }
 
     function renderSessions() {
