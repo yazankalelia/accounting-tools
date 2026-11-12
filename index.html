@@ -1235,6 +1235,39 @@
           </div>
           <div class="table-note" id="D_note">—</div>
         </div>
+
+        <div class="card" id="Ast_card">
+          <div class="card-title"><span class="ico" aria-hidden="true">A</span> سجل أصول ثابتة + ترحيل إهلاك</div>
+          <div class="fin-note">سجل أصول ثابتة (IAS 16). «ترحيل إهلاك الشهر» يُنشئ قيداً (Dr 5200 / Cr 1510) لمجموع إهلاك الأصول النشطة.</div>
+          <div class="row">
+            <div class="field"><label>اسم الأصل</label><input type="text" id="Ast_name" placeholder="آلة #1" /></div>
+            <div class="field"><label>التكلفة</label><input type="number" id="Ast_cost" value="0" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>القيمة التخريدية</label><input type="number" id="Ast_salvage" value="0" /></div>
+            <div class="field"><label>العمر (سنوات)</label><input type="number" id="Ast_life" value="5" /></div>
+            <div class="field"><label>العمر (أشهر)</label><input type="number" id="Ast_month" value="0" placeholder="0" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>الطريقة</label>
+              <select id="Ast_method"><option value="sl">قسط ثابت (SL)</option><option value="ddb">رصيد متناقص (DDB)</option></select>
+            </div>
+            <div class="field"><label>تاريخ الشراء</label><input type="month" id="Ast_start" value="" /></div>
+          </div>
+          <div class="table-actions">
+            <button class="btn sm" id="Ast_add" type="button">إضافة أصل</button>
+            <button class="btn sm" id="Ast_post" type="button">ترحيل إهلاك الشهر</button>
+            <input type="month" id="Ast_monthPost" value="" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-2);color:var(--text);" />
+          </div>
+          <div class="data-table-wrap">
+            <table class="data-table" id="Ast_table"><thead><tr><th scope="col">الأصل</th><th scope="col">التكلفة</th><th scope="col">مجمع</th><th scope="col">NBV</th><th scope="col">الحالة</th><th scope="col">إجراء</th></tr></thead><tbody></tbody></table>
+          </div>
+          <div class="je">
+            <div class="je-header"><span class="je-title">قيد إهلاك (شهري)</span></div>
+            <div id="Ast_je"></div>
+          </div>
+          <div class="fin-status" id="Ast_status"></div>
+        </div>
       </section>
 
       <!-- ============ BE ============ -->
@@ -1487,6 +1520,25 @@
           <p>لقطات قابلة لإعادة التشغيل · القيود المرحّلة · سجل تدقيق دائم</p>
         </div>
 
+        <div class="card no-print" id="FY_card">
+          <div class="card-title"><span class="ico" aria-hidden="true">Y</span> السنة المالية وإغلاق</div>
+          <div class="fin-note">حدد بداية السنة المالية (شهر/سنة). «إغلاق السنة» يُرحّل صافي الدخل إلى 3200 (أرباح محتجزة) ويُغلق الفترة (لا يمكن الترحيل afterwards).</div>
+          <div class="row">
+            <div class="field"><label>شهر البداية</label>
+              <select id="FY_startMonth">
+                <option value="1">يناير (1)</option><option value="4">أبريل (4)</option><option value="7">يوليو (7)</option><option value="10">أكتوبر (10)</option>
+              </select>
+            </div>
+            <div class="field"><label>سنة</label><input type="number" id="FY_year" value="2026" min="2000" max="2100" /></div>
+            <div class="field"><label>الحالة</label><span class="val" id="FY_status" style="font-size:14px;">—</span></div>
+          </div>
+          <div class="table-actions">
+            <button class="btn sm" id="FY_save" type="button">حفظ</button>
+            <button class="btn danger sm" id="FY_close" type="button">إغلاق السنة</button>
+          </div>
+          <div class="fin-status" id="FY_msg"></div>
+        </div>
+
         <div class="card bk-card no-print" id="bkCard">
           <div class="card-title"><span class="ico" aria-hidden="true">⛁</span> النسخ الاحتياطي والسيادة على البيانات</div>
           <div class="bk-row">
@@ -1577,6 +1629,24 @@
           </div>
           <div class="fin-empty" id="Fin_empty" hidden>لا توجد قيود مرحّلة ضمن هذه الفترة — رحّل قيداً من أي أداة ليظهر هنا.</div>
           <div class="fin-note" id="Fin_note" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="card" id="Aging_card">
+          <div class="card-title"><span class="ico" aria-hidden="true">AR</span> أعمار الذمم (AR/AP)</div>
+          <div class="fin-note">من القيود المرحّلة. buckets by entry date (0–30، 31–60، 61–90، 91+). ذمم مدينة (1300) ودائنة (2100).</div>
+          <div class="fin-status" id="Aging_status"></div>
+          <div class="data-table-wrap">
+            <table class="data-table fin-table" id="Aging_table"><thead><tr><th scope="col">الحساب</th><th scope="col">0–30</th><th scope="col">31–60</th><th scope="col">61–90</th><th scope="col">91+</th><th scope="col">الإجمالي</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+
+        <div class="card" id="CF_card">
+          <div class="card-title"><span class="ico" aria-hidden="true">CF</span> قائمة التدفقات النقدية (indirect)</div>
+          <div class="fin-note">يُحسب من القيود المرحّلة + أرصدة افتتاحية. التدفق من العمليات (indirect) + استثمار + تمويل = صافي التغير في النقدية.</div>
+          <div class="fin-status" id="CF_status"></div>
+          <div class="data-table-wrap">
+            <table class="data-table fin-table" id="CF_table"><thead><tr><th scope="col">البند</th><th scope="col">القيمة</th></tr></thead><tbody></tbody></table>
+          </div>
         </div>
 
         <div class="card" id="Open_card">
@@ -1787,6 +1857,9 @@
   const $ = (id) => document.getElementById(id);
   function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400); }
   function fmt(n){ if(!isFinite(n)) return 'خطأ'; const r=Math.round(n*1e9)/1e9; return r.toLocaleString('en-US',{maximumFractionDigits:9}); }
+  function toCents(n){ return Math.round((Number(n)||0)*100); }
+  function fromCents(c){ return (Number(c)||0)/100; }
+  function money(n){ return fromCents(toCents(n)); }
   function escHtml(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
   function safeEval(s){ const safe=s.replace(/[^0-9+\-*/.()%]/g,''); if(safe==='') return NaN; try{return Function('"use strict"; return ('+safe+')')();}catch(e){return NaN;} }
 
@@ -1833,6 +1906,7 @@
     if (mainEl) mainEl.scrollTop = 0;
     if (page === 'fx') fxInit();
     if (page === 'tape' && window.SCTape) SCTape.render();
+    if (page === 'depr' && window.SCAssets) SCAssets.render();
     if (window.Persist && window.Persist.touch) window.Persist.touch(page);
     if (window.innerWidth <= 768) setNavOpen(false);
   }
@@ -2725,7 +2799,7 @@
   function calcFx() {
     const amt = parseFloat($('Fx_amount').value) || 0;
     const rate = parseFloat($('Fx_rate').value) || 0;
-    const res = amt * rate;
+    const res = money(amt * rate);
     const from = $('Fx_from').value, to = $('Fx_to').value;
     $('Fx_result').textContent = fmt(res) + ' ' + to;
   }
@@ -2763,17 +2837,17 @@
   });
 
   function calcVAT() {
-    const out = parseFloat($('V_out').value) || 0;
-    const inn = parseFloat($('V_in').value) || 0;
-    const adj = parseFloat($('V_adj').value) || 0;
-    const net = out - inn + adj;
+    const out = money(parseFloat($('V_out').value) || 0);
+    const inn = money(parseFloat($('V_in').value) || 0);
+    const adj = money(parseFloat($('V_adj').value) || 0);
+    const net = money(out - inn + adj);
     $('V_net').textContent = fmt(Math.abs(net));
     $('V_status').textContent = net >= 0 ? 'مستحق للدفع' : 'استرداد';
     // قيد إقفال: يُصفّر ضريبة المخرجات وضريبة المدخلات معاً، والصافي قبل التسويات إلى 2400
     const lines = [];
     if (out > 0) lines.push({ code: '2200', account: 'ضريبة المخرجات', dr: out, cr: null });
     if (inn > 0) lines.push({ code: '2210', account: 'ضريبة المدخلات', dr: null, cr: inn });
-    const bal = out - inn;
+    const bal = money(out - inn);
     if (bal > 0) lines.push({ code: '2400', account: 'ذمم ضريبية دائنة', dr: null, cr: bal });
     else if (bal < 0) lines.push({ code: '2400', account: 'ذمم ضريبية مدينة', dr: Math.abs(bal), cr: null });
     setJE('V_je', lines);
@@ -2800,8 +2874,9 @@
     let pmt;
     if (r === 0) pmt = P / n;
     else pmt = P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
-    const total = pmt * n;
-    const interest = total - P;
+    pmt = money(pmt);
+    const total = money(pmt * n);
+    const interest = money(total - P);
     $('L_pmt').textContent = fmt(pmt);
     $('L_total').textContent = fmt(total);
     $('L_interest').textContent = fmt(interest);
@@ -3073,9 +3148,9 @@
     const amt = parseFloat($('FxR_amt').value) || 0;
     const oldR = parseFloat($('FxR_old').value) || 0;
     const newR = parseFloat($('FxR_new').value) || 0;
-    const oldVal = amt * oldR;
-    const newVal = amt * newR;
-    const gain = newVal - oldVal;
+    const oldVal = money(amt * oldR);
+    const newVal = money(amt * newR);
+    const gain = money(newVal - oldVal);
     $('FxR_oldVal').textContent = fmt(oldVal);
     $('FxR_newVal').textContent = fmt(newVal);
     $('FxR_gain').textContent = fmt(gain);
@@ -3116,7 +3191,7 @@
       rem -= take;
       if (rem <= 0) break;
     }
-    const endFIFO = fifoLayers.reduce((a, b) => a + b.qty * b.cost, 0);
+    const endFIFO = money(fifoLayers.reduce((a, b) => a + b.qty * b.cost, 0));
     rem = sold; let cogsLIFO = 0;
     const lifoLayers = layers.map(l => ({ ...l })).reverse();
     for (const l of lifoLayers) {
@@ -3126,10 +3201,10 @@
       rem -= take;
       if (rem <= 0) break;
     }
-    const endLIFO = lifoLayers.reduce((a, b) => a + b.qty * b.cost, 0);
+    const endLIFO = money(lifoLayers.reduce((a, b) => a + b.qty * b.cost, 0));
     const wac = totalQty > 0 ? totalCost / totalQty : 0;
-    const cogsWAC = sold * wac;
-    const endWAC = (totalQty - sold) * wac;
+    const cogsWAC = money(sold * wac);
+    const endWAC = money((totalQty - sold) * wac);
     const warn = $('Iv_warn');
     if (warn) {
       if (sold > totalQty) {
@@ -3160,9 +3235,9 @@
     const fees = parseFloat($('Br_fees').value) || 0;
     const interest = parseFloat($('Br_interest').value) || 0;
 
-    const adjBank = bank + deposits - checks;
-    const adjBook = book + interest - fees;
-    const diff = adjBank - adjBook;
+    const adjBank = money(bank + deposits - checks);
+    const adjBook = money(book + interest - fees);
+    const diff = money(adjBank - adjBook);
     const ok = Math.abs(diff) <= 0.005;
 
     $('Br_adjBank').textContent = fmt(adjBank);
@@ -4130,8 +4205,83 @@
       });
     }
 
+    // ---- fiscal year + period locking ----
+    function fiscalYear() {
+      // sync-ish: cached in window; load if missing
+      if (window.__fiscalYear) return window.__fiscalYear;
+      return { startMonth: 1, year: new Date().getFullYear() };
+    }
+    function loadFiscalYear() {
+      return SCStore.kvGet('fiscalYear').then(function (v) {
+        const fy = (v && typeof v === 'object') ? v : { startMonth: 1, year: new Date().getFullYear() };
+        window.__fiscalYear = fy;
+        return fy;
+      }).catch(function () { const fy = { startMonth: 1, year: new Date().getFullYear() }; window.__fiscalYear = fy; return fy; });
+    }
+    function periodOf(date) {
+      const fy = fiscalYear();
+      const d = new Date(date || new Date());
+      const m = d.getMonth() + 1;
+      const y = d.getFullYear();
+      if (m < fy.startMonth) return String(y - 1);
+      return String(y);
+    }
+    function periodStatus() {
+      return window.__periodStatus || {};
+    }
+    function loadPeriodStatus() {
+      return SCStore.kvGet('periodStatus').then(function (v) {
+        window.__periodStatus = (v && typeof v === 'object') ? v : {};
+        return window.__periodStatus;
+      }).catch(function () { window.__periodStatus = {}; return window.__periodStatus; });
+    }
+    function isPeriodClosed(date) {
+      return periodStatus()[periodOf(date)] === 'closed';
+    }
+    function closeYear() {
+      const fy = fiscalYear();
+      const year = String(fy.year);
+      // collect posted entries in this fiscal year
+      return (window.SCCOA ? SCCOA.ready() : Promise.resolve()).then(function () { return SCJE.allEntries(); }).then(function (rows) {
+        const inYear = (rows || []).filter(function (e) { return periodOf(e.date) === year; });
+        let rev = 0, exp = 0;
+        const revLines = [], expLines = [];
+        inYear.forEach(function (e) {
+          (e.lines || []).forEach(function (l) {
+            const acct = window.SCCOA ? SCCOA.name(l.code, '') : '';
+            // determine type via coa list
+            const coa = (window.SCCOA && SCCOA.list) ? SCCOA.list().filter(function (a) { return a.code === l.code; })[0] : null;
+            const type = coa ? coa.type : '';
+            if (type === 'revenue') { rev += (Number(l.credit) || 0) - (Number(l.debit) || 0); revLines.push(l); }
+            else if (type === 'expense') { exp += (Number(l.debit) || 0) - (Number(l.credit) || 0); expLines.push(l); }
+          });
+        });
+        const ni = r2(rev - exp);
+        // build closing lines: Dr revenue, Cr expense, Cr 3200 (NI)
+        const lines = [];
+        // aggregate revenue by code
+        const revMap = {}, expMap = {};
+        revLines.forEach(function (l) { revMap[l.code] = (revMap[l.code] || 0) + ((Number(l.credit) || 0) - (Number(l.debit) || 0)); });
+        expLines.forEach(function (l) { expMap[l.code] = (expMap[l.code] || 0) + ((Number(l.debit) || 0) - (Number(l.credit) || 0)); });
+        Object.keys(revMap).forEach(function (code) { if (revMap[code]) lines.push({ code: code, debit: revMap[code], credit: 0 }); });
+        Object.keys(expMap).forEach(function (code) { if (expMap[code]) lines.push({ code: code, debit: 0, credit: expMap[code] }); });
+        if (ni > 0) lines.push({ code: '3200', debit: 0, credit: ni });
+        else if (ni < 0) lines.push({ code: '3200', debit: Math.abs(ni), credit: 0 });
+        const entry = build({ date: new Date().toISOString().slice(0, 10), memo: 'إغلاق سنة ' + year, src: 'closing' }, lines);
+        entry.noFp = true;
+        return post(entry).then(function (saved) {
+          // mark period closed
+          return loadPeriodStatus().then(function (ps) {
+            ps[year] = 'closed';
+            window.__periodStatus = ps;
+            return SCStore.kvSet('periodStatus', ps);
+          }).then(function () { return saved; });
+        });
+      });
+    }
     function post(entry) {
       if (!entry || !entry.balanced || entry.total <= 0) return Promise.reject(new Error('unbalanced'));
+      if (entry.src !== 'closing' && entry.src !== 'opening' && isPeriodClosed(entry.date)) return Promise.reject(new Error('period-closed'));
       return nextNumber(entry.date).then(function (id) {
         const saved = {
           id: id,
@@ -4257,7 +4407,9 @@
 
     return { today: today, build: build, format: format, post: post, recent: recent, totals: totals, nextNumber: nextNumber,
       loadPosted: loadPosted, postedId: postedId, forget: forget, fingerprint: fingerprint,
-      getEntry: getEntry, allEntries: allEntries, auditLog: auditLog, reverse: reverse, deleteJE: deleteJE };
+      getEntry: getEntry, allEntries: allEntries, auditLog: auditLog, reverse: reverse, deleteJE: deleteJE,
+      fiscalYear: fiscalYear, loadFiscalYear: loadFiscalYear, periodOf: periodOf, periodStatus: periodStatus,
+      loadPeriodStatus: loadPeriodStatus, isPeriodClosed: isPeriodClosed, closeYear: closeYear };
   })();
   window.SCJE = SCJE;
 
@@ -4315,7 +4467,30 @@
     }
     function saveOpening(map) {
       openingCache = map || {};
-      return SCStore.kvSet('openingBalances', openingCache);
+      // build opening-balance JE (Dr/Cr per account, offset by 3100/3200)
+      const coa = coaIndex();
+      const lines = [];
+      let equityOffset = 0;
+      Object.keys(openingCache).forEach(function (code) {
+        const amt = Number(openingCache[code]) || 0;
+        if (!amt) return;
+        const acct = coa[code] || { type: '' };
+        const o = openingAmt(code, acct.type);
+        if (o.dr) lines.push({ code: code, debit: o.dr, credit: 0 });
+        if (o.cr) lines.push({ code: code, debit: 0, credit: o.cr });
+        // offset: assets/expense opening → credit equity; liability/equity/revenue → debit equity
+        if (acct.type === 'asset' || acct.type === 'expense') equityOffset += amt;
+        else equityOffset -= amt;
+      });
+      if (equityOffset > 0) lines.push({ code: '3100', debit: 0, credit: equityOffset });
+      else if (equityOffset < 0) lines.push({ code: '3100', debit: Math.abs(equityOffset), credit: 0 });
+      const entry = (lines.length ? SCJE.build({ date: new Date().toISOString().slice(0, 10), memo: 'أرصدة افتتاحية', src: 'opening' }, lines) : null);
+      const p = SCStore.kvSet('openingBalances', openingCache);
+      if (entry && entry.balanced && entry.total > 0) {
+        entry.noFp = true;
+        return p.then(function () { return SCJE.post(entry).catch(function () { return null; }); });
+      }
+      return p;
     }
     function openingAmt(code, type) {
       const v = Number((openingCache || {})[code]) || 0;
@@ -4406,6 +4581,93 @@
         }).join('');
       });
     }
+    function aging(from, to) {
+      return ready().then(function () { return SCJE.allEntries(); }).then(function (rows) {
+        const coa = coaIndex();
+        const buckets = {};
+        const today = new Date();
+        (rows || []).forEach(function (e) {
+          if (!usable(e) || !inRange(e.date, from, to)) return;
+          (e.lines || []).forEach(function (l) {
+            const code = String(l.code || '');
+            const acct = coa[code];
+            if (!acct) return;
+            if (code !== '1300' && code !== '1310' && code !== '2100') return;
+            const amt = (Number(l.debit) || 0) - (Number(l.credit) || 0);
+            const val = (acct.type === 'liability') ? -amt : amt;
+            if (!val) return;
+            const age = Math.floor((today.getTime() - new Date(e.date).getTime()) / 86400000);
+            const bi = age <= 30 ? 0 : (age <= 60 ? 1 : (age <= 90 ? 2 : 3));
+            const m = buckets[code] = buckets[code] || [0, 0, 0, 0];
+            m[bi] = R(m[bi] + val);
+          });
+        });
+        const out = [];
+        Object.keys(buckets).sort().forEach(function (code) {
+          const b = buckets[code];
+          const total = R(b.reduce(function (a, c) { return a + c; }, 0));
+          if (!total) return;
+          const acct = coa[code];
+          out.push({ code: code, name: acct.name, buckets: b.map(R), total: total });
+        });
+        return { rows: out };
+      });
+    }
+    function accountChange(code, from, to, op, rows) {
+      const opening = Number((op || {})[code]) || 0;
+      let period = 0;
+      (rows || []).forEach(function (e) {
+        if (!usable(e) || !inRange(e.date, from, to)) return;
+        (e.lines || []).forEach(function (l) {
+          if (l.code === code) period += (Number(l.debit) || 0) - (Number(l.credit) || 0);
+        });
+      });
+      return { opening: opening, period: R(period), closing: R(opening + period) };
+    }
+    function cashflow(from, to) {
+      return ready().then(function () { return SCJE.allEntries(); }).then(function (rows) {
+        return opening().then(function (op) {
+          const inc = null; // computed below
+          // income
+          const coa = coaIndex();
+          const agg = aggregate(rows, from, to, {});
+          let rev = 0, exp = 0;
+          Object.keys(agg.map).forEach(function (code) {
+            const m = agg.map[code];
+            const acct = coa[code] || { type: '' };
+            const credit = R(m.cr - m.dr);
+            if (acct.type === 'revenue') rev += credit;
+            else if (acct.type === 'expense') exp += -credit;
+          });
+          const ni = R(rev - exp);
+          const depr = (agg.map['5200'] ? R(agg.map['5200'].dr - agg.map['5200'].cr) : 0);
+          const ar = accountChange('1300', from, to, op, rows);
+          const ap = accountChange('2100', from, to, op, rows);
+          const inv = accountChange('1400', from, to, op, rows);
+          const fa = accountChange('1500', from, to, op, rows);
+          const loans = accountChange('2300', from, to, op, rows);
+          const cash = accountChange('1200', from, to, op, rows);
+          const lines = [];
+          lines.push({ label: 'صافي الدخل', value: ni, cls: ni >= 0 ? 'cr' : 'dr' });
+          lines.push({ label: '+ إهلاك (5200)', value: depr, cls: 'dr' });
+          lines.push({ label: (ar.closing - ar.opening >= 0 ? '−' : '+') + ' تغير الذمم (1300)', value: R(-(ar.closing - ar.opening)), cls: '' });
+          lines.push({ label: (ap.closing - ap.opening >= 0 ? '+' : '−') + ' تغير الدائنين (2100)', value: R(ap.closing - ap.opening), cls: '' });
+          lines.push({ label: (inv.closing - inv.opening >= 0 ? '−' : '+') + ' تغير المخزون (1400)', value: R(-(inv.closing - inv.opening)), cls: '' });
+          const ops = R(ni + depr - (ar.closing - ar.opening) + (ap.closing - ap.opening) - (inv.closing - inv.opening));
+          lines.push({ label: '= التدفق من العمليات', value: ops, cls: 'cr', bold: true });
+          lines.push({ label: '− تغير الأصول الثابتة (1500)', value: R(-(fa.closing - fa.opening)), cls: '' });
+          const invest = R(-(fa.closing - fa.opening));
+          lines.push({ label: '= التدفق من الاستثمار', value: invest, cls: '' });
+          lines.push({ label: '+ تغير القروض (2300)', value: R(loans.closing - loans.opening), cls: '' });
+          const fin = R(loans.closing - loans.opening);
+          lines.push({ label: '= التدفق من التمويل', value: fin, cls: '' });
+          const net = R(ops + invest + fin);
+          lines.push({ label: 'صافي التغير في النقدية', value: net, cls: net >= 0 ? 'green' : 'red', bold: true });
+          lines.push({ label: 'مطابقة: Δالنقدية (1200)', value: cash.period, cls: Math.abs(cash.period - net) < 0.005 ? 'green' : 'red' });
+          return { lines: lines, posted: agg.posted };
+        });
+      });
+    }
     function render(box, from, to) {
       if (!box) return;
       const st = $('Fin_status');
@@ -4486,6 +4748,33 @@
           }
           body.innerHTML = html;
         }
+        // Aging
+        const agt = $('Aging_table');
+        if (agt) {
+          aging(from, to).then(function (ag) {
+            const body = agt.querySelector('tbody');
+            body.innerHTML = (ag.rows || []).map(function (r) {
+              return '<tr><td class="acct">' + escHtml(r.code + ' ' + r.name) + '</td>' +
+                r.buckets.map(function (b) { return '<td class="num">' + (b ? fmt(b) : '') + '</td>'; }).join('') +
+                '<td class="num"><b>' + fmt(r.total) + '</b></td></tr>';
+            }).join('') || '<tr><td colspan="6" class="empty">لا توجد ذمم</td></tr>';
+            const st = $('Aging_status');
+            if (st) st.textContent = 'قيود مرحّلة: ' + (ag.rows ? ag.rows.length : 0) + ' حساب';
+          }).catch(function () {});
+        }
+        // Cash flow
+        const cft = $('CF_table');
+        if (cft) {
+          cashflow(from, to).then(function (cf) {
+            const body = cft.querySelector('tbody');
+            body.innerHTML = (cf.lines || []).map(function (l) {
+              return '<tr><td class="acct">' + (l.bold ? '<b>' + escHtml(l.label) + '</b>' : escHtml(l.label)) + '</td>' +
+                '<td class="num ' + (l.cls || '') + '">' + (l.bold ? '<b>' + fmt(l.value) + '</b>' : fmt(l.value)) + '</td></tr>';
+            }).join('');
+            const st = $('CF_status');
+            if (st) st.textContent = 'قيود مرحّلة: ' + (cf.posted || 0);
+          }).catch(function () { const st = $('CF_status'); if (st) st.textContent = 'تعذّر الحساب'; });
+        }
         const empty = $('Fin_empty');
         if (empty) {
           empty.hidden = t.posted !== 0;
@@ -4501,9 +4790,81 @@
         if (st) st.textContent = 'تعذّر حساب التقرير';
       });
     }
-    return { trial: trial, income: income, balance: balance, opening: opening, saveOpening: saveOpening, render: render, renderOpening: renderOpening };
+    return { trial: trial, income: income, balance: balance, aging: aging, cashflow: cashflow, opening: opening, saveOpening: saveOpening, render: render, renderOpening: renderOpening };
   })();
   window.SCFin = SCFin;
+
+  // ================= سجل أصول ثابتة + ترحيل إهلاك · SCAssets =================
+  const SCAssets = (function () {
+    function load() { return SCStore.kvGet('assets').then(function (v) { return Array.isArray(v) ? v : []; }).catch(function () { return []; }); }
+    function save(list) { return SCStore.kvSet('assets', list || []); }
+    function monthlyDepr(a) {
+      const cost = Number(a.cost) || 0, salvage = Number(a.salvage) || 0, life = Math.max(1, Number(a.life) || 1);
+      const depreciable = Math.max(cost - salvage, 0);
+      if (a.method === 'sl') return depreciable / (life * 12);
+      // DDB: 2/life per year
+      const rate = 2 / life;
+      const nbv = cost - (Number(a.accum) || 0);
+      return Math.max(0, nbv * rate / 12);
+    }
+    function render() {
+      const tb = $('Ast_table');
+      if (!tb) return;
+      load().then(function (list) {
+        const body = tb.querySelector('tbody');
+        body.innerHTML = (list || []).map(function (a, i) {
+          const accum = Number(a.accum) || 0;
+          const nbv = (Number(a.cost) || 0) - accum;
+          const status = a.disposed ? 'مستبعد' : 'نشط';
+          return '<tr><td class="acct">' + escHtml(a.name || ('أصل ' + (i + 1))) + '</td>' +
+            '<td class="num">' + fmt(a.cost) + '</td>' +
+            '<td class="num">' + fmt(accum) + '</td>' +
+            '<td class="num">' + fmt(nbv) + '</td>' +
+            '<td>' + status + '</td>' +
+            '<td><button class="je-btn" type="button" data-ast="del" data-i="' + i + '">حذف</button></td></tr>';
+        }).join('') || '<tr><td colspan="6" class="empty">لا توجد أصول</td></tr>';
+      });
+    }
+    function add() {
+      const name = String(($('Ast_name') || {}).value || '').trim();
+      const cost = parseFloat($('Ast_cost').value) || 0;
+      const salvage = parseFloat($('Ast_salvage').value) || 0;
+      const life = parseFloat($('Ast_life').value) || 0;
+      const month = parseInt($('Ast_month').value, 10) || 0;
+      const method = ($('Ast_method') || {}).value || 'sl';
+      const start = ($('Ast_start') || {}).value || '';
+      if (!name || cost <= 0 || life <= 0) { toast('أدخل اسم الأصل وتكلفته وعمره'); return; }
+      load().then(function (list) {
+        list.push({ name: name, cost: cost, salvage: salvage, life: life, month: month, method: method, start: start, accum: 0, disposed: false });
+        save(list).then(function () { render(); toast('أُضيف الأصل'); });
+      });
+    }
+    function remove(i) {
+      load().then(function (list) {
+        list.splice(i, 1);
+        save(list).then(function () { render(); toast('حُذف الأصل'); });
+      });
+    }
+    function postMonth() {
+      const ym = ($('Ast_monthPost') || {}).value;
+      if (!ym) { toast('اختر الشهر'); return; }
+      load().then(function (list) {
+        const active = (list || []).filter(function (a) { return !a.disposed; });
+        if (!active.length) { toast('لا توجد أصول نشطة'); return; }
+        let total = 0;
+        active.forEach(function (a) { total += monthlyDepr(a); });
+        total = money(total);
+        if (total <= 0) { toast('إهلاك صفر'); return; }
+        const lines = [{ code: '5200', account: 'مصروف الإهلاك', dr: total, cr: null }, { code: '1510', account: 'مجمع إهلاك الأصول', dr: null, cr: total }];
+        setJE('Ast_je', lines);
+        // update accum
+        active.forEach(function (a) { a.accum = money((Number(a.accum) || 0) + monthlyDepr(a)); });
+        save(list).then(function () { render(); toast('تم إنشاء قيد الإهلاك · ' + fmt(total)); });
+      });
+    }
+    return { load: load, save: save, render: render, add: add, remove: remove, postMonth: postMonth, monthlyDepr: monthlyDepr };
+  })();
+  window.SCAssets = SCAssets;
 
   // ================= شاشة دليل الحسابات =================
   (function initCOA() {
@@ -5199,6 +5560,53 @@
       if (fq) fq.addEventListener('input', function () { if (window.SCFin) renderFin(); });
       const fc = $('Fin_compare');
       if (fc) fc.addEventListener('change', function () { if (window.SCFin) renderFin(); });
+      const fys = $('FY_startMonth'), fyy = $('FY_year');
+      function loadFYUI() {
+        if (!window.SCJE) return;
+        SCJE.loadFiscalYear().then(function (fy) {
+          if (fys) fys.value = String(fy.startMonth || 1);
+          if (fyy) fyy.value = String(fy.year || new Date().getFullYear());
+          const st = $('FY_status');
+          if (st) {
+            const ps = SCJE.periodStatus();
+            const closed = ps[String(fy.year)] === 'closed';
+            st.textContent = closed ? 'مغلق' : 'مفتوح';
+            st.className = 'val ' + (closed ? 'red' : 'green');
+          }
+        });
+      }
+      loadFYUI();
+      const fysave = $('FY_save');
+      if (fysave) fysave.addEventListener('click', function () {
+        const fy = { startMonth: parseInt(fys.value, 10) || 1, year: parseInt(fyy.value, 10) || new Date().getFullYear() };
+        SCStore.kvSet('fiscalYear', fy).then(function () {
+          window.__fiscalYear = fy;
+          const msg = $('FY_msg');
+          if (msg) msg.textContent = 'حُفظت السنة المالية.';
+          loadFYUI();
+          toast('حُفظت السنة المالية');
+        });
+      });
+      const fyclose = $('FY_close');
+      if (fyclose) fyclose.addEventListener('click', function () {
+        if (!window.confirm('سيتم إغلاق السنة ' + ($('FY_year').value || '') + ' وإنشاء قيد إغلاق. لا يمكن التراجع. متابعة؟')) return;
+        const btn = fyclose;
+        btn.disabled = true;
+        SCJE.closeYear().then(function (saved) {
+          btn.disabled = false;
+          const msg = $('FY_msg');
+          if (msg) msg.textContent = 'أُغلقت السنة · قيد ' + (saved ? saved.id : '');
+          loadFYUI();
+          toast('أُغلقت السنة ' + ($('FY_year').value || ''));
+          if (window.SCFin) renderFin();
+        }).catch(function (e) {
+          btn.disabled = false;
+          const msg = $('FY_msg');
+          const m = e && e.message;
+          if (msg) msg.textContent = m === 'period-closed' ? 'السنة مغلقة مسبقاً.' : 'تعذّر الإغلاق: ' + (m || '');
+          toast('تعذّر إغلاق السنة');
+        });
+      });
       const os = $('Open_save');
       if (os) os.addEventListener('click', function () {
         const map = {};
@@ -5882,6 +6290,18 @@
       const fi = $('bkFile');
       if (fi) fi.addEventListener('change', onFile);
       const bcb = $('Br_csvBtn'), bcf = $('Br_csvFile');
+      const aa = $('Ast_add');
+      if (aa) aa.addEventListener('click', function () { if (window.SCAssets) SCAssets.add(); });
+      const ap = $('Ast_post');
+      if (ap) ap.addEventListener('click', function () { if (window.SCAssets) SCAssets.postMonth(); });
+      const at = $('Ast_table');
+      if (at) at.addEventListener('click', function (ev) {
+        const b = ev.target.closest('[data-ast="del"]');
+        if (!b) return;
+        const i = parseInt(b.getAttribute('data-i'), 10);
+        if (window.SCAssets) SCAssets.remove(i);
+      });
+      if (window.SCAssets) SCAssets.render();
       if (bcb && bcf) bcb.addEventListener('click', function () { bcf.click(); });
       if (bcf) bcf.addEventListener('change', function (e) {
         const f = e.target.files && e.target.files[0];
@@ -5986,6 +6406,8 @@
     Promise.resolve(Persist.init())
       .then(function () { return window.SCCOA ? SCCOA.ready() : null; })
       .then(function () { return window.SCJE ? SCJE.loadPosted() : null; })
+      .then(function () { return window.SCJE ? SCJE.loadFiscalYear() : null; })
+      .then(function () { return window.SCJE ? SCJE.loadPeriodStatus() : null; })
       .then(function () { return window.SCTape ? SCTape.ready() : null; })
       .then(function () { return window.SCReport ? SCReport.init() : null; })
       .then(function () { return window.SCBackup ? SCBackup.init() : null; })
