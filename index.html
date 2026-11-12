@@ -559,6 +559,10 @@
   .main:focus, .page-header h1:focus { outline: none; }
   .theme-row { display: flex; align-items: center; gap: 8px;
     padding: 8px 8px 2px; }
+  .profile-row { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  .profile-lbl { font-size: 11px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .profile-sel { flex: 1; min-width: 0; padding: 6px 8px; font-size: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-2); color: var(--text); }
+  .profile-sel:focus { outline: none; border-color: var(--accent); }
   .theme-row .theme-lbl { font-size: 11px; color: var(--muted); font-weight: 600; white-space: nowrap; }
   .theme-seg { display: flex; flex: 1; gap: 2px; background: var(--bg-2); border: 1px solid var(--border);
     border-radius: 999px; padding: 2px; }
@@ -864,6 +868,12 @@
           <div class="name">أدوات محاسبية</div>
           <div class="sub">Pro Suite</div>
         </div>
+      </div>
+
+      <div class="profile-row no-print">
+        <label for="profileSelect" class="profile-lbl">الشركة</label>
+        <select id="profileSelect" class="profile-sel"></select>
+        <button class="btn secondary sm" id="profileAdd" type="button" title="إضافة شركة">+</button>
       </div>
 
       <div class="group">
@@ -3665,7 +3675,9 @@
 
   // ================= الحفظ المحلي · SCStore =================
   const SCStore = (function () {
-    const DB_NAME = 'supercalc', DB_VERSION = 1;
+    const _profile = (function () { try { return localStorage.getItem('sc:profile') || 'default'; } catch (e) { return 'default'; } })();
+    const DB_NAME = _profile === 'default' ? 'supercalc' : 'supercalc_' + _profile;
+    const DB_VERSION = 1;
     const SPEC = {
       kv: { keyPath: 'k' },
       journal: { keyPath: 'id' },
@@ -3673,7 +3685,7 @@
       coa: { keyPath: 'code' },
       sessions: { keyPath: 'id' }
     };
-    const LS_KEY = 'sc:fallback';
+    const LS_KEY = 'sc:fallback:' + _profile;
     let db = null, mode = 'ls', memory = null, seq = 1, opening = null;
 
     function loadFallback() {
@@ -3826,6 +3838,40 @@
     };
   })();
   window.SCStore = SCStore;
+
+  // ================= إدارة الشركات (Profiles) =================
+  function profileList() {
+    try { const raw = localStorage.getItem('sc:profiles'); if (raw) { const arr = JSON.parse(raw); if (Array.isArray(arr) && arr.length) return arr; } } catch (e) {}
+    return [{ id: 'default', name: 'شركتي' }];
+  }
+  function saveProfileList(list) { try { localStorage.setItem('sc:profiles', JSON.stringify(list || [])); } catch (e) {} }
+  function currentProfile() { try { return localStorage.getItem('sc:profile') || 'default'; } catch (e) { return 'default'; } }
+  function switchProfile(id) {
+    try { localStorage.setItem('sc:profile', id || 'default'); } catch (e) {}
+    location.reload();
+  }
+  function addProfile(name) {
+    const n = String(name || '').trim();
+    if (!n) { toast('أدخل اسم الشركة'); return; }
+    const list = profileList();
+    const id = 'p' + Date.now();
+    list.push({ id: id, name: n });
+    saveProfileList(list);
+    toast('أُضيفت الشركة: ' + n);
+    switchProfile(id);
+  }
+  function renderProfileSelect() {
+    const sel = $('profileSelect');
+    if (!sel) return;
+    const list = profileList();
+    const cur = currentProfile();
+    sel.innerHTML = list.map(function (p) { return '<option value="' + escHtml(p.id) + '"' + (p.id === cur ? ' selected' : '') + '>' + escHtml(p.name) + '</option>'; }).join('');
+  }
+  window.profileList = profileList;
+  window.currentProfile = currentProfile;
+  window.switchProfile = switchProfile;
+  window.addProfile = addProfile;
+  window.renderProfileSelect = renderProfileSelect;
 
   // ================= الحفظ المحلي · Persist =================
   const Persist = (function () {
@@ -6290,6 +6336,16 @@
       const fi = $('bkFile');
       if (fi) fi.addEventListener('change', onFile);
       const bcb = $('Br_csvBtn'), bcf = $('Br_csvFile');
+      const psel = $('profileSelect');
+      if (psel) {
+        renderProfileSelect();
+        psel.addEventListener('change', function () { switchProfile(psel.value); });
+      }
+      const padd = $('profileAdd');
+      if (padd) padd.addEventListener('click', function () {
+        const name = window.prompt('اسم الشركة الجديدة:');
+        if (name) addProfile(name);
+      });
       const aa = $('Ast_add');
       if (aa) aa.addEventListener('click', function () { if (window.SCAssets) SCAssets.add(); });
       const ap = $('Ast_post');
