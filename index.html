@@ -19,7 +19,13 @@
     } catch (e) {}
   })();
 </script>
-<link rel="icon" type="image/png" href="logo-ar.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png" />
+<link rel="apple-touch-icon" href="favicon-192.png" />
+<meta name="description" content="قيد — منظومة محاسبة احترافية عربية تعمل داخل المتصفح: VAT، إهلاك، قروض، NPV/IRR، نسب مالية، مخزون، تسوية بنكية، قيود يومية وتقارير مالية." />
+<meta property="og:title" content="قيد — منظومة المحاسبة الاحترافية (QAYD)" />
+<meta property="og:description" content="QAYD — Professional Accounting System. أدوات محاسبية عربية كاملة في ملف واحد." />
+<meta property="og:image" content="https://yazankalelia.github.io/accounting-tools/logo-ar.png" />
+<meta property="og:type" content="website" />
 <title>قيد — منظومة المحاسبة الاحترافية (QAYD)</title>
 <style>
   :root {
@@ -82,6 +88,14 @@
   .main { flex: 1; overflow-y: auto; padding: 32px; }
   .main::-webkit-scrollbar { width: 8px; }
   .main::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
+
+  /* English (LTR) adjustments */
+  html[dir="ltr"] .sidebar { border-left: 0; border-right: 1px solid var(--border); }
+  html[dir="ltr"] .je-table td.acct,
+  html[dir="ltr"] .fin-table td.acct,
+  html[dir="ltr"] .keys-row .t { text-align: left; }
+  html[dir="ltr"] #printRoot th,
+  html[dir="ltr"] #printRoot td { text-align: left; }
 
   .page { display: none; max-width: 900px; margin: 0 auto; }
   #page-calc { max-width: clamp(320px, 90vw, 620px); }
@@ -864,7 +878,7 @@
         <button class="sheet-close" id="sheetClose" type="button" aria-label="إغلاق القائمة">✕</button>
       </div>
       <div class="brand">
-        <img id="brandLogo" class="brand-logo" src="logo-ar.png" alt="قيد — QAYD" />
+        <img id="brandLogo" class="brand-logo" src="logo-ar.png" width="48" height="48" alt="قيد — QAYD" />
         <div>
           <div class="name">قيد</div>
           <div class="sub">QAYD — Professional Accounting System</div>
@@ -1034,10 +1048,10 @@
           <div class="row">
             <div class="field"><label>المبلغ</label><input type="number" id="Fx_amount" value="1000" oninput="calcFx()" /></div>
             <div class="field"><label>من</label>
-              <select id="Fx_from" onchange="calcFx()"><option value="USD">USD</option><option value="EUR">EUR</option><option value="SAR">SAR</option><option value="AED">AED</option><option value="GBP">GBP</option></select>
+              <select id="Fx_from" onchange="fxPick()"><option value="USD">USD</option><option value="EUR">EUR</option><option value="SAR">SAR</option><option value="AED">AED</option><option value="GBP">GBP</option></select>
             </div>
             <div class="field"><label>إلى</label>
-              <select id="Fx_to" onchange="calcFx()"><option value="SAR">SAR</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="AED">AED</option><option value="GBP">GBP</option></select>
+              <select id="Fx_to" onchange="fxPick()"><option value="SAR">SAR</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="AED">AED</option><option value="GBP">GBP</option></select>
             </div>
             <div class="field"><label>سعر الصرف</label><input type="number" id="Fx_rate" value="3.75" step="0.0001" oninput="calcFx()" /></div>
           </div>
@@ -1125,7 +1139,7 @@
           <div class="row">
             <div class="field"><label>VAT خرج (مبيعات)</label><input type="number" id="V_out" value="15000" oninput="calcVAT()" /></div>
             <div class="field"><label>VAT دخل (مشتريات)</label><input type="number" id="V_in" value="8000" oninput="calcVAT()" /></div>
-            <div class="field"><label>adjustments</label><input type="number" id="V_adj" value="0" oninput="calcVAT()" /></div>
+            <div class="field"><label>تسويات</label><input type="number" id="V_adj" value="0" oninput="calcVAT()" /></div>
           </div>
           <div class="results">
             <div class="rcard"><div class="lbl">VAT صافي مستحق</div><div class="val red" id="V_net">—</div></div>
@@ -1141,9 +1155,9 @@
          <!-- VAT multi-rate -->
          <div class="card" id="V_mrCard">
            <div class="card-title">VAT متعدد المعدلات (Multi-rate)</div>
-           <p style="color:var(--muted);font-size:13px;">أدخل basis لكل معدل (خرج/دخل). يُحسب صافي VAT وقيد إقفال موحّد.</p>
+           <p style="color:var(--muted);font-size:13px;">أدخل أساس المبيعات/المشتريات لكل معدل؛ يُضرب في المعدل لحساب VAT. يُحسب صافي VAT وقيد إقفال موحّد.</p>
            <table class="data-table" id="V_mrTable">
-             <thead><tr><th scope="col">المعدل %</th><th scope="col">خرج (مبيعات)</th><th scope="col">دخل (مشتريات)</th><th scope="col">صافي</th><th scope="col"></th></tr></thead>
+             <thead><tr><th scope="col">المعدل %</th><th scope="col">أساس خرج</th><th scope="col">أساس دخل</th><th scope="col">صافي</th><th scope="col"></th></tr></thead>
              <tbody id="V_mrBody"></tbody>
            </table>
            <div style="margin-top:8px;"><button type="button" class="btn" onclick="addVatRate()">+ إضافة معدل</button></div>
@@ -1217,7 +1231,7 @@
           <div class="row">
             <div class="field"><label>الفائدة السنوية %</label><input type="number" id="I_rate" value="6" step="0.01" oninput="calcInterest()" /></div>
             <div class="field"><label>سنوات</label><input type="number" id="I_years" value="10" oninput="calcInterest()" /></div>
-            <div class="field"><label>compounding/سنة</label>
+            <div class="field"><label>مرات التركيب سنوياً</label>
               <select id="I_comp" onchange="calcInterest()"><option value="1">سنوي</option><option value="2">نصف سنوي</option><option value="4">ربع سنوي</option><option value="12">شهري</option><option value="365">يومي</option></select>
             </div>
             <div class="field"><label>مساهمة دورية</label><input type="number" id="I_pmt" value="0" oninput="calcInterest()" /></div>
@@ -1621,7 +1635,7 @@
 
         <div class="card" id="Fin_card">
           <div class="card-title"><span class="ico" aria-hidden="true">⊞</span> ميزان المراجعة وقائمة الدخل</div>
-          <div class="fin-note">يُحسب من القيود <b>المرحّلة</b> فقط ضمن تاريحي «من/إلى» أعلاه، وتُثنَى القيود الملغاة بالعكس. تُعرض الأرصدة في الطرف الطبيعي لكل حساب.</div>
+          <div class="fin-note">يُحسب من القيود <b>المرحّلة</b> فقط، وتُثنَى القيود الملغاة بالعكس. ميزان المراجعة والميزانية يُعرضان الأرصدة <b>حتى تاريخ «إلى»</b> (افتتاحي + كل الحركات)، وقائمة الدخل لحركة الفترة «من–إلى». تُعرض الأرصدة في الطرف الطبيعي لكل حساب.</div>
           <div class="filters" style="margin-bottom:10px;">
             <div class="fld q"><label for="Fin_q">بحث في الحسابات</label><input id="Fin_q" type="search" autocomplete="off" placeholder="رمز أو اسم حساب..." /></div>
             <div class="fld"><label for="Fin_compare">مقارنة</label><select id="Fin_compare"><option value="0">بدون مقارنة</option><option value="1">فترة سابقة (نفس المدة)</option></select></div>
@@ -1672,7 +1686,7 @@
 
         <div class="card" id="Aging_card">
           <div class="card-title"><span class="ico" aria-hidden="true">AR</span> أعمار الذمم (AR/AP)</div>
-          <div class="fin-note">من القيود المرحّلة. buckets by entry date (0–30، 31–60، 61–90، 91+). ذمم مدينة (1300) ودائنة (2100).</div>
+          <div class="fin-note">من القيود المرحّلة، والأعمار محسوبة حتى تاريخ «إلى» (لا اليوم). توزيع حسب تاريخ القيد (0–30، 31–60، 61–90، 91+). ذمم مدينة (1300) ودائنة (2100).</div>
           <div class="fin-status" id="Aging_status"></div>
           <div class="data-table-wrap">
             <table class="data-table fin-table" id="Aging_table"><thead><tr><th scope="col">الحساب</th><th scope="col">0–30</th><th scope="col">31–60</th><th scope="col">61–90</th><th scope="col">91+</th><th scope="col">الإجمالي</th></tr></thead><tbody></tbody></table>
@@ -1680,8 +1694,8 @@
         </div>
 
         <div class="card" id="CF_card">
-          <div class="card-title"><span class="ico" aria-hidden="true">CF</span> قائمة التدفقات النقدية (indirect)</div>
-          <div class="fin-note">يُحسب من القيود المرحّلة + أرصدة افتتاحية. التدفق من العمليات (indirect) + استثمار + تمويل = صافي التغير في النقدية.</div>
+          <div class="card-title"><span class="ico" aria-hidden="true">CF</span> قائمة التدفقات النقدية (الطريقة غير المباشرة)</div>
+          <div class="fin-note">يُحسب من القيود المرحّلة + أرصدة افتتاحية. التدفق من العمليات (غير المباشرة) + استثمار + تمويل = صافي التغير في النقدية.</div>
           <div class="fin-status" id="CF_status"></div>
           <div class="data-table-wrap">
             <table class="data-table fin-table" id="CF_table"><thead><tr><th scope="col">البند</th><th scope="col">القيمة</th></tr></thead><tbody></tbody></table>
@@ -1690,7 +1704,7 @@
 
         <div class="card" id="Open_card">
           <div class="card-title"><span class="ico" aria-hidden="true">§</span> أرصدة افتتاحية</div>
-          <div class="fin-note">أدخل أرصدة بداية الفترة (قبل أول قيد). تُضاف إلى أرصدة القيود في ميزان المراجعة وميزانية العمومية.</div>
+          <div class="fin-note">أدخل أرصدة بداية السنة المالية (قبل أول قيد). تُضاف إلى كل الحركات حتى تاريخ «إلى» في ميزان المراجعة والميزانية، ولا تتأثر بتاريخ «من».</div>
           <div class="data-table-wrap">
             <table class="data-table fin-table" id="Open_table">
               <thead><tr><th scope="col">الحساب</th><th scope="col">النوع</th><th scope="col">رصيد افتتاحي</th></tr></thead>
@@ -1887,7 +1901,7 @@
       <div class="ph-logo" id="phLogo"></div>
     </div>
     <div id="printArea"></div>
-    <div class="print-foot">أُعدّ بواسطة أدوات محاسبية · Pro Suite — <span id="phFoot"></span></div>
+    <div class="print-foot">قيد — QAYD — <span id="phFoot"></span></div>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -2048,7 +2062,8 @@
     const title = block ? block.querySelector('.je-title') : null;
     return {
       src: page ? page.id.replace('page-', '') : '',
-      memo: title ? title.textContent.trim() : ''
+      // البيان الأصلي بالعربية يُحفظ في data-title-ar حتى لا تتغير بصمة القيد عند تبديل اللغة
+      memo: title ? (title.getAttribute('data-title-ar') || title.textContent.trim()) : ''
     };
   }
 
@@ -2835,12 +2850,34 @@
     $('Dc_totalPct').textContent = fmt(totalPct) + '%';
     $('Dc_saved').textContent = fmt(saved);
   }
+  function fxCrossRate(from, to) {
+    try {
+      const rf = fxRate(from), rt = fxRate(to);
+      if (!rf || rt == null) return null;
+      return rt / rf;
+    } catch (e) { return null; }
+  }
+  // تغيير زوج العملات يعبّئ سعر الصرف من الأسعار الحية (أو 1 عند نفس العملة)
+  function fxPick() {
+    const fromEl = $('Fx_from'), toEl = $('Fx_to'), rateEl = $('Fx_rate');
+    if (!fromEl || !toEl || !rateEl) return;
+    const from = fromEl.value, to = toEl.value;
+    if (from === to) { rateEl.value = '1'; }
+    else {
+      const live = fxCrossRate(from, to);
+      // بلا سعر حي: يُفرّغ الحقل بدل إبقاء سعر زوج آخر (نتيجة مضلّلة)
+      rateEl.value = (live != null) ? String(Math.round(live * 1e6) / 1e6) : '';
+    }
+    calcFx();
+  }
   function calcFx() {
     const amt = parseFloat($('Fx_amount').value) || 0;
-    const rate = parseFloat($('Fx_rate').value) || 0;
+    const fromEl = $('Fx_from'), toEl = $('Fx_to');
+    const from = fromEl ? fromEl.value : '', to = toEl ? toEl.value : '';
+    let rate = parseFloat($('Fx_rate').value) || 0;
+    if (from && to && from === to) rate = 1; // نفس العملة: لا تحويل
     const res = money(amt * rate);
-    const from = $('Fx_from').value, to = $('Fx_to').value;
-    $('Fx_result').textContent = fmt(res) + ' ' + to;
+    $('Fx_result').textContent = rate > 0 ? (fmt(res) + ' ' + to) : '—';
   }
   function calcProfit() {
     const cost = parseFloat($('P_cost').value) || 0;
@@ -2853,7 +2890,8 @@
       markup = cost > 0 ? (profit / cost) * 100 : 0;
     } else if (mode === 'cm') {
       margin = parseFloat($('P_margin').value) || 0;
-      price = margin < 100 ? cost / (1 - margin / 100) : 0;
+      if (margin >= 100) { toast('هامش الربح يجب أن يكون أقل من 100%'); price = 0; }
+      else price = cost / (1 - margin / 100);
       profit = price - cost;
       markup = cost > 0 ? (profit / cost) * 100 : 0;
     } else {
@@ -2930,7 +2968,6 @@
   function calcVatMR() {
     let totalOut=0, totalIn=0;
     const lines=[];
-    const outByRate={};
     window.__vatMR.forEach(function(r){
       const rate=(Number(r.rate)||0)/100;
       const o=money((Number(r.out)||0)*rate);
@@ -2986,7 +3023,7 @@
     if (P > 0) {
       setJE('L_je', [
         { code: '1200', account: 'البنك', dr: P, cr: null },
-        { code: '2300', account: 'أقساط مستحقة', dr: null, cr: P }
+        { code: '2300', account: 'قروض دائنة', dr: null, cr: P }
       ]);
     }
   }
@@ -2996,7 +3033,7 @@
     const pi = parseFloat($('L_payInterest').value) || 0;
     if (pp === 0 && pi === 0) { setJE('L_payJe', []); return; }
     const lines = [];
-    if (pp > 0) lines.push({ code: '2300', account: 'أقساط مستحقة', dr: pp, cr: null });
+    if (pp > 0) lines.push({ code: '2300', account: 'قروض دائنة', dr: pp, cr: null });
     if (pi > 0) lines.push({ code: '5700', account: 'مصروف فوائد', dr: pi, cr: null });
     if (pp + pi > 0) lines.push({ code: '1200', account: 'البنك', dr: null, cr: pp + pi });
     setJE('L_payJe', lines);
@@ -3020,8 +3057,10 @@
       $('I_resTitle').textContent = 'القيمة المستقبلية (FV)';
     } else {
       const growth = Math.pow(1 + r, n);
-      res = pv / growth;
-      gain = pv - res;
+      // PV = خصم المبلغ + خصم المساهمات الدورية (معاشة)
+      const pvAnnuity = pmt !== 0 ? (r !== 0 ? pmt * (1 - 1 / growth) / r : pmt * n) : 0;
+      res = pv / growth + pvAnnuity;
+      gain = (pv + pmt * n) - res;
       $('I_resTitle').textContent = 'القيمة الحالية (PV)';
     }
     $('I_res').textContent = fmt(res);
@@ -3190,17 +3229,21 @@
     const ar = parseFloat($('R_ar').value) || 0;
     const ap = parseFloat($('R_ap').value) || 0;
     const rows = [];
-    const add = (name, val, suffix = '') => rows.push(`<tr><td>${name}</td><td>${(isFinite(val) ? Number(val).toFixed(2) : fmt(val))}${suffix}</td></tr>`);
-    add('السيولة (Current Ratio)', cl > 0 ? ca / cl : 0);
-    add('السيولة السريعة (Quick)', cl > 0 ? (ca - inv) / cl : 0);
-    add('المديونية (D/E)', eq > 0 ? tl / eq : 0);
-    add('ROA (العائد على الأصول) %', ta > 0 ? (ni / ta) * 100 : 0, '%');
-    add('ROE (العائد على الملكية) %', eq > 0 ? (ni / eq) * 100 : 0, '%');
-    add('هامش إجمالي %', rev > 0 ? ((rev - cogs) / rev) * 100 : 0, '%');
-    add('هامش صافي %', rev > 0 ? (ni / rev) * 100 : 0, '%');
-    add('دوران الأصول', ta > 0 ? rev / ta : 0);
-    add('DSO (أيام تحصيل)', rev > 0 ? (ar / rev) * 365 : 0, ' يوم');
-    add('DPO (أيام دفع)', cogs > 0 ? (ap / cogs) * 365 : 0, ' يوم');
+    const add = (name, val, suffix = '') => {
+      const txt = (val === null || !isFinite(val)) ? '—' : Number(val).toFixed(2) + suffix;
+      rows.push(`<tr><td>${name}</td><td>${txt}</td></tr>`);
+    };
+    const ratio = (num, den) => (den > 0 ? num / den : NaN);
+    add('السيولة (Current Ratio)', ratio(ca, cl));
+    add('السيولة السريعة (Quick)', ratio(ca - inv, cl));
+    add('المديونية (D/E)', ratio(tl, eq));
+    add('ROA (العائد على الأصول) %', ratio(ni * 100, ta), '%');
+    add('ROE (العائد على الملكية) %', ratio(ni * 100, eq), '%');
+    add('هامش إجمالي %', ratio((rev - cogs) * 100, rev), '%');
+    add('هامش صافي %', ratio(ni * 100, rev), '%');
+    add('دوران الأصول', ratio(rev, ta));
+    add('DSO (أيام تحصيل)', ratio(ar * 365, rev), ' يوم');
+    add('DPO (أيام دفع)', ratio(ap * 365, cogs), ' يوم');
     $('R_table').querySelector('tbody').innerHTML = rows.join('');
     const bench = $('R_bench');
     if (bench) {
@@ -3306,8 +3349,9 @@
     }
     const endLIFO = money(lifoLayers.reduce((a, b) => a + b.qty * b.cost, 0));
     const wac = totalQty > 0 ? totalCost / totalQty : 0;
-    const cogsWAC = money(sold * wac);
-    const endWAC = money((totalQty - sold) * wac);
+    const soldQty = Math.min(Math.max(sold, 0), totalQty);
+    const cogsWAC = money(soldQty * wac);
+    const endWAC = money(Math.max(totalQty - soldQty, 0) * wac);
     const warn = $('Iv_warn');
     if (warn) {
       if (sold > totalQty) {
@@ -3827,13 +3871,17 @@
       return opening;
     }
 
+    // كل عملية تخزين تنتظر جاهزية المتجر أولاً، حتى لا تُكتب بيانات في
+    // localStorage ثم تصبح غير مرئية بعد نجاح فتح IndexedDB (انقسام المتجرين).
+    let readyP = null;
     function ready() {
-      if (!opening) {
-        open().then(function (d) {
-          if (d) { db = d; mode = 'idb'; } else { mode = 'ls'; loadFallback(); }
-        });
-      }
-      return open().then(function () { return mode; });
+      if (readyP) return readyP;
+      readyP = open().then(function (d) {
+        if (d) { db = d; mode = 'idb'; }
+        else { db = null; mode = 'ls'; loadFallback(); }
+        return mode;
+      });
+      return readyP;
     }
 
     function idb(store, txMode, fn) {
@@ -3853,72 +3901,82 @@
     function degrade() { mode = 'ls'; db = null; loadFallback(); }
 
     function get(name, key) {
-      if (mode === 'idb' && db) {
-        return idb(name, 'readonly', function (st) { return st.get(key); })
-          .catch(function () { degrade(); return get(name, key); });
-      }
-      const m = loadFallback();
-      if (name === 'audit') {
-        for (let i = 0; i < m.audit.length; i++) {
-          if (String(m.audit[i].id) === String(key)) return Promise.resolve(m.audit[i]);
+      return ready().then(function () {
+        if (mode === 'idb' && db) {
+          return idb(name, 'readonly', function (st) { return st.get(key); })
+            .catch(function () { degrade(); return get(name, key); });
         }
-        return Promise.resolve(undefined);
-      }
-      return Promise.resolve(m[name][String(key)]);
+        const m = loadFallback();
+        if (name === 'audit') {
+          for (let i = 0; i < m.audit.length; i++) {
+            if (String(m.audit[i].id) === String(key)) return m.audit[i];
+          }
+          return undefined;
+        }
+        return m[name][String(key)];
+      });
     }
 
     function all(name) {
-      if (mode === 'idb' && db) {
-        return idb(name, 'readonly', function (st) { return st.getAll(); })
-          .catch(function () { degrade(); return all(name); });
-      }
-      const m = loadFallback();
-      if (name === 'audit') return Promise.resolve(m.audit.slice());
-      return Promise.resolve(Object.keys(m[name]).map(function (k) { return m[name][k]; }));
+      return ready().then(function () {
+        if (mode === 'idb' && db) {
+          return idb(name, 'readonly', function (st) { return st.getAll(); })
+            .catch(function () { degrade(); return all(name); });
+        }
+        const m = loadFallback();
+        if (name === 'audit') return m.audit.slice();
+        return Object.keys(m[name]).map(function (k) { return m[name][k]; });
+      });
     }
 
     function put(name, value) {
-      if (mode === 'idb' && db) {
-        return idb(name, 'readwrite', function (st) { return st.put(value); })
-          .catch(function () { degrade(); return put(name, value); });
-      }
-      const m = loadFallback();
-      if (name === 'audit') {
-        if (value.id == null) value.id = seq++;
-        let found = false;
-        for (let i = 0; i < m.audit.length; i++) {
-          if (m.audit[i].id === value.id) { m.audit[i] = value; found = true; }
+      return ready().then(function () {
+        if (mode === 'idb' && db) {
+          return idb(name, 'readwrite', function (st) { return st.put(value); })
+            .catch(function () { degrade(); return put(name, value); });
         }
-        if (!found) m.audit.push(value);
-      } else {
-        m[name][String(value[SPEC[name].keyPath])] = value;
-      }
-      saveFallback();
-      return Promise.resolve(true);
+        const m = loadFallback();
+        if (name === 'audit') {
+          if (value.id == null) value.id = seq++;
+          let found = false;
+          for (let i = 0; i < m.audit.length; i++) {
+            if (m.audit[i].id === value.id) { m.audit[i] = value; found = true; }
+          }
+          if (!found) m.audit.push(value);
+        } else {
+          m[name][String(value[SPEC[name].keyPath])] = value;
+        }
+        saveFallback();
+        return true;
+      });
     }
 
     function del(name, key) {
-      if (mode === 'idb' && db) {
-        return idb(name, 'readwrite', function (st) { return st.delete(key); })
-          .catch(function () { degrade(); return del(name, key); });
-      }
-      const m = loadFallback();
-      if (name === 'audit') m.audit = m.audit.filter(function (x) { return String(x.id) !== String(key); });
-      else delete m[name][String(key)];
-      saveFallback();
-      return Promise.resolve(true);
+      return ready().then(function () {
+        if (mode === 'idb' && db) {
+          return idb(name, 'readwrite', function (st) { return st.delete(key); })
+            .catch(function () { degrade(); return del(name, key); });
+        }
+        const m = loadFallback();
+        if (name === 'audit') m.audit = m.audit.filter(function (x) { return String(x.id) !== String(key); });
+        else delete m[name][String(key)];
+        saveFallback();
+        return true;
+      });
     }
 
     function clearAll() {
-      if (mode === 'idb' && db) {
-        return Promise.all(Object.keys(SPEC).map(function (n) {
-          return idb(n, 'readwrite', function (st) { return st.clear(); });
-        })).catch(function () { degrade(); return clearAll(); });
-      }
-      memory = null;
-      try { localStorage.removeItem(LS_KEY); } catch (e) {}
-      loadFallback();
-      return Promise.resolve(true);
+      return ready().then(function () {
+        if (mode === 'idb' && db) {
+          return Promise.all(Object.keys(SPEC).map(function (n) {
+            return idb(n, 'readwrite', function (st) { return st.clear(); });
+          })).catch(function () { degrade(); return clearAll(); });
+        }
+        memory = null;
+        try { localStorage.removeItem(LS_KEY); } catch (e) {}
+        loadFallback();
+        return true;
+      });
     }
 
     return {
@@ -4121,7 +4179,7 @@
       { code: '2100', name: 'الدائنون', type: 'liability' },
       { code: '2200', name: 'ضريبة المخرجات', type: 'liability' },
       { code: '2210', name: 'ضريبة المدخلات', type: 'asset' },
-      { code: '2300', name: 'أقساط مستحقة', type: 'liability' },
+      { code: '2300', name: 'قروض دائنة', type: 'liability' },
       { code: '2400', name: 'ذمم ضريبية', type: 'liability' },
       { code: '3100', name: 'حقوق ملكية', type: 'equity' },
       { code: '3200', name: 'أرباح محتجزة', type: 'equity' },
@@ -4168,6 +4226,14 @@
       })).then(function () { sortRows(cache); return cache; });
     }
 
+    // ترحيل اسم الحساب 2300 القديم إلى المصطلح المحاسبي الصحيح (لا يمسّ الأسماء المخصّصة)
+    function migrateNames() {
+      const a = (cache || []).filter(function (x) { return x.code === '2300'; })[0];
+      if (!a || a.name !== 'أقساط مستحقة') return Promise.resolve(cache);
+      a.name = 'قروض دائنة';
+      return SCStore.put('coa', a).then(function () { return cache; });
+    }
+
     function ready() {
       if (opening) return opening;
       opening = SCStore.ready()
@@ -4181,6 +4247,7 @@
             return addMissing();
           });
         })
+        .then(function () { return migrateNames(); })
         .catch(function () {
           cache = DEFAULTS.map(function (a) { return { code: a.code, name: a.name, type: a.type }; });
           return cache;
@@ -4365,6 +4432,15 @@
       if (m < fy.startMonth) return String(y - 1);
       return String(y);
     }
+    // آخر يوم في السنة المالية (يحترم شهر بداية السنة المالية)
+    function fiscalYearEnd(fy) {
+      const f = fy || fiscalYear();
+      const sm = Math.min(12, Math.max(1, Number(f.startMonth) || 1));
+      const endYear = (sm === 1) ? Number(f.year) : Number(f.year) + 1;
+      const endMonth = (sm === 1) ? 12 : sm - 1;
+      const last = new Date(endYear, endMonth, 0).getDate();
+      return endYear + '-' + String(endMonth).padStart(2, '0') + '-' + String(last).padStart(2, '0');
+    }
     function periodStatus() {
       return window.__periodStatus || {};
     }
@@ -4406,7 +4482,7 @@
         Object.keys(expMap).forEach(function (code) { if (expMap[code]) lines.push({ code: code, debit: 0, credit: expMap[code] }); });
         if (ni > 0) lines.push({ code: '3200', debit: 0, credit: ni });
         else if (ni < 0) lines.push({ code: '3200', debit: Math.abs(ni), credit: 0 });
-        const entry = build({ date: new Date().toISOString().slice(0, 10), memo: 'إغلاق سنة ' + year, src: 'closing' }, lines);
+        const entry = build({ date: fiscalYearEnd(fy), memo: 'إغلاق سنة ' + year, src: 'closing' }, lines);
         entry.noFp = true;
         return post(entry).then(function (saved) {
           // mark period closed
@@ -4644,10 +4720,11 @@
       return v >= 0 ? { dr: 0, cr: v } : { dr: -v, cr: 0 };
     }
     // كل حساب يوضع صافي رصيده في طرفه الطبيعي، فيتوازن الميزان دائمًا
+    // ميزان المراجعة «حتى تاريخ»: الافتتاحي + كل الحركات حتى «إلى» (وليس حركة الفترة فقط)
     function trial(from, to) {
       return ready().then(function () { return SCJE.allEntries(); }).then(function (rows) {
         return opening().then(function (op) {
-          const agg = aggregate(rows, from, to, op);
+          const agg = aggregate(rows, '', to, op);
           const coa = coaIndex();
           const out = [];
           let tdr = 0, tcr = 0;
@@ -4682,7 +4759,7 @@
     function balance(from, to) {
       return ready().then(function () { return SCJE.allEntries(); }).then(function (rows) {
         return opening().then(function (op) {
-          const agg = aggregate(rows, from, to, op);
+          const agg = aggregate(rows, '', to, op);
           const coa = coaIndex();
           const assets = [], liabilities = [], equity = [];
           let ta = 0, tl = 0, te = 0;
@@ -4730,7 +4807,8 @@
       return ready().then(function () { return SCJE.allEntries(); }).then(function (rows) {
         const coa = coaIndex();
         const buckets = {};
-        const today = new Date();
+        // أعمار الذمم تُقاس حتى تاريخ «إلى» (لا حتى تاريخ اليوم) حتى تطابق الفترة المعروضة
+        const refDate = to ? new Date(to) : new Date();
         (rows || []).forEach(function (e) {
           if (!usable(e) || !inRange(e.date, from, to)) return;
           (e.lines || []).forEach(function (l) {
@@ -4741,7 +4819,7 @@
             const amt = (Number(l.debit) || 0) - (Number(l.credit) || 0);
             const val = (acct.type === 'liability') ? -amt : amt;
             if (!val) return;
-            const age = Math.floor((today.getTime() - new Date(e.date).getTime()) / 86400000);
+            const age = Math.max(0, Math.floor((refDate.getTime() - new Date(e.date).getTime()) / 86400000));
             const bi = age <= 30 ? 0 : (age <= 60 ? 1 : (age <= 90 ? 2 : 3));
             const m = buckets[code] = buckets[code] || [0, 0, 0, 0];
             m[bi] = R(m[bi] + val);
@@ -4758,22 +4836,27 @@
         return { rows: out };
       });
     }
+    // رصيد بداية الفترة = الافتتاحي + حركة ما قبل «من»، والنهاية = البداية + حركة الفترة
     function accountChange(code, from, to, op, rows) {
-      const opening = Number((op || {})[code]) || 0;
-      let period = 0;
+      const base = Number((op || {})[code]) || 0;
+      let before = 0, period = 0;
       (rows || []).forEach(function (e) {
-        if (!usable(e) || !inRange(e.date, from, to)) return;
+        if (!usable(e) || e.src === 'opening') return; // الأرصدة الافتتاحية محسوبة عبر kv (تجنّب الازدواج)
+        let v = 0;
         (e.lines || []).forEach(function (l) {
-          if (l.code === code) period += (Number(l.debit) || 0) - (Number(l.credit) || 0);
+          if (String(l.code || '') === String(code)) v += (Number(l.debit) || 0) - (Number(l.credit) || 0);
         });
+        if (!v) return;
+        if (from && e.date < from) before += v;
+        else if (inRange(e.date, from, to)) period += v;
       });
+      const opening = R(base + before);
       return { opening: opening, period: R(period), closing: R(opening + period) };
     }
     function cashflow(from, to) {
       return ready().then(function () { return SCJE.allEntries(); }).then(function (rows) {
         return opening().then(function (op) {
-          const inc = null; // computed below
-          // income
+          // الدخل يعاد حسابه هنا من نفس نطاق الفترة
           const coa = coaIndex();
           const agg = aggregate(rows, from, to, {});
           let rev = 0, exp = 0;
@@ -4795,17 +4878,22 @@
           const lines = [];
           lines.push({ label: 'صافي الدخل', value: ni, cls: ni >= 0 ? 'cr' : 'dr' });
           lines.push({ label: '+ إهلاك (5200)', value: depr, cls: 'dr' });
-          lines.push({ label: (ar.closing - ar.opening >= 0 ? '−' : '+') + ' تغير الذمم (1300)', value: R(-(ar.closing - ar.opening)), cls: '' });
-          lines.push({ label: (ap.closing - ap.opening >= 0 ? '+' : '−') + ' تغير الدائنين (2100)', value: R(ap.closing - ap.opening), cls: '' });
-          lines.push({ label: (inv.closing - inv.opening >= 0 ? '−' : '+') + ' تغير المخزون (1400)', value: R(-(inv.closing - inv.opening)), cls: '' });
-          const ops = R(ni + depr - (ar.closing - ar.opening) + (ap.closing - ap.opening) - (inv.closing - inv.opening));
+          // الإشارات: الأصول تستهلك نقداً عند الزيادة، الالتزامات توفّر نقداً عند الزيادة
+          const dAR = R(ar.closing - ar.opening);
+          const dAP = R(-(ap.closing - ap.opening));
+          const dInv = R(inv.closing - inv.opening);
+          const dFA = R(fa.closing - fa.opening);
+          const dLoan = R(-(loans.closing - loans.opening));
+          lines.push({ label: (dAR > 0 ? '−' : '+') + ' تغير الذمم المدينة (1300)', value: R(-dAR), cls: '' });
+          lines.push({ label: (dAP >= 0 ? '+' : '−') + ' تغير الذمم الدائنة (2100)', value: dAP, cls: '' });
+          lines.push({ label: (dInv > 0 ? '−' : '+') + ' تغير المخزون (1400)', value: R(-dInv), cls: '' });
+          const ops = R(ni + depr - dAR + dAP - dInv);
           lines.push({ label: '= التدفق من العمليات', value: ops, cls: 'cr', bold: true });
-          lines.push({ label: '− تغير الأصول الثابتة (1500)', value: R(-(fa.closing - fa.opening)), cls: '' });
-          const invest = R(-(fa.closing - fa.opening));
+          lines.push({ label: (dFA > 0 ? '−' : '+') + ' تغير الأصول الثابتة (1500)', value: R(-dFA), cls: '' });
+          const invest = R(-dFA);
           lines.push({ label: '= التدفق من الاستثمار', value: invest, cls: '' });
-          lines.push({ label: '+ تغير القروض (2300)', value: R(loans.closing - loans.opening), cls: '' });
-          const fin = R(loans.closing - loans.opening);
-          lines.push({ label: '= التدفق من التمويل', value: fin, cls: '' });
+          lines.push({ label: (dLoan >= 0 ? '+' : '−') + ' تغير القروض (2300)', value: dLoan, cls: '' });
+          const fin = dLoan;
           const net = R(ops + invest + fin);
           lines.push({ label: 'صافي التغير في النقدية', value: net, cls: net >= 0 ? 'green' : 'red', bold: true });
           lines.push({ label: 'مطابقة: Δالنقدية (1200)', value: cash.period, cls: Math.abs(cash.period - net) < 0.005 ? 'green' : 'red' });
@@ -4843,7 +4931,7 @@
         const diff = R(t.dr - t.cr);
         set('Fin_diff', fmt(diff), Math.abs(diff) < 0.005 ? 'green' : 'red');
         set('Fin_net', fmt(inc.net), inc.net >= 0 ? 'green' : 'red');
-        try { if (window.drawFinChart) window.drawFinChart(inc.revenue, inc.expense, prev ? prev.net : null); } catch (e) {}
+        try { if (window.drawFinChart) window.drawFinChart(inc.revenue, inc.expense, inc.net); } catch (e) {}
         const pc = $('Fin_prevCard'), cc = $('Fin_changeCard');
         if (compare && prev) {
           if (pc) pc.hidden = false;
@@ -4884,7 +4972,7 @@
           html += '<tr><td class=\"acct\"><b>إجمالي الالتزامات</b></td><td class=\"num\"><b>' + fmt(bs.totalLiab) + '</b></td></tr>';
           html += '<tr><td colspan=\"2\" class=\"acct\"><b>حقوق الملكية</b></td></tr>';
           (bs.equity || []).forEach(function (r) { html += '<tr><td class=\"acct\">' + escHtml(r.code + ' ' + r.name) + '</td><td class=\"num\">' + fmt(r.bal) + '</td></tr>'; });
-          html += '<tr><td class=\"acct\">صافي الدخل (للفترة)</td><td class=\"num\">' + fmt(bs.netIncome) + '</td></tr>';
+          html += '<tr><td class=\"acct\">صافي الدخل (حتى التاريخ)</td><td class=\"num\">' + fmt(bs.netIncome) + '</td></tr>';
           const te = R(bs.totalEquity + bs.netIncome);
           html += '<tr><td class=\"acct\"><b>إجمالي حقوق الملكية</b></td><td class=\"num\"><b>' + fmt(te) + '</b></td></tr>';
           const totalLE = R(bs.totalLiab + te);
@@ -4929,7 +5017,7 @@
             : '';
         }
         const note = $('Fin_note');
-        if (note) note.textContent = 'قيود مرحّلة ضمن الفترة: ' + t.posted + ' · من ' + (from || 'البداية') + ' إلى ' + (to || 'اليوم');
+        if (note) note.textContent = 'قيود مرحّلة ضمن الفترة: ' + inc.posted + ' · من ' + (from || 'البداية') + ' إلى ' + (to || 'اليوم') + ' · الميزان والميزانية حتى «إلى»';
         renderOpening();
         if (st) st.textContent = '';
       }).catch(function () {
@@ -4946,12 +5034,19 @@
     function save(list) { return SCStore.kvSet('assets', list || []); }
     function monthlyDepr(a) {
       const cost = Number(a.cost) || 0, salvage = Number(a.salvage) || 0, life = Math.max(1, Number(a.life) || 1);
+      const accum = Number(a.accum) || 0;
       const depreciable = Math.max(cost - salvage, 0);
-      if (a.method === 'sl') return depreciable / (life * 12);
-      // DDB: 2/life per year
-      const rate = 2 / life;
-      const nbv = cost - (Number(a.accum) || 0);
-      return Math.max(0, nbv * rate / 12);
+      const remaining = Math.max(depreciable - accum, 0);
+      if (remaining <= 0) return 0;
+      const monthsTotal = life * 12;
+      const monthsUsed = Math.min(monthsTotal, Number(a.months) || 0);
+      const monthsLeft = Math.max(1, monthsTotal - monthsUsed);
+      if (a.method === 'sl') return Math.min(remaining, depreciable / monthsTotal);
+      // DDB مع التحول للقسط الثابت عند تجاوزه، وسقف القيمة المتبقية القابلة للإهلاك
+      const nbv = Math.max(cost - accum, salvage);
+      const ddb = nbv * (2 / life) / 12;
+      const sl = remaining / monthsLeft;
+      return Math.min(remaining, Math.max(ddb, sl));
     }
     function render() {
       const tb = $('Ast_table');
@@ -5004,7 +5099,11 @@
         const lines = [{ code: '5200', account: 'مصروف الإهلاك', dr: total, cr: null }, { code: '1510', account: 'مجمع إهلاك الأصول', dr: null, cr: total }];
         setJE('Ast_je', lines);
         // update accum
-        active.forEach(function (a) { a.accum = money((Number(a.accum) || 0) + monthlyDepr(a)); });
+        active.forEach(function (a) {
+          const d = monthlyDepr(a);
+          a.accum = money((Number(a.accum) || 0) + d);
+          a.months = (Number(a.months) || 0) + 1;
+        });
         save(list).then(function () { render(); toast('تم إنشاء قيد الإهلاك · ' + fmt(total)); });
       });
     }
@@ -5535,10 +5634,10 @@
           if (r.reversed) badge = '<span class="tape-badge rev">ملغى بالعكس</span>';
           else if (r.reverses) badge = '<span class="tape-badge rep">قيد عكسي</span>';
           const sub = [];
-          if (r.memo) sub.push(esc(r.memo));
-          if (r.revReason) sub.push('السبب: ' + esc(r.revReason));
-          if (r.reverses) sub.push('يعكس ' + esc(r.reverses));
-          if (r.reversed) sub.push('عُكس بـ ' + esc(r.reversed));
+          if (r.memo) sub.push('<span data-no-i18n>' + esc(r.memo) + '</span>');
+          if (r.revReason) sub.push('السبب: <span data-no-i18n>' + esc(r.revReason) + '</span>');
+          if (r.reverses) sub.push('يعكس <span data-no-i18n>' + esc(r.reverses) + '</span>');
+          if (r.reversed) sub.push('عُكس بـ <span data-no-i18n>' + esc(r.reversed) + '</span>');
           return '<div class="lg">' +
             '<span class="tape-ts">' + esc(r.date || '') + '</span>' +
             '<span class="lg-k">' + esc(r.id || '') + '</span>' +
@@ -5604,7 +5703,7 @@
         if (!info) return;
         info.innerHTML = r
           ? '<span>القيد: <b>' + esc(r.id) + '</b></span><span>التاريخ: <b>' + esc(r.date) + '</b></span>' +
-            '<span>المبلغ: <b>' + fmt(r.dr || 0) + '</b></span>' + (r.memo ? '<span>' + esc(r.memo) + '</span>' : '')
+            '<span>المبلغ: <b>' + fmt(r.dr || 0) + '</b></span>' + (r.memo ? '<span data-no-i18n>' + esc(r.memo) + '</span>' : '')
           : '<span>القيد غير موجود</span>';
       });
       setTimeout(function () { if (ta) ta.focus(); }, 60);
@@ -5961,7 +6060,11 @@
       $('phDate').textContent = 'تاريخ الإصدار: ' + dateStr();
       $('phFoot').textContent = d.toLocaleString('en-GB');
       const logo = $('phLogo');
-      if (logo) logo.innerHTML = head.logo ? '<img alt="شعار المؤسسة" src="' + head.logo + '" />' : '';
+      if (logo) {
+        // عند عدم رفع شعار للمنشأة يظهر شعار «قيد» بحسب لغة الواجهة
+        const src = head.logo || ((currentLang() === 'en') ? 'logo-en.png' : 'logo-ar.png');
+        logo.innerHTML = '<img alt="' + (head.logo ? 'شعار المؤسسة' : 'قيد — QAYD') + '" src="' + src + '" />';
+      }
     }
     function buildClone(page) {
       const clone = page.cloneNode(true);
@@ -6550,19 +6653,19 @@
     if (act) act.setAttribute('aria-current', 'page');
   }
 
-  function drawFinChart(rev, exp, prevNet) {
+  function drawFinChart(rev, exp, net) {
     const c = document.getElementById('Fin_chart');
     if (!c) return;
     const ctx = c.getContext('2d');
     const w = c.width, h = c.height;
     ctx.clearRect(0,0,w,h);
     const pad = 40;
-    const maxv = Math.max(rev||0, exp||0, Math.abs(prevNet||0), 1);
+    const maxv = Math.max(rev||0, exp||0, Math.abs(net||0), 1);
     const barW = (w - pad*2) / 3;
     const scale = (h - pad*2) / maxv;
-    const vals = [rev||0, exp||0, (prevNet==null?0:Math.abs(prevNet))];
-    const labels = ['إيرادات','مصروفات','صافي (سابق)'];
-    const colors = ['#4caf50','#f44336','#2196f3'];
+    const vals = [rev||0, exp||0, Math.abs(net||0)];
+    const labels = ['إيرادات','مصروفات','صافي الدخل'];
+    const colors = ['#4caf50','#f44336', (net||0) >= 0 ? '#2196f3' : '#ff9800'];
     vals.forEach(function(v,i){
       const x = pad + i*(barW+10);
       const bh = v*scale;
@@ -6589,43 +6692,1235 @@
 
   // ===== i18n (Phase 12 scaffold) =====
   const I18N = {
-    nav: {
-      calc: {ar:'حاسبة', en:'Calculator'},
-      disc: {ar:'خصومات/عملات', en:'Discounts/FX'},
-      fx: {ar:'أسعار العملات', en:'FX Rates'},
-      profit: {ar:"ربح/هامش", en:'Profit/Margin'},
-      vat: {ar:'VAT', en:'VAT'},
-      loan: {ar:'قروض', en:'Loans'},
-      interest: {ar:'فائدة FV/PV', en:'Interest'},
-      depr: {ar:'إهلاك', en:'Depreciation'},
-      be: {ar:'تعادل', en:'Break-even'},
-      npv: {ar:'NPV/IRR', en:'NPV/IRR'},
-      ratios: {ar:'نسب مالية', en:'Ratios'},
-      aging: {ar:'أعمار ديون', en:'Aging'},
-      fxrev: {ar:'إعادة تقييم FX', en:'FX Reval'},
-      inv: {ar:'مخزون', en:'Inventory'},
-      bank: {ar:'تسوية بنكية', en:'Bank Rec'},
-      tape: {ar:'السجل والقيود', en:'Journal'}
-    },
-    titles: {
-      calc: {ar:'حاسبة محاسبية', en:'Accounting Calculator'},
-      vat: {ar:'حاسبة VAT', en:'VAT Calculator'}
-    }
+    // قاموس عربي → إنجليزي، يُملأ بـ Object.assign أدناه ويستخدمه محرك الترجمة
+    map: {}
   };
+  /* i18n-map: قاموس الترجمة المولّد */
+  Object.assign(I18N.map, {
+    "(افتتاحي + كل الحركات)، وقائمة الدخل لحركة الفترة «من–إلى». تُعرض الأرصدة في الطرف الطبيعي لكل حساب.": "(opening + all movements), while the income statement covers the period movement from–to. Balances are presented on the natural side of each account.",
+    "+ إضافة معدل": "+ Add rate",
+    "+ حساب": "+ Account",
+    ". تُنزَّل كملف JSON على جهازك، وتُستعاد فوراً على أي متصفح آخر دون أي خادم.": ". It is downloaded as a JSON file to your device and restored instantly on any other browser without any server.",
+    "0-30 يوم": "0-30 days",
+    "10 نسب رئيسية": "10 key ratios",
+    "16 أداة محاسبية": "16 accounting tools",
+    "181+ يوم": "181+ days",
+    "31-60 يوم": "31-60 days",
+    "61-90 يوم": "61-90 days",
+    "91-180 يوم": "91-180 days",
+    "PMT + جدول إطفاء (أول 24 دفعة)": "PMT + amortization schedule (first 24 payments)",
+    "SL / DDB / SYD + إهلاك نسبي للسنة الأولى + جدول شهري": "SL / DDB / SYD + partial first-year depreciation + monthly schedule",
+    "VAT خرج (مبيعات)": "Output VAT (sales)",
+    "VAT دخل (مشتريات)": "Input VAT (purchases)",
+    "VAT صافي مستحق": "Net VAT payable",
+    "VAT متعدد المعدلات (Multi-rate)": "Multi-rate VAT (Multi-rate)",
+    "×1.00 بلا تعديل · ×1.20 يرفع المخصص 20% لمخاطر مستقبلية": "×1.00 no adjustment · ×1.20 raises the allowance by 20% for future risk",
+    "؟": "?",
+    "آلة حاسبة مع ذاكرة، ضريبة، خصم، مجموع كلي، سجل": "Calculator with memory, tax, discount, grand total and history",
+    "أبريل (4)": "April (4)",
+    "أخرى": "Other",
+    "أدخل أرصدة بداية السنة المالية (قبل أول قيد). تُضاف إلى كل الحركات حتى تاريخ «إلى» في ميزان المراجعة والميزانية، ولا تتأثر بتاريخ «من».": "Enter the opening balances at the start of the fiscal year (before the first entry). They are added to all movements up to the To date in the trial balance and balance sheet, and are not affected by the From date.",
+    "أدخل أساس المبيعات/المشتريات لكل معدل؛ يُضرب في المعدل لحساب VAT. يُحسب صافي VAT وقيد إقفال موحّد.": "Enter the sales/purchases base for each rate; it is multiplied by the rate to compute VAT. Net VAT and a single closing entry are calculated.",
+    "أرسل ملاحظتك": "Send your note",
+    "أرصدة افتتاحية": "Opening balances",
+    "أساس خرج": "Output base",
+    "أساس دخل": "Input base",
+    "أسعار العملات": "Exchange rates",
+    "أسعار العملات العالمية": "Global exchange rates",
+    "أصل": "Asset",
+    "أصل سداد": "Principal repayment",
+    "أعمار الديون + ECL": "Receivable aging + ECL",
+    "أعمار الذمم (AR/AP)": "Receivable/payable aging (AR/AP)",
+    "أعمار ديون": "Aging of receivables",
+    "أكتوبر (10)": "October (10)",
+    "أو زر": "or press",
+    "إجراء": "Action",
+    "إجمالي الأصول": "Total assets",
+    "إجمالي الإهلاك": "Total depreciation",
+    "إجمالي الخصم %": "Total discount %",
+    "إجمالي الخصوم": "Total liabilities",
+    "إجمالي الدائن": "Total credit",
+    "إجمالي الدفعات": "Total payments",
+    "إجمالي الذمم": "Total receivables",
+    "إجمالي الفائدة": "Total interest",
+    "إجمالي المدين": "Total debit",
+    "إجمالي خرج": "Total output",
+    "إجمالي دخل": "Total input",
+    "إرسال الملاحظة": "Send note",
+    "إزالة": "Remove",
+    "إضافة أصل": "Add asset",
+    "إعادة تقييم FX": "FX revaluation",
+    "إعدادات الضريبة والخصم": "Tax and discount settings",
+    "إغلاق السنة": "Year-end close",
+    "إلغاء": "Cancel",
+    "إلى": "To",
+    "إلى تاريخ": "To date",
+    "إهلاك": "Depreciation",
+    "إهلاك الأصول (Depreciation)": "Asset depreciation (Depreciation)",
+    "إهلاك السنة الأولى": "First-year depreciation",
+    "إيداعات في الطريق": "Deposits in transit",
+    "إيراد التعادل": "Break-even revenue",
+    "اختصارات لوحة المفاتيح": "Keyboard shortcuts",
+    "اختيار شعار المؤسسة": "Select organization logo",
+    "اختيار ملف CSV": "Choose CSV file",
+    "استعادة نسخة احتياطية": "Restore backup",
+    "استعادة واستبدال": "Restore and replace",
+    "استورد ملف CSV من بنكك (الأعمدة: تاريخ، وصف، مبلغ أو مدين/دائن). تُطابق الحركات تلقائياً مع قيود الدفتر حسب المبلغ (±0.01) ونطاق 7 أيام.": "Import a CSV file from your bank (columns: date, description, amount or debit/credit). Transactions are matched automatically with book entries by amount (±0.01) within a 7-day window.",
+    "استيراد كشف بنكي (CSV)": "Import bank statement (CSV)",
+    "اسم الأصل": "Asset name",
+    "اسم المؤسسة": "Organization name",
+    "اضغط": "Press",
+    "اضغط على أي عملة لتصبح الأساس": "Click any currency to make it the base",
+    "افتح الدليل في أي أداة بالضغط على": "Open the guide in any tool by pressing",
+    "الأدوات": "Tools",
+    "الأدوات اليومية": "Daily tools",
+    "الأسماء المعدّلة تظهر في القيود الجديدة": "Renamed accounts appear in new entries",
+    "الأصل": "Principal",
+    "الأصول المتداولة": "Current assets",
+    "الأصول والتمويل": "Assets and financing",
+    "الإجمالي": "Total",
+    "الإهلاك الشهري": "Monthly depreciation",
+    "الإيرادات": "Revenue",
+    "الاختصارات لا تعمل أثناء الكتابة داخل الحقول.": "Shortcuts do not work while typing inside fields.",
+    "الاستثمار الأولي": "Initial investment",
+    "الاسم": "Name",
+    "البند": "Line item",
+    "التحليل والاستثمار": "Analysis and investment",
+    "التدفقات (مفصولة بفواصل)": "Cash flows (comma-separated)",
+    "التسوية البنكية (Bank Rec)": "Bank reconciliation (Bank Rec)",
+    "التغير": "Change",
+    "التكاليف الثابتة": "Fixed costs",
+    "التكلفة": "Cost",
+    "التكلفة المتغيرة/وحدة": "Variable cost/unit",
+    "الحالة": "Status",
+    "الحساب": "Account",
+    "الخصوم المتداولة": "Current liabilities",
+    "الدفعة الدورية": "Periodic payment",
+    "الذمم (AP)": "Payables (AP)",
+    "الذمم (AR)": "Receivables (AR)",
+    "الربح المستهدف": "Target profit",
+    "الرصيد": "Balance",
+    "الرصيد (foreign)": "Balance (foreign)",
+    "الرصيد المعدل (بنك)": "Adjusted balance (bank)",
+    "الرصيد المعدل (دفتر)": "Adjusted balance (book)",
+    "السبب (يُحفظ في سجل التدقيق) *": "Reason (saved to the audit log) *",
+    "السجل": "Log",
+    "السجل والتدقيق": "Log and audit",
+    "السجل والقيود": "Log and entries",
+    "السعر الأصلي": "Original price",
+    "السعر الجديد": "New price",
+    "السعر القديم": "Old price",
+    "السعر النهائي": "Final price",
+    "السنة 1، 2، 3…": "Year 1, 2, 3…",
+    "السنة المالية": "Fiscal year",
+    "السنة المالية وإغلاق": "Fiscal year and close",
+    "الشركة": "Company",
+    "الشهر": "Month",
+    "الطريقة": "Method",
+    "العكس يُنشئ قيداً معاكساً ويُبقي الأصل · الحذف نهائي مع نسخة في سجل التدقيق": "Reversal creates an offsetting entry and keeps the asset · deletion is permanent with a copy in the audit log",
+    "العمر (أشهر)": "Life (months)",
+    "العمر (سنوات)": "Life (years)",
+    "العملة": "Currency",
+    "العمليات والتقييم": "Transactions and valuation",
+    "الفئة": "Category",
+    "الفائدة السنوية %": "Annual interest %",
+    "الفترة (اختياري)": "Period (optional)",
+    "الفرق": "Difference",
+    "القسط الشهري (السنة الأولى)": "Monthly installment (first year)",
+    "القيمة": "Value",
+    "القيمة التخريدية": "Salvage value",
+    "القيمة الجديدة": "New value",
+    "القيمة الدفترية": "Book value",
+    "القيمة القديمة": "Old value",
+    "القيمة المستقبلية": "Future value",
+    "القيمة المستقبلية/الحالية + DCF": "Future/present value + DCF",
+    "القيود المرحّلة": "Posted entries",
+    "القيود، سجل التدقيق، دليل الحسابات، اللقطات، رأس التقرير والشعار": "Entries, audit log, chart of accounts, snapshots, report header and logo",
+    "اللغة": "Language",
+    "المبلغ": "Amount",
+    "المتصفح منع النسخ التلقائي — النص محدَّد، انسخه من الحقل": "The browser blocked automatic copying — the text is selected, copy it from the field",
+    "المخزون": "Inventory",
+    "المخصص": "Allowance",
+    "المخصص (ECL)": "Allowance (ECL)",
+    "المدة (سنوات)": "Term (years)",
+    "المرحّلة": "Posted",
+    "المظهر": "Theme",
+    "المعدل %": "Rate %",
+    "الملاحظة": "Note",
+    "النتيجة": "Result",
+    "النسبة": "Ratio",
+    "النسبة %": "Ratio %",
+    "النسخ الاحتياطي والسيادة على البيانات": "Backup and data sovereignty",
+    "النوع": "Type",
+    "الوحدات المباعة": "Units sold",
+    "الوضع": "Mode",
+    "بافتراض أن السنة المالية تبدأ في يناير": "Assuming the fiscal year starts in January",
+    "بحث": "Search",
+    "بحث فوري": "Instant search",
+    "بحث في الحسابات": "Search accounts",
+    "بحث وفلترة الأرشيف": "Search and filter the archive",
+    "بدون مقارنة": "No comparison",
+    "تأكيد": "Confirm",
+    "تاريخ": "Date",
+    "تاريخ الشراء": "Purchase date",
+    "تاريخ الشراء (شهر/سنة)": "Purchase date (month/year)",
+    "تحديث": "Update",
+    "تحديث الأسعار": "Update rates",
+    "تحويل عملات": "Currency conversion",
+    "تحويل فوري بين 10 عملات بأسعار محدّثة، وأهم 3 عملات مثبّتة في الأعلى": "Instant conversion between 10 currencies at updated rates, with the top 3 currencies pinned at the top",
+    "تحويل مباشر بين تكلفة، سعر، هامش، و markup": "Direct conversion between cost, price, margin and markup",
+    "تخطَّ إلى المحتوى": "Skip to content",
+    "ترحيل إهلاك الشهر": "Post monthly depreciation",
+    "تسويات": "Adjustments",
+    "تسوية بنكية": "Bank reconciliation",
+    "تصفير": "Clear",
+    "تصل ملاحظتك إلى مالك الموقع": "Your note reaches the site owner",
+    "تعادل": "Break-even",
+    "تقرير": "Report",
+    "تقييم استثماري": "Investment appraisal",
+    "تقييم المخزون": "Inventory valuation",
+    "تكلفة + markup% → سعر": "Cost + markup% → price",
+    "تكلفة + سعر → هامش": "Cost + price → margin",
+    "تكلفة + هامش% → سعر": "Cost + margin% → price",
+    "تكلفة أولية/وحدة": "Initial cost/unit",
+    "تكلفة الأصل": "Asset cost",
+    "تكلفة الشراء": "Purchase cost",
+    "تكلفة شراء (قيد)": "Purchase cost (entry)",
+    "تلقائي": "Automatic",
+    "تم": "Done",
+    "تُسجَّل تلقائياً عند تغيير أي مدخل في أي أداة (آخر 40 لقطة)": "Recorded automatically whenever any input changes in any tool (last 40 snapshots)",
+    "جارٍ تحميل الأسعار…": "Loading rates…",
+    "جميع العملات": "All currencies",
+    "حاسبة": "Calculator",
+    "حاسبة VAT": "VAT calculator",
+    "حاسبة محاسبية": "Accounting calculator",
+    "حالة التسوية": "Reconciliation status",
+    "حتى تاريخ «إلى»": "Up to the To date",
+    "حدد بداية السنة المالية (شهر/سنة). «إغلاق السنة» يُرحّل صافي الدخل إلى 3200 (أرباح محتجزة) ويُغلق الفترة (لا يمكن الترحيل afterwards).": "Select the start of the fiscal year (month/year). Year-end close transfers net income to 3200 (retained earnings) and closes the period (posting is no longer possible afterwards).",
+    "حذف": "Delete",
+    "حساب الخصومات المركبة وتحويل العملات": "Composite discount and currency conversion calculator",
+    "حساب الضريبة المستحقة/الاسترداد مع قيد تلقائي": "Calculate VAT due/refundable with an automatic entry",
+    "حفظ": "Save",
+    "حفظ الأرصدة": "Save balances",
+    "حقوق الملكية": "Equity",
+    "خصم 1 %": "Discount 1 %",
+    "خصم 2 %": "Discount 2 %",
+    "خصم 3 %": "Discount 3 %",
+    "خصومات متتالية": "Successive discounts",
+    "خصومات متتالية وتحويل عملات": "Successive discounts and currency conversion",
+    "خصومات/عملات": "Discounts/currencies",
+    "دائن": "Credit",
+    "داكن": "Dark",
+    "دفعات/سنة": "Payments/year",
+    "دفعة": "Payment",
+    "دليل": "Guide",
+    "دليل الأداة": "Tool guide",
+    "دليل الحسابات": "Chart of accounts",
+    "رأس التقرير": "Report header",
+    "ربح وهامش (التسعير)": "Profit and margin (pricing)",
+    "ربح/خسارة FX": "FX gain/loss",
+    "ربح/هامش": "Profit/margin",
+    "ربع سنوي": "Quarterly",
+    "ربع سنوي (4)": "Quarterly (4)",
+    "رصيد": "Balance",
+    "رصيد افتتاحي": "Opening balance",
+    "رصيد البنك + شيكات معلقة + إيداعات في الطريق + عمولات وفوائد · قيد تسوية متوازن": "Bank balance + outstanding checks + deposits in transit + fees and interest · balanced reconciliation entry",
+    "رصيد الدفتر (البنك)": "Book balance (bank)",
+    "رصيد كشف البنك": "Bank statement balance",
+    "رصيد متناقص (DDB)": "Declining balance (DDB)",
+    "سجل أصول ثابتة (IAS 16). «ترحيل إهلاك الشهر» يُنشئ قيداً (Dr 5200 / Cr 1510) لمجموع إهلاك الأصول النشطة.": "Fixed asset register (IAS 16). Post monthly depreciation creates an entry (Dr 5200 / Cr 1510) for the total depreciation of active assets.",
+    "سجل أصول ثابتة + ترحيل إهلاك": "Fixed asset register + depreciation posting",
+    "سجل التدقيق": "Audit log",
+    "سعر البيع": "Selling price",
+    "سعر البيع/وحدة": "Selling price/unit",
+    "سعر الصرف": "Exchange rate",
+    "سنة": "Year",
+    "سنوات": "Years",
+    "سنوي": "Annual",
+    "سنوي (1)": "Annual (1)",
+    "سياسة الشهر الأول": "First-month policy",
+    "سيتم استبدال كل البيانات الحالية في هذا المتصفح بمحتوى النسخة. لا يمكن التراجع — يُنصح بتنزيل نسخة احتياطية من الوضع الحالي أولاً.": "All current data in this browser will be replaced with the backup contents. This cannot be undone — downloading a backup of the current state first is recommended.",
+    "شراء 1 (تكلفة/وحدة)": "Purchase 1 (cost/unit)",
+    "شراء 1 (كمية)": "Purchase 1 (quantity)",
+    "شراء 2 (تكلفة/وحدة)": "Purchase 2 (cost/unit)",
+    "شراء 2 (كمية)": "Purchase 2 (quantity)",
+    "شهر البداية": "Start month",
+    "شهر الشراء يُحتسب كاملاً (IAS 16 §55)": "The purchase month is counted in full (IAS 16 §55)",
+    "شهري": "Monthly",
+    "شهري (12)": "Monthly (12)",
+    "شيكات معلقة (لم تُصرف)": "Outstanding checks (uncleared)",
+    "صافي": "Net",
+    "صافي الدخل": "Net income",
+    "صافي الدخل (سابق)": "Net income (prior)",
+    "صافي الذمم": "Net receivables",
+    "صافي الربح": "Net profit",
+    "صافي مستحق": "Net payable",
+    "ض": "Dr",
+    "ضريبة": "Tax",
+    "طريقة LIFO ممنوعة في المعايير الدولية. تُعرض هنا للمقارنة فقط ولا يجوز استخدامها في القوائم المالية — المعتمد هو FIFO أو المتوسط المرجّح.": "LIFO is prohibited under international standards. It is shown here for comparison only and may not be used in the financial statements — FIFO or weighted average is the accepted method.",
+    "عامل التعديل المستقبلي (IFRS 9)": "Forward-looking adjustment factor (IFRS 9)",
+    "عدد الدفعات": "Number of payments",
+    "عكس القيد": "Reverse entry",
+    "عمولات/مصاريف بنكية غير مسجلة": "Unrecorded bank fees/charges",
+    "فائدة": "Interest",
+    "فائدة (FV / PV)": "Interest (FV / PV)",
+    "فائدة FV/PV": "Interest FV/PV",
+    "فائدة سداد": "Interest paid",
+    "فاتح": "Light",
+    "فترة سابقة (نفس المدة)": "Prior period (same duration)",
+    "فروق عملات + قيد تلقائي": "FX differences + automatic entry",
+    "فقط، وتُثنَى القيود الملغاة بالعكس. ميزان المراجعة والميزانية يُعرضان الأرصدة": "only, and reversed entries are netted out. The trial balance and balance sheet present balances",
+    "فوائد دائنة غير مسجلة": "Unrecorded credit interest",
+    "في أي وقت لفتح هذه القائمة": "at any time to open this list",
+    "قائمة التدفقات النقدية (الطريقة غير المباشرة)": "Cash flow statement (indirect method)",
+    "قائمة الدخل": "Income statement",
+    "قاعدة 72": "Rule of 72",
+    "قروض": "Loans",
+    "قروض (Loan Amortization)": "Loans (Loan Amortization)",
+    "قسط ثابت (SL)": "Straight-line installment (SL)",
+    "قيد": "Entry",
+    "قيد COGS (FIFO)": "COGS entry (FIFO)",
+    "قيد VAT": "VAT entry",
+    "قيد VAT (متعدد)": "VAT entry (multi-rate)",
+    "قيد إعادة التقييم": "Revaluation entry",
+    "قيد إهلاك (شهري)": "Depreciation entry (monthly)",
+    "قيد استلام قرض": "Loan drawdown entry",
+    "قيد الإهلاك (شهري)": "Depreciation entry (monthly)",
+    "قيد التسوية (عمولات وفوائد)": "Reconciliation entry (fees and interest)",
+    "قيد المخصص": "Allowance entry",
+    "قيد سداد قسط": "Installment payment entry",
+    "قيد شراء مخزون": "Inventory purchase entry",
+    "قيد عكسي": "Reversing entry",
+    "قيد — QAYD": "QAYD",
+    "قيد — QAYD —": "QAYD —",
+    "قيد — منظومة المحاسبة الاحترافية (QAYD)": "QAYD — Professional Accounting System",
+    "كل الأدوات": "All tools",
+    "كل الأنواع": "All types",
+    "كل الاختصارات": "All shortcuts",
+    "كل الحالات": "All statuses",
+    "لا توجد قيود مرحّلة ضمن هذه الفترة — رحّل قيداً من أي أداة ليظهر هنا.": "No posted entries in this period — post an entry from any tool to see it here.",
+    "لا شعار": "No logo",
+    "لقطات الحساب": "Account snapshots",
+    "لقطات قابلة لإعادة التشغيل · القيود المرحّلة · سجل تدقيق دائم": "Replayable snapshots · posted entries · permanent audit log",
+    "لقطة مُستبدلة": "Replaced snapshot",
+    "مؤسستي": "My organization",
+    "مبلغ": "Amount",
+    "مبلغ الخصم": "Discount amount",
+    "مبلغ الربح": "Profit amount",
+    "مبلغ القرض": "Loan amount",
+    "مجمع": "Accumulated",
+    "مجمع الإهلاك": "Accumulated depreciation",
+    "مجموع أرقام (SYD)": "Sum of years digits (SYD)",
+    "محذوف (تدقيق)": "Deleted (audit)",
+    "محفوظ محلياً": "Saved locally",
+    "مخزون": "Inventory",
+    "مخزون final": "Closing inventory",
+    "مخزون أولي (كمية)": "Opening inventory (quantity)",
+    "مخصص مشكوك فيها + قيد تلقائي": "Doubtful debt allowance + automatic entry",
+    "مخصصات": "Allowances",
+    "مدين": "Debit",
+    "مرات التركيب سنوياً": "Compounding frequency per year",
+    "مرحّل / نشط": "Posted / active",
+    "مساهمة دورية": "Periodic contribution",
+    "مسح": "Clear",
+    "مسح اللقطات": "Clear snapshots",
+    "مطابقة": "Match",
+    "معدل الخصم %": "Discount rate %",
+    "مقارنة": "Comparison",
+    "ملاحظة": "Note",
+    "ملاحظة: التسليم يعتمد على خدمة خارجية ولا يمكن التحقق من استلام الملاحظة، لذا تُعرض رسالة «تم الإرسال» بعد إرسال الطلب.": "Note: delivery depends on an external service and receipt cannot be verified, so a Sent message is displayed after submitting.",
+    "ملغى بالعكس": "Reversed",
+    "من": "From",
+    "من القيود المرحّلة، والأعمار محسوبة حتى تاريخ «إلى» (لا اليوم). توزيع حسب تاريخ القيد (0–30، 31–60، 61–90، 91+). ذمم مدينة (1300) ودائنة (2100).": "of posted entries, with aging calculated as of the To date (not today). Distribution by entry date (0–30, 31–60, 61–90, 91+). Receivables (1300) and payables (2100).",
+    "من تاريخ": "From date",
+    "من عملة": "From currency",
+    "ميزان المراجعة": "Trial balance",
+    "ميزان المراجعة وقائمة الدخل": "Trial balance and income statement",
+    "ميزانية عمومية": "Balance sheet",
+    "نتيجة": "Result",
+    "نسب مالية": "Financial ratios",
+    "نسبة 0-30 %": "0-30 % share",
+    "نسبة 181+ %": "181+ % share",
+    "نسبة 31-60 %": "31-60 % share",
+    "نسبة 61-90 %": "61-90 % share",
+    "نسبة 91-180 %": "91-180 % share",
+    "نسبة Markup %": "Markup %",
+    "نسبة التعثر (90+)": "Default rate (90+)",
+    "نسبة الخصم %": "Discount %",
+    "نسبة الضريبة %": "Tax rate %",
+    "نسبة المساهمة %": "Contribution %",
+    "نسخ": "Copy",
+    "نسخ CSV": "Copy CSV",
+    "نسخ CSV للدخل": "Copy income CSV",
+    "نسخ CSV للميزان": "Copy trial balance CSV",
+    "نسخ النتائج": "Copy results",
+    "نسخ يدوي": "Manual copy",
+    "نسخة واحدة كاملة تشمل": "One complete backup including",
+    "نصف سنوي": "Semi-annual",
+    "نصف سنوي (2)": "Semi-annual (2)",
+    "نقطة التعادل (Break-Even)": "Break-even point (Break-Even)",
+    "نهاية العمر الإنتاجي": "End of useful life",
+    "هامش الربح %": "Profit margin %",
+    "هامش المساهمة/وحدة": "Contribution margin/unit",
+    "هذه الأداة تعمل بالكامل داخل متصفحك ولا ترسل بياناتك إلى أي خادم، لكنها تحتاج JavaScript لتعمل الحسابات والحفظ والقيود. يرجى تفعيل JavaScript في إعدادات المتصفح ثم إعادة تحميل الصفحة.": "This tool runs entirely in your browser and does not send your data to any server, but it needs JavaScript for calculations, saving and entries. Please enable JavaScript in your browser settings and reload the page.",
+    "وحدات التعادل": "Break-even units",
+    "وحدات لتحقيق الربح المستهدف": "Units to achieve target profit",
+    "وحدات/إيراد التعادل + ربح مستهدف": "Break-even units/revenue + target profit",
+    "وصف": "Description",
+    "يظهر الاسم والفترة والشعار في أعلى ورقة الطباعة/PDF وفي ملف CSV. يُصغَّر الشعار تلقائياً ويُحفظ محلياً على هذا الجهاز.": "The name, period and logo appear at the top of the print/PDF page and in the CSV file. The logo is resized automatically and saved locally on this device.",
+    "يغلق النوافذ ويعيدك للحاسبة.": "Closes the windows and returns you to the calculator.",
+    "يلزم تشغيل JavaScript": "JavaScript is required",
+    "يناير (1)": "January (1)",
+    "يوليو (7)": "July (7)",
+    "يومي": "Daily",
+    "يُحسب من القيود": "Calculated from entries",
+    "يُحسب من القيود المرحّلة + أرصدة افتتاحية. التدفق من العمليات (غير المباشرة) + استثمار + تمويل = صافي التغير في النقدية.": "Calculated from posted entries + opening balances. Cash flow from operations (indirect) + investing + financing = net change in cash.",
+    "⟲ استعادة من ملف JSON": "⟲ Restore from JSON file",
+    "⤓ نسخة احتياطية كاملة": "⤓ Full backup",
+    "آلة #1": "Calculator #1",
+    "أهم ثلاث عملات": "Top three currencies",
+    "إضافة شركة": "Add company",
+    "إعدادات الضريبة": "Tax settings",
+    "إغلاق": "Close",
+    "إغلاق الدليل": "Close guide",
+    "إغلاق القائمة": "Close menu",
+    "إغلاق صندوق الملاحظات": "Close feedback box",
+    "اختصارات لوحة المفاتيح (?)": "Keyboard shortcuts (?)",
+    "استعادة نسخة على هذا الجهاز أو أي جهاز آخر": "Restore a backup on this device or any other device",
+    "اكتب اسمك": "Enter your name",
+    "اكتب ملاحظتك أو اقتراحك...": "Write your note or suggestion...",
+    "الحفظ التلقائي": "Auto-save",
+    "الذاكرة": "Memory",
+    "المجموع الكلي": "Grand total",
+    "النص المطلوب نسخه": "Text to copy",
+    "رقم القيد، البيان، الحساب، السبب...": "Entry no., description, account, reason...",
+    "رمز أو اسم حساب...": "Account code or name...",
+    "فتح صندوق الملاحظات": "Open feedback box",
+    "فتح قائمة الأدوات": "Open tools menu",
+    "قائمة الأدوات": "Tools menu",
+    "مثال: خطأ في مبلغ الضريبة": "Example: error in the tax amount",
+    "مثال: مؤسسة النخبة للمحاسبة": "Example: Al-Nokhba Accounting Firm",
+    "مثال: يناير – نوفمبر 2026": "Example: January – November 2026",
+    "محتوى الأداة": "Tool content",
+    "مسح البيانات المحفوظة": "Clear saved data",
+    "مظهر الواجهة": "Interface appearance",
+    "نسخة كاملة تشمل القيود وسجل التدقيق ودليل الحسابات واللقطات": "A full backup including entries, audit log, chart of accounts and snapshots",
+    "\" aria-label=\"اسم الحساب\" />": "\" aria-label=\"Account name\" />",
+    "\" aria-label=\"رمز الحساب\" />": "\" aria-label=\"Account code\" />",
+    "\" aria-label=\"ملاحظة على اللقطة\" placeholder=\"ملاحظة على هذه اللقطة...\" value=\"": "\" aria-label=\"Snapshot note\" placeholder=\"Note on this snapshot...\" value=\"",
+    "\" title=\"اجعل": "\" title=\"Make",
+    "\">إعادة تشغيل<\/button>": "\">Replay<\/button>",
+    "\">حذف<\/button>": "\">Delete<\/button>",
+    "\">حذف<\/button><\/td><\/tr>": "\">Delete<\/button><\/td><\/tr>",
+    "\">عكس<\/button>": "\">Reverse<\/button>",
+    "\">نسخ<\/button>": "\">Copy<\/button>",
+    "(أسعار": "(rates",
+    "(بلا تعديل)": "(no adjustment)",
+    "(زيادة)": "(increase)",
+    "(شهر الشراء كامل)": "(full purchase month)",
+    "(نقص)": "(decrease)",
+    ") تتجاوز الكمية المتاحة (": ") exceed the available quantity (",
+    ") معدّلة في صافي المستحق ولا تدخل قيد الإقفال لعدم وجود حساب مقابل.": ") adjusted in net payable and not included in the closing entry because there is no offsetting account.",
+    ") — COGS محسوب جزئياً.": ") — COGS partially calculated.",
+    ")\">حذف<\/button><\/td>": ")\">Delete<\/button><\/td>",
+    "+ إهلاك (5200)": "+ Depreciation (5200)",
+    "+ إيداعات في الطريق": "+ Deposits in transit",
+    "+ فوائد دائنة غير مسجلة": "+ Unrecorded credit interest",
+    ". راجع الشيكات المعلقة أو الإيداعات في الطريق أو حركة غير مسجلة قبل الترحيل — لا تُعد التسوية مكتملة حتى يصبح الفرق صفراً.<\/span>": ". Review outstanding checks, deposits in transit or unrecorded transactions before posting — the reconciliation is not complete until the difference is zero.<\/span>",
+    "<\/b> · إجمالي الإهلاك على العمر = <b>": "<\/b> · Total depreciation over the life = <b>",
+    "<\/b> · القيمة الدفترية النهائية = <b>": "<\/b> · Final book value = <b>",
+    "<\/b> · تدقيق: <b>": "<\/b> · Audit: <b>",
+    "<\/b> · عامل التعديل المستقبلي المطبّق = <b>×": "<\/b> · Applied forward-looking adjustment factor = <b>×",
+    "<\/b> · لقطات: <b>": "<\/b> · Snapshots: <b>",
+    "<\/b> من": "<\/b> of",
+    "<\/b>. البنود المعلقة تُسوّى في الشهر التالي، والعمولات والفوائد تُثبت بقيد التسوية.<\/span>": "<\/b>. Outstanding items are cleared in the following month, and fees and interest are recorded through the reconciliation entry.<\/span>",
+    "<\/b><\/span><span>التاريخ: <b>": "<\/b><\/span><span>Date: <b>",
+    "<\/b><\/span><span>الحجم: <b>": "<\/b><\/span><span>Size: <b>",
+    "<\/b><\/span><span>تدقيق: <b>": "<\/b><\/span><span>Audit: <b>",
+    "<\/b><\/span><span>لقطات: <b>": "<\/b><\/span><span>Snapshots: <b>",
+    "<button class=\"btn secondary sm\" type=\"button\" data-rep=\"csv\" title=\"تنزيل CSV للجدول الأساسي\">⤓ CSV<\/button>": "<button class=\"btn secondary sm\" type=\"button\" data-rep=\"csv\" title=\"Download CSV for the main table\">⤓ CSV<\/button>",
+    "<button class=\"btn secondary sm\" type=\"button\" data-rep=\"head\" title=\"اسم المؤسسة والفترة\">⚙ رأس التقرير<\/button>": "<button class=\"btn secondary sm\" type=\"button\" data-rep=\"head\" title=\"Organization name and period\">⚙ Report header<\/button>",
+    "<button class=\"btn secondary sm\" type=\"button\" data-rep=\"pdf\" title=\"طباعة أو حفظ PDF\">⎙ طباعة / PDF<\/button>": "<button class=\"btn secondary sm\" type=\"button\" data-rep=\"pdf\" title=\"Print or save PDF\">⎙ Print / PDF<\/button>",
+    "<button class=\"coa-del\" type=\"button\" title=\"حذف\" aria-label=\"حذف الحساب\">✕<\/button>": "<button class=\"coa-del\" type=\"button\" title=\"Delete\" aria-label=\"Delete account\">✕<\/button>",
+    "<button class=\"je-btn\" type=\"button\" data-bk=\"auto\">استعادة اللقطة التلقائية<\/button>": "<button class=\"je-btn\" type=\"button\" data-bk=\"auto\">Restore auto-snapshot<\/button>",
+    "<button class=\"je-btn\" type=\"button\" data-je=\"erp\" title=\"نص جاهز لأنظمة ERP\">ERP<\/button>": "<button class=\"je-btn\" type=\"button\" data-je=\"erp\" title=\"Text ready for ERP systems\">ERP<\/button>",
+    "<button class=\"je-btn\" type=\"button\" data-je=\"json\" title=\"JSON للتكامل البرمجي\">JSON<\/button>": "<button class=\"je-btn\" type=\"button\" data-je=\"json\" title=\"JSON for programmatic integration\">JSON<\/button>",
+    "<button class=\"je-btn\" type=\"button\" data-je=\"newpost\" title=\"ترحيل نسخة جديدة من هذا القيد\">قيد جديد<\/button>": "<button class=\"je-btn\" type=\"button\" data-je=\"newpost\" title=\"Post a new copy of this entry\">New entry<\/button>",
+    "<button class=\"je-btn\" type=\"button\" data-je=\"tsv\" title=\"لصق مباشر في Excel\">TSV<\/button>": "<button class=\"je-btn\" type=\"button\" data-je=\"tsv\" title=\"Paste directly into Excel\">TSV<\/button>",
+    "<button type=\"button\" class=\"hitem\" data-hi=\"${i}\" title=\"استرجاع الناتج\"><span class=\"he\">${escHtml(h.expr)}<\/span><span class=\"hr\">${escHtml(h.res)}<\/span><\/button>": "<button type=\"button\" class=\"hitem\" data-hi=\"${i}\" title=\"Restore result\"><span class=\"he\">${escHtml(h.expr)}<\/span><span class=\"hr\">${escHtml(h.res)}<\/span><\/button>",
+    "<div class=\"empty\">لا توجد عمليات<\/div>": "<div class=\"empty\">No operations<\/div>",
+    "<div class=\"help-tip\"><p><b>ملاحظة:<\/b>": "<div class=\"help-tip\"><p><b>Note:<\/b>",
+    "<div class=\"tape-empty\">سجل التدقيق فارغ.<\/div>": "<div class=\"tape-empty\">The audit log is empty.<\/div>",
+    "<div class=\"tape-empty\">لا توجد أحداث تدقيق مطابقة لبحثك.<\/div>": "<div class=\"tape-empty\">No audit events match your search.<\/div>",
+    "<div class=\"tape-empty\">لا توجد قيود مرحّلة — رحّل قيداً من أي أداة وسيظهر هنا.<\/div>": "<div class=\"tape-empty\">No posted entries — post an entry from any tool and it will appear here.<\/div>",
+    "<div class=\"tape-empty\">لا توجد قيود مطابقة لبحثك — جرّب توسيع الفترة أو تصفير الفلاتر.<\/div>": "<div class=\"tape-empty\">No entries match your search — try widening the period or clearing the filters.<\/div>",
+    "<div class=\"tape-empty\">لا توجد لقطات بعد — غيّر أي مدخل في إحدى الأدوات ليُسجَّل تلقائياً.<\/div>": "<div class=\"tape-empty\">No snapshots yet — change any input in a tool to record one automatically.<\/div>",
+    "<div class=\"tape-empty\">لا توجد لقطات مطابقة لبحثك — جرّب توسيع الفترة أو تصفير الفلاتر.<\/div>": "<div class=\"tape-empty\">No snapshots match your search — try widening the period or clearing the filters.<\/div>",
+    "<h3>المخرجات<\/h3>": "<h3>Outputs<\/h3>",
+    "<h3>المدخلات المطلوبة<\/h3>": "<h3>Required inputs<\/h3>",
+    "<h3>ما تفعله الأداة<\/h3><p>": "<h3>What the tool does<\/h3><p>",
+    "<img alt=\"معاينة شعار المؤسسة\" src=\"": "<img alt=\"Organization logo preview\" src=\"",
+    "<select class=\"tp\" aria-label=\"نوع الحساب\">": "<select class=\"tp\" aria-label=\"Account type\">",
+    "<span class=\"bk-warn\">لم تُنشئ نسخة بعد<\/span>": "<span class=\"bk-warn\">No backup created yet<\/span>",
+    "<span class=\"fx-badge\">الأساس<\/span>": "<span class=\"fx-badge\">Base<\/span>",
+    "<span class=\"ico\">!<\/span><span><b>فرق غير مفسَّر:<\/b>": "<span class=\"ico\">!<\/span><span><b>Unexplained difference:<\/b>",
+    "<span class=\"ico\">✓<\/span><span><b>التسوية مطابقة:<\/b> الرصيد المعدل للبنك = الرصيد المعدل للدفتر = <b>": "<span class=\"ico\">✓<\/span><span><b>Reconciliation matched:<\/b> adjusted bank balance = adjusted book balance = <b>",
+    "<span class=\"je-flag bad\">غير متوازن": "<span class=\"je-flag bad\">Unbalanced",
+    "<span class=\"je-flag ok\">متوازن<\/span>": "<span class=\"je-flag ok\">Balanced<\/span>",
+    "<span class=\"tape-badge ok\">مرحّل<\/span>": "<span class=\"tape-badge ok\">Posted<\/span>",
+    "<span class=\"tape-badge rep\">إعادة تشغيل<\/span>": "<span class=\"tape-badge rep\">Replay<\/span>",
+    "<span class=\"tape-badge rep\">قيد عكسي<\/span>": "<span class=\"tape-badge rep\">Reversing entry<\/span>",
+    "<span class=\"tape-badge rev\">ملغى بالعكس<\/span>": "<span class=\"tape-badge rev\">Reversed<\/span>",
+    "<span class=\"tape-badge rev\">مُستبدلة<\/span>": "<span class=\"tape-badge rev\">Replaced<\/span>",
+    "<span class=\"tape-badge\">حاسبة<\/span>": "<span class=\"tape-badge\">Calculator<\/span>",
+    "<span class=\"tape-chip\">لا نتائج مسجلة<\/span>": "<span class=\"tape-chip\">No results recorded<\/span>",
+    "<span style=\"color:var(--green)\">✓ مطابق<\/span>": "<span style=\"color:var(--green)\">✓ Matched<\/span>",
+    "<span>آخر نسخة: <b>": "<span>Last backup: <b>",
+    "<span>القيد غير موجود<\/span>": "<span>Entry not found<\/span>",
+    "<span>القيد: <b>": "<span>Entry: <b>",
+    "<span>اللقطة التلقائية: ستُنشأ بعد أول ترحيل أو تعديل على البيانات.<\/span>": "<span>Auto-snapshot: it will be created after the first posting or data change.<\/span>",
+    "<span>اللقطة التلقائية: غير متاحة على هذا المتصفح (تُستخدم عند التخزين عبر IndexedDB).<\/span>": "<span>Auto-snapshot: not available in this browser (used when storing via IndexedDB).<\/span>",
+    "<span>المبلغ: <b>": "<span>Amount: <b>",
+    "<span>المصدر: <b>": "<span>Source: <b>",
+    "<span>تاريخ النسخة: <b>": "<span>Backup date: <b>",
+    "<span>حسابات: <b>": "<span>Accounts: <b>",
+    "<span>قيود مرحّلة: <b id=\"tapeJECount\">": "<span>Posted entries: <b id=\"tapeJECount\">",
+    "<span>قيود: <b>": "<span>Entries: <b>",
+    "<span>لا شعار<\/span>": "<span>No logo<\/span>",
+    "<span>لقطات محفوظة: <b>": "<span>Saved snapshots: <b>",
+    "<span>لقطات مطابقة: <b>": "<span>Matching snapshots: <b>",
+    "<span>لقطة تلقائية: <b>": "<span>Auto-snapshot: <b>",
+    "<span>مفاتيح: <b>": "<span>Keys: <b>",
+    "<table class=\"je-table\"><thead><tr><th scope=\"col\">الحساب<\/th><th scope=\"col\">مدين (Dr)<\/th><th scope=\"col\">دائن (Cr)<\/th><\/tr><\/thead><tbody>": "<table class=\"je-table\"><thead><tr><th scope=\"col\">Account<\/th><th scope=\"col\">Debit (Dr)<\/th><th scope=\"col\">Credit (Cr)<\/th><\/tr><\/thead><tbody>",
+    "<tr><td class=\"acct\" colspan=\"3\" style=\"color:var(--muted);text-align:center;\">لا توجد مبالغ<\/td><\/tr>": "<tr><td class=\"acct\" colspan=\"3\" style=\"color:var(--muted);text-align:center;\">No amounts<\/td><\/tr>",
+    "<tr><td class=\"acct\"><b>صافي الدخل<\/b><\/td><td class=\"num": "<tr><td class=\"acct\"><b>Net income<\/b><\/td><td class=\"num",
+    "<tr><td class=\"acct\">إيرادات<\/td><td class=\"num\">": "<tr><td class=\"acct\">Revenue<\/td><td class=\"num\">",
+    "<tr><td class=\"acct\">مصروفات<\/td><td class=\"num\">": "<tr><td class=\"acct\">Expenses<\/td><td class=\"num\">",
+    "<tr><td class=\\\"acct\\\"><b>إجمالي الأصول<\/b><\/td><td class=\\\"num\\\"><b>": "<tr><td class=\\\"acct\\\"><b>Total assets<\/b><\/td><td class=\\\"num\\\"><b>",
+    "<tr><td class=\\\"acct\\\"><b>إجمالي الالتزامات + حقوق الملكية<\/b><\/td><td class=\\\"num\\\"><b>": "<tr><td class=\\\"acct\\\"><b>Total liabilities + equity<\/b><\/td><td class=\\\"num\\\"><b>",
+    "<tr><td class=\\\"acct\\\"><b>إجمالي الالتزامات<\/b><\/td><td class=\\\"num\\\"><b>": "<tr><td class=\\\"acct\\\"><b>Total liabilities<\/b><\/td><td class=\\\"num\\\"><b>",
+    "<tr><td class=\\\"acct\\\"><b>إجمالي حقوق الملكية<\/b><\/td><td class=\\\"num\\\"><b>": "<tr><td class=\\\"acct\\\"><b>Total equity<\/b><\/td><td class=\\\"num\\\"><b>",
+    "<tr><td class=\\\"acct\\\">صافي الدخل (حتى التاريخ)<\/td><td class=\\\"num\\\">": "<tr><td class=\\\"acct\\\">Net income (to date)<\/td><td class=\\\"num\\\">",
+    "<tr><td colspan=\"4\" class=\"empty\">لا توجد أرصدة<\/td><\/tr>": "<tr><td colspan=\"4\" class=\"empty\">No balances<\/td><\/tr>",
+    "<tr><td colspan=\"5\" style=\"color:var(--muted)\">… ${n - 24} دفعة متبقية<\/td><\/tr>": "<tr><td colspan=\"5\" style=\"color:var(--muted)\">… ${n - 24} remaining payments<\/td><\/tr>",
+    "<tr><td colspan=\"6\" class=\"empty\">لا توجد أصول<\/td><\/tr>": "<tr><td colspan=\"6\" class=\"empty\">No assets<\/td><\/tr>",
+    "<tr><td colspan=\"6\" class=\"empty\">لا توجد ذمم<\/td><\/tr>": "<tr><td colspan=\"6\" class=\"empty\">No receivables<\/td><\/tr>",
+    "<tr><td colspan=\\\"2\\\" class=\\\"acct\\\"><b>الأصول<\/b><\/td><\/tr>": "<tr><td colspan=\\\"2\\\" class=\\\"acct\\\"><b>Assets<\/b><\/td><\/tr>",
+    "<tr><td colspan=\\\"2\\\" class=\\\"acct\\\"><b>الالتزامات<\/b><\/td><\/tr>": "<tr><td colspan=\\\"2\\\" class=\\\"acct\\\"><b>Liabilities<\/b><\/td><\/tr>",
+    "<tr><td colspan=\\\"2\\\" class=\\\"acct\\\"><b>حقوق الملكية<\/b><\/td><\/tr>": "<tr><td colspan=\\\"2\\\" class=\\\"acct\\\"><b>Equity<\/b><\/td><\/tr>",
+    "<tr><td colspan=\\\"2\\\" class=\\\"empty\\\">⚠️ فرق:": "<tr><td colspan=\\\"2\\\" class=\\\"empty\\\">⚠️ Difference:",
+    "<tr><td><b>الإجمالي<\/b><\/td><td><b>": "<tr><td><b>Total<\/b><\/td><td><b>",
+    "<tr><td>FIFO <span class=\"std-badge ok\">IAS 2 ✓<\/span><\/td><td>${fmt(cogsFIFO)}<\/td><td>${fmt(endFIFO)}<\/td><\/tr> <tr><td>LIFO <span class=\"std-badge red\">ممنوع · IAS 2<\/span><\/td><td>${fmt(cogsLIFO)}<\/td><td>${fmt(endLIFO)}<\/td><\/tr> <tr><td>WAC <span class=\"std-badge ok\">IAS 2 ✓<\/span><\/td><td>${fmt(cogsWAC)}<\/td><td>${fmt(endWAC)}<\/td><\/tr>": "<tr><td>FIFO <span class=\"std-badge ok\">IAS 2 ✓<\/span><\/td><td>${fmt(cogsFIFO)}<\/td><td>${fmt(endFIFO)}<\/td><\/tr> <tr><td>LIFO <span class=\"std-badge red\">Prohibited · IAS 2<\/span><\/td><td>${fmt(cogsLIFO)}<\/td><td>${fmt(endLIFO)}<\/td><\/tr> <tr><td>WAC <span class=\"std-badge ok\">IAS 2 ✓<\/span><\/td><td>${fmt(cogsWAC)}<\/td><td>${fmt(endWAC)}<\/td><\/tr>",
+    "= التدفق من الاستثمار": "= Cash flow from investing",
+    "= التدفق من العمليات": "= Cash flow from operations",
+    "= الرصيد المعدل للبنك": "= Adjusted bank balance",
+    "= الرصيد المعدل للدفتر": "= Adjusted book balance",
+    ">ترحيل<\/button>": ">Post<\/button>",
+    "DPO (أيام دفع)": "DPO (days payable)",
+    "DSO (أيام تحصيل)": "DSO (days receivable)",
+    "Esc يصفّر الحاسبة وEnter يظهر النتيجة، وAlt+T يضيف الضريبة فوراً.": "Esc clears the calculator, Enter shows the result, and Alt+T adds tax instantly.",
+    "NPV الموجب يعني أن المشروع يضيف قيمة بمعدل الخصم المحدد.": "A positive NPV means the project adds value at the specified discount rate.",
+    "NPV وIRR": "NPV and IRR",
+    "ROA (العائد على الأصول) %": "ROA (return on assets) %",
+    "ROE (العائد على الملكية) %": "ROE (return on equity) %",
+    "\\n\\n---\\nالصفحة:": "\\n\\n---\\nPage:",
+    "\\n\\nالملاحظة:\\n": "\\n\\nNote:\\n",
+    "\\nالتاريخ:": "\\nDate:",
+    "localStorage (بديل)": "localStorage (fallback)",
+    "· آخر شهر:": "· Last month:",
+    "· الميزان والميزانية حتى «إلى»": "· Trial balance and balance sheet up to To",
+    "· غير مطابقة:": "· Unmatched:",
+    "· مطابقة:": "· Matched:",
+    "· من": "· From",
+    "آخر تحديث:": "Last updated:",
+    "أدخل اسم الأصل وتكلفته وعمره": "Enter the asset name, cost and life",
+    "أدخل اسم الشركة": "Enter the company name",
+    "أرباح فروق تقييم عملات": "FX revaluation gains",
+    "أرباح فروق عملة": "Foreign exchange gains",
+    "أرباح محتجزة": "Retained earnings",
+    "أرسلت ملاحظة حديثاً، انتظر قليلاً قبل إرسال أخرى.": "You recently sent a note; please wait a little before sending another.",
+    "أرصدة الفئات العمرية الخمس": "Balances of the five aging buckets",
+    "أسطر:": "Lines:",
+    "أسعار العملات تُجلب حيّة": "Exchange rates are fetched live",
+    "أسعار العملات وأهم ثلاث عملات مثبتة": "Exchange rates with the top three currencies pinned",
+    "أسعار عملات محدّثة من مصدر شبكي مع تحويل فوري بين 10 عملات.": "Updated currency rates from an online source with instant conversion between 10 currencies.",
+    "أسعار محدّثة": "Updated rates",
+    "أسعار محفوظة — جارٍ التحديث...": "Saved rates — updating...",
+    "أشهر إهلاك في": "months of depreciation in",
+    "أصول": "Assets",
+    "أصول ثابتة": "Fixed assets",
+    "أعمار الديون وECL": "Aging of receivables and ECL",
+    "أعمار-الديون": "receivable-aging",
+    "أقساط مستحقة": "Installments due",
+    "أكمل رمز واسم كل حساب": "Complete the code and name of each account",
+    "أُضيف الأصل": "Asset added",
+    "أُضيفت الشركة:": "Company added:",
+    "أُعيد تشغيل لقطة:": "Snapshot replayed:",
+    "أُغلقت السنة": "Year closed",
+    "أُغلقت السنة · قيد": "Year closed · Entry",
+    "أُنشئ القيد العكسي": "Reversing entry created",
+    "إجمالي الأصول والخصوم وحقوق الملكية": "Total assets, liabilities and equity",
+    "إجمالي الذمم والمخصص وصافي الذمم": "Total receivables, allowance and net receivables",
+    "إدخال الأرقام": "Number entry",
+    "إذا كان سعر البيع أقل من التكلفة المتغيرة فلا توجد نقطة تعادل.": "If the selling price is below the variable cost, there is no break-even point.",
+    "إضافة الضريبة للسطر الحالي": "Add tax to the current line",
+    "إظهار النتيجة (أو =)": "Show result (or =)",
+    "إعادة تقييم رصيد بعملة أجنبية عند تغير سعر الصرف.": "Revalue a foreign-currency balance when the exchange rate changes.",
+    "إعدادات الضريبة:": "Tax settings:",
+    "إغلاق سنة": "Close year",
+    "إمكانية نسخ الجدول وتصديره CSV": "Table can be copied and exported to CSV",
+    "إنشاء القيد العكسي": "Create the reversing entry",
+    "إهلاك الأصول": "Asset depreciation",
+    "إهلاك الأصول بطريقة القسط الثابت أو الرصيد المتناقص أو مجموع أرقام السنوات.": "Depreciate assets using the straight-line, declining balance or sum-of-years-digits method.",
+    "إهلاك السنة الأولى والقسط الشهري": "First-year depreciation and monthly installment",
+    "إهلاك صفر": "Zero depreciation",
+    "إيرادات": "Revenue",
+    "إيرادات فوائد": "Interest income",
+    "اختر PV لخصم مبلغ مستقبلي إلى قيمته الحالية بدلاً من حساب نموه.": "Choose PV to discount a future amount to its present value instead of compounding its growth.",
+    "اختر الشهر": "Select month",
+    "اختر صورة PNG أو JPG أو WebP.": "Choose a PNG, JPG or WebP image.",
+    "اختيار FV أو PV والمبلغ الأساس": "Choose FV or PV and the base amount",
+    "اختيار الوضع: سعر بيع، هامش %، أو markup %": "Select mode: selling price, margin % or markup %",
+    "استرداد": "Refund",
+    "استُعيد التعبير — اضغط = للحساب": "Expression restored — press = to calculate",
+    "استُعيدت النسخة الاحتياطية ·": "Backup restored ·",
+    "اسم الشركة الجديدة:": "New company name:",
+    "اسم المؤسسة مطلوب": "Organization name is required",
+    "اكتب سبباً موجزاً (3 أحرف على الأقل).": "Enter a brief reason (at least 3 characters).",
+    "الأرقام والعمليات من لوحة المفاتيح أو من أزرار الحاسبة": "Numbers and operations from the keyboard or the calculator buttons",
+    "الأساس\">": "Base\">",
+    "الأصول والخصوم المتداولة والمخزون": "Current assets, current liabilities and inventory",
+    "الأقواس": "Parentheses",
+    "الإيرادات وصافي الربح وCOGS والذمم": "Revenue, net profit, COGS and receivables",
+    "الاستثمار الأولي ومعدل الخصم": "Initial investment and discount rate",
+    "الاسم:": "Name:",
+    "الانتقال إلى الحاسبة": "Go to calculator",
+    "الانتقال إلى السجل والقيود": "Go to log and entries",
+    "البداية": "Start",
+    "البنك": "Bank",
+    "البيان": "Description",
+    "التاريخ": "Date",
+    "التدفقات النقدية السنوية مفصولة بفواصل": "Annual cash flows separated by commas",
+    "التزامات": "Liabilities",
+    "التسويات (": "Adjustments (",
+    "التسوية البنكية": "Bank reconciliation",
+    "التسوية-البنكية": "bank-reconciliation",
+    "التعبير": "Expression",
+    "التقرير": "Report",
+    "التكاليف الثابتة والتكلفة المتغيرة للوحدة": "Fixed costs and variable cost per unit",
+    "الجدول فارغ": "The table is empty",
+    "الجدول يوضح نصيب الفائدة من كل دفعة ونصيب سداد الأصل والرصيد المتبقي.": "The table shows the interest portion of each payment, the principal repayment portion and the remaining balance.",
+    "الحساب\\tمدين\\tدائن": "Account\\tDebit\\tCredit",
+    "الحفظ التلقائي —": "Auto-save —",
+    "الخصومات متتالية ولا تُجمع؛ كل خصم يُطبّق على المتبقي بعد الخصم السابق.": "Discounts are successive and not additive; each discount applies to the remainder after the previous one.",
+    "الدائنون": "Creditors",
+    "الدفعة الدورية وإجمالي الدفعات والفوائد": "Periodic payment, total payments and interest",
+    "الذاكرة:": "Memory:",
+    "الرصيد المعدل للبنك والدفتر والفرق": "Adjusted bank balance, book balance and difference",
+    "السبب:": "Reason:",
+    "السعر الأصلي ونسب الخصم 1 و2 و3": "Original price and discount rates 1, 2 and 3",
+    "السعر النهائي وإجمالي الخصم ونسبته": "Final price, total discount and its percentage",
+    "السنة الأولى (": "First year (",
+    "السنة مغلقة مسبقاً.": "The year is already closed.",
+    "السيولة": "Liquidity",
+    "السيولة (Current Ratio)": "Current ratio",
+    "السيولة السريعة (Quick)": "Quick ratio",
+    "الشيكات المعلقة والإيداعات في الطريق": "Outstanding checks and deposits in transit",
+    "الصافي المستحق أو مبلغ الاسترداد": "Net payable or refundable amount",
+    "العمليات الحسابية": "Arithmetic operations",
+    "العمولات والفوائد غير المسجلة": "Unrecorded fees and interest",
+    "الفائدة السنوية وعدد السنوات": "Annual interest and number of years",
+    "الفترة": "Period",
+    "الفترة:": "Period:",
+    "الفرق السالب يعني استرداداً وليس التزاماً على المنشأة. قيد الإقفال يُصفّر 2200 و2210 كاملين، وحقل التسويات يعدّل صافي المستحق فقط ولا يدخل القيد لعدم وجود حساب مقابل.": "A negative difference means a refund rather than a liability for the entity. The closing entry zeroes 2200 and 2210 in full, while the adjustments field adjusts net payable only and is not included in the entry because there is no offsetting account.",
+    "الفرق الموجب ربح غير محقق والسالبة خسارة، ويُسجّلان في الأرباح والخسائر.": "A positive difference is an unrealized gain and a negative one is a loss, both recorded in profit or loss.",
+    "القيد غير موجود.": "Entry not found.",
+    "القيمة الحالية (PV)": "Present value (PV)",
+    "القيمة القديمة والجديدة للرصيد": "Old and new balance",
+    "القيمة المستقبلية (FV)": "Future value (FV)",
+    "القيمة المستقبلية أو الحالية مع فائدة مركبة ومساهمات دورية.": "Future or present value with compound interest and periodic contributions.",
+    "القيمة المطلوبة وإجمالي الفائدة": "Required value and total interest",
+    "القيود-المحاسبية": "accounting-entries",
+    "اللقطة التلقائية": "Auto-snapshot",
+    "اللقطة غير موجودة": "Snapshot not found",
+    "المؤسسة": "Organization",
+    "المبلغ المحوّل بالعملة الهدف": "Converted amount in the target currency",
+    "المبلغ والعملة الأساس": "Amount and base currency",
+    "المبلغ والعملة المصدر والهدف وسعر الصرف": "Amount, source and target currencies, and exchange rate",
+    "المجموع Dr": "Total Dr",
+    "المجموع الكلي:": "Grand total:",
+    "المجموع\\t": "Total\\t",
+    "المخزون الأولي وكميات وتكاليف الشراء 1 و2": "Opening inventory, purchase quantities and costs 1 and 2",
+    "المخصص = Σ(رصيد × نسبة × عامل) = <b>": "Allowance = Σ(balance × rate × factor) = <b>",
+    "المدة بالسنوات وعدد الدفعات في السنة": "Term in years and payments per year",
+    "المدينون": "Debtors",
+    "المديونية (D/E)": "Leverage (D/E)",
+    "المطابق —": "Matching —",
+    "المظهر:": "Theme:",
+    "الملف كبير جداً (الحد 60 ميجابايت)": "File is too large (limit 60 MB)",
+    "الميزان وقائمة الدخل يحسبان من القيود المرحّلة فقط ضمن تاريحي «من/إلى»، وتُثنَى القيود الملغاة بالعكس. صفّر الفلاتر لعرض كل القيود.": "The trial balance and income statement are computed only from posted entries within the From/To dates, and reversed entries are netted out. Clear the filters to show all entries.",
+    "الناتج": "Output",
+    "النتيجة الفورية في شاشة الحاسبة": "The live result on the calculator screen",
+    "النسب للمقارنة والتحليل؛ راجع سياسات المنشأة قبل الاعتماد عليها.": "Ratios are for comparison and analysis; review the entity policies before relying on them.",
+    "النسب-المالية": "financial-ratios",
+    "النسبة المئوية": "Percentage",
+    "النسخة لا تحتوي بيانات قابلة للاستعادة.": "The backup contains no restorable data.",
+    "النقدية": "Cash",
+    "الهامش يُحسب على سعر البيع، بينما markup يُحسب على التكلفة.": "Margin is calculated on the selling price, while markup is calculated on cost.",
+    "الوحدات المباعة (": "Units sold (",
+    "الوحدات المطلوبة لتحقيق الربح المستهدف": "Units required to achieve the target profit",
+    "اليوم": "Today",
+    "بحث فوري في أرشيف السجل": "Instant search in the log archive",
+    "بحث فوري ونوع وحالة ونطاق تاريخ": "Instant search, type, status and date range",
+    "بيانات غير صحيحة": "Invalid data",
+    "تاريخ الإصدار": "Issue date",
+    "تاريخ الإصدار:": "Issue date:",
+    "تاريخ سعر المصدر:": "Source rate date:",
+    "تبديل المظهر: داكن / فاتح / تلقائي": "Toggle theme: dark / light / auto",
+    "تحليل أعمار الذمم وحساب مخصص الخسائر الائتمانية المتوقعة وفق IFRS 9.": "Analyze receivable aging and compute the expected credit loss allowance under IFRS 9.",
+    "تحويل": "Convert",
+    "تحويل مباشر بين التكلفة وسعر البيع وهامش الربح ونسبة markup.": "Direct conversion between cost, selling price, profit margin and markup percentage.",
+    "تدقيق": "Audit",
+    "ترحيل": "Post",
+    "تساوي الرصيدين المعدلين يعني تسوية سليمة؛ أي فرق يستدعي مراجعة البنود.": "Equal adjusted balances mean a correct reconciliation; any difference requires reviewing the items.",
+    "تصدير CSV ونسخة احتياطية كاملة": "CSV export and full backup",
+    "تصدير جدول الصفحة CSV": "Export the page table to CSV",
+    "تصفير الحاسبة أو إغلاق النافذة": "Clear the calculator or close the window",
+    "تعذر الإرسال. تحقق من الاتصال وحاول مرة أخرى.": "Could not send. Check your connection and try again.",
+    "تعذر التحديث — تُعرض آخر أسعار محفوظة": "Update failed — the last saved rates are shown",
+    "تعذر النسخ": "Copy failed",
+    "تعذر تصدير القيود": "Could not export the entries",
+    "تعذر جلب الأسعار، تحقق من الإنترنت": "Could not fetch rates, check your internet connection",
+    "تعذر فتح الطباعة": "Could not open printing",
+    "تعذّر إتمام العملية.": "The operation could not be completed.",
+    "تعذّر إغلاق السنة": "Could not close the year",
+    "تعذّر إنشاء النسخة الاحتياطية": "Could not create the backup",
+    "تعذّر الإغلاق:": "Could not close:",
+    "تعذّر الحساب": "Calculation failed",
+    "تعذّر الحفظ": "Save failed",
+    "تعذّر تحميل القيود": "Could not load the entries",
+    "تعذّر حساب التقرير": "Could not compute the report",
+    "تعذّر قراءة الصورة.": "Could not read the image.",
+    "تعذّر قراءة الملف": "Could not read the file",
+    "تعذّر قراءة الملف.": "Could not read the file.",
+    "تعذّر معالجة الصورة.": "Could not process the image.",
+    "تعذّرت إعادة التشغيل": "Replay failed",
+    "تعذّرت الاستعادة — الملف تالف أو التخزين غير متاح.": "Restore failed — the file is corrupted or storage is unavailable.",
+    "تغير الأصول الثابتة (1500)": "Change in fixed assets (1500)",
+    "تغير الذمم الدائنة (2100)": "Change in payables (2100)",
+    "تغير الذمم المدينة (1300)": "Change in receivables (1300)",
+    "تغير القروض (2300)": "Change in loans (2300)",
+    "تغير المخزون (1400)": "Change in inventory (1400)",
+    "تغيير الإشارة": "Change sign",
+    "تقييم المخزون بطرق FIFO وLIFO والمتوسط المرجح ومقارنة نتائجها.": "Value inventory using FIFO, LIFO and weighted average, and compare the results.",
+    "تقييم جدوى استثمار باستخدام صافي القيمة الحالية ومعدل العائد الداخلي.": "Appraise an investment using net present value and internal rate of return.",
+    "تكلفة الأصل والقيمة التخريدية والعمر الإنتاجي": "Asset cost, salvage value and useful life",
+    "تكلفة المبيعات": "Cost of sales",
+    "تكلفة المبيعات وقيمة المخزون النهائي لكل طريقة": "Cost of sales and closing inventory value for each method",
+    "تم إرسال الملاحظة ✅": "Note sent ✅",
+    "تم إرسال ملاحظتك. (لا يمكن التحقق من التسليم بسبب إعدادات الخدمة)": "Your note was sent. (Delivery cannot be verified due to the service settings)",
+    "تم إنشاء قيد الإهلاك ·": "Depreciation entry created ·",
+    "تم التحديث": "Updated",
+    "تم المسح": "Cleared",
+    "تم النسخ": "Copied",
+    "تم النسخ:": "Copied:",
+    "تم ترحيل القيد": "Entry posted",
+    "تم حفظ دليل الحسابات": "Chart of accounts saved",
+    "تم مسح اللقطات": "Snapshots cleared",
+    "تنزيل هذا الجدول كملف CSV": "Download this table as a CSV file",
+    "جاري الإرسال...": "Sending...",
+    "جاري حساب التقرير…": "Computing the report…",
+    "جارٍ الحفظ…": "Saving…",
+    "جارٍ تجهيز النسخة الاحتياطية…": "Preparing the backup…",
+    "جارٍ تحديث الأسعار...": "Updating rates...",
+    "جاهز لترحيل قيد جديد": "Ready to post a new entry",
+    "جدول": "Table",
+    "جدول إطفاء لأول 24 دفعة": "Amortization schedule for the first 24 payments",
+    "جدول إهلاك شهري وقيد الإهلاك": "Monthly depreciation schedule and depreciation entry",
+    "جدول النسب العشر مع قيمها": "Table of the ten ratios with their values",
+    "جدول مقارنة الطرق": "Method comparison table",
+    "جدول-الأقساط": "installment-schedule",
+    "جدول-الإهلاك": "depreciation-schedule",
+    "جمع": "Add",
+    "جنيه إسترليني": "Pound sterling",
+    "جنيه مصري": "Egyptian pound",
+    "حاسبة يومية بذاكرة M ومجموع GT وضريبة قابلة للضبط وخصم، مع سجل محلي للعمليات.": "Daily calculator with M memory, GT total, adjustable tax and discount, plus a local history of operations.",
+    "حجم الصورة كبير — الحد الأقصى 3 ميجابايت.": "Image size is too large — the maximum is 3 MB.",
+    "حدّد النص وانسخه يدوياً": "Select the text and copy it manually",
+    "حذف آخر خانة": "Delete last digit",
+    "حذف القيد": "Delete entry",
+    "حذف نهائي": "Permanent deletion",
+    "حركة": "Transaction",
+    "حساب": "Account",
+    "حساب الدفعة الدورية وجدول إطفاء القرض على مدى السداد.": "Compute the periodic payment and the loan amortization schedule over the repayment term.",
+    "حساب صافي السعر بعد خصومات متتالية وتحويل مبلغ بين عملتين بسعر صرف يدوي.": "Compute the net price after successive discounts and convert an amount between two currencies at a manual exchange rate.",
+    "حساب صافي ضريبة القيمة المضافة مع قيد محاسبي تلقائي متوازن.": "Compute net VAT with an automatic balanced accounting entry.",
+    "حساب عشر نسب مالية رئيسية من بيانات الميزانية وقائمة الدخل.": "Compute ten key financial ratios from the balance sheet and income statement data.",
+    "حساب نقطة التعادل بالوحدات والإيراد مع ربح مستهدف اختياري.": "Compute the break-even point in units and revenue with an optional target profit.",
+    "حسابات بعملات أجنبية": "Foreign currency accounts",
+    "حقل": "Field",
+    "حقوق ملكية": "Equity",
+    "حُذف الأصل": "Asset deleted",
+    "حُذف القيد": "Entry deleted",
+    "حُفظ رأس التقرير": "Report header saved",
+    "حُفظت الأرصدة الافتتاحية": "Opening balances saved",
+    "حُفظت السنة المالية": "Fiscal year saved",
+    "حُفظت السنة المالية.": "Fiscal year saved.",
+    "خدمة الإرسال غير مفعّلة بعد. تواصل مع مالك الموقع.": "The sending service is not enabled yet. Contact the site owner.",
+    "خسائر ائتمانية متوقعة": "Expected credit losses",
+    "خسائر فروق تقييم عملات": "FX revaluation losses",
+    "خسائر فروق عملة": "Foreign exchange losses",
+    "خصم": "Discount",
+    "خصومات وتحويل عملات": "Discounts and currency conversion",
+    "خطأ": "Error",
+    "درهم إماراتي": "UAE dirham",
+    "دليل:": "Guide:",
+    "دوران الأصول": "Asset turnover",
+    "دولار أمريكي": "US dollar",
+    "دينار أردني": "Jordanian dinar",
+    "دينار كويتي": "Kuwaiti dinar",
+    "ذمم ضريبية": "Tax receivables/payables",
+    "ذمم ضريبية دائنة": "Tax payables",
+    "ذمم ضريبية مدينة": "Tax receivables",
+    "ربح أو خسارة فروق العملة": "Foreign exchange gain or loss",
+    "ربح وهامش التسعير": "Profit and pricing margin",
+    "رصيد الدفتر": "Book balance",
+    "رصيد كشف البنك ورصيد الدفتر": "Bank statement balance and book balance",
+    "رقم القيد": "Entry number",
+    "رمز الحساب": "Account code",
+    "رمز العملة والرصيد الأجنبي": "Currency code and foreign balance",
+    "رمز مكرر:": "Duplicate code:",
+    "ريال سعودي": "Saudi riyal",
+    "ريال قطري": "Qatari riyal",
+    "زر تحديث الأسعار": "Update rates button",
+    "سجل": "Log",
+    "سجل آخر العمليات محفوظ محلياً": "Recent operations log saved locally",
+    "سجل مركزي للقطات الحساب والقيود المرحّلة وسجل التدقيق مع بحث وفلترة ونسخ احتياطي، وميزان مراجعة وقائمة دخل من القيود المرحّلة.": "A central register of account snapshots, posted entries and the audit log with search, filtering and backup, plus a trial balance and income statement from posted entries.",
+    "سعر البيع المقترح ومبلغ الربح": "Suggested selling price and profit amount",
+    "سعر البيع للوحدة والربح المستهدف": "Selling price per unit and target profit",
+    "سعر البيع يجب أن يتجاوز التكلفة المتغيرة": "The selling price must exceed the variable cost",
+    "سعر الصرف القديم وسعر الصرف الجديد": "Old exchange rate and new exchange rate",
+    "سيتم إغلاق السنة": "The year will be closed",
+    "سيتم مسح كل البيانات المحفوظة في هذا المتصفح: مدخلات الأدوات، حالة الحاسبة، وآخر صفحة. لا يمكن التراجع. هل تريد المتابعة؟": "All data saved in this browser will be cleared: tool inputs, calculator state and the last page. This cannot be undone. Do you want to continue?",
+    "سيتم مسح كل لقطات الحساب المحفوظة. القيود وسجل التدقيق تبقى كما هي. هل تريد المتابعة؟": "All saved account snapshots will be cleared. Entries and the audit log remain unchanged. Do you want to continue?",
+    "شرح أداة": "Tool description",
+    "شركتي": "My company",
+    "شعار المؤسسة": "Organization logo",
+    "شهر الشراء يُحتسب كاملاً وفق السياسة المطبقة هنا (IAS 16).": "The purchase month is counted in full under the policy applied here (IAS 16).",
+    "شهراً<\/b> × القسط الشهري": "months<\/b> × monthly installment",
+    "صافي التغير في النقدية": "Net change in cash",
+    "صورة غير صالحة.": "Invalid image.",
+    "ضرب": "Multiply",
+    "ضريبة القيمة المضافة": "VAT",
+    "ضريبة المخرجات": "Output VAT",
+    "ضريبة المخرجات (المبيعات)": "Output VAT (sales)",
+    "ضريبة المدخلات": "Input VAT",
+    "ضريبة المدخلات (المشتريات)": "Input VAT (purchases)",
+    "طباعة / PDF للصفحة الحالية": "Print / PDF for the current page",
+    "طرح": "Subtract",
+    "طريقة LIFO ممنوعة في IAS 2 وتُعرض هنا للمقارنة فقط.": "LIFO is prohibited under IAS 2 and is shown here for comparison only.",
+    "طريقة الإهلاك وتاريخ الشراء": "Depreciation method and purchase date",
+    "عامل التعديل المستقبلي": "Forward-looking adjustment factor",
+    "عامل تعديل 1.20 يرفع المخصص 20% لتغطية مخاطر مستقبلية إضافية.": "A factor of 1.20 increases the allowance by 20% to cover additional future risk.",
+    "عدد الوحدات المباعة": "Number of units sold",
+    "عدد مرات التركيب والمساهمة الدورية": "Compounding frequency and periodic contribution",
+    "عكس": "Reverse",
+    "عُكس بـ": "Reversed by",
+    "غير قابلة لإعادة التشغيل": "Not replayable",
+    "فاصلة عشرية": "Decimal separator",
+    "فتح دليل الأداة الحالية": "Open the current tool guide",
+    "فتح قائمة الاختصارات": "Open the shortcuts list",
+    "فترة الاسترداد ومؤشر الربحية PI": "Payback period and profitability index PI",
+    "فرق": "Difference",
+    "قاعدة 72 لتقدير زمن مضاعفة المبلغ": "Rule of 72 for estimating the time to double an amount",
+    "قد يتعذر التحديث دون إنترنت؛ تبقى آخر أسعار محفوظة متاحة للاستخدام.": "Updating may fail without internet; the last saved rates remain available for use.",
+    "قروض دائنة": "Credit loans",
+    "قروض وإطفاء": "Loans and amortization",
+    "قسمة": "Divide",
+    "قوس إغلاق": "Closing parenthesis",
+    "قوس فتح": "Opening parenthesis",
+    "قيد VAT جاهز للترحيل": "VAT entry ready to post",
+    "قيد تسوية متوازن": "Balanced reconciliation entry",
+    "قيم M وGT لتجميع المبالغ": "M and GT values for accumulating amounts",
+    "قيمة التحويل وإمكانية نسخ النتائج": "Converted value and the ability to copy results",
+    "قيمة التسويات إن وجدت": "Adjustments amount, if any",
+    "قيود": "Entries",
+    "قيود مرحّلة ضمن الفترة:": "Posted entries within the period:",
+    "قيود مرحّلة قابلة للنسخ أو العكس أو الحذف": "Posted entries that can be copied, reversed or deleted",
+    "قيود مرحّلة:": "Posted entries:",
+    "كما في": "As of",
+    "لا استرداد": "No refund",
+    "لا توجد أصول نشطة": "No active assets",
+    "لا توجد قيود بعد": "No entries yet",
+    "لا توجد قيود للتصدير": "No entries to export",
+    "لا توجد قيود للتصدير بعد": "No entries to export yet",
+    "لا شيء": "None",
+    "لا يمكن ترحيل قيد غير متوازن": "An unbalanced entry cannot be posted",
+    "لا يوجد جدول للتصدير في هذه الصفحة": "There is no table to export on this page",
+    "لا يوجد نص للنسخ": "There is no text to copy",
+    "لقطات": "Snapshots",
+    "لقطات قابلة لإعادة التشغيل": "Replayable snapshots",
+    "ليرة تركية": "Turkish lira",
+    "مبلغ القرض والفائدة السنوية": "Loan amount and annual interest",
+    "مجمع إهلاك الأصول": "Accumulated depreciation of assets",
+    "محفوظ محلياً ·": "Saved locally ·",
+    "محفوظة": "Saved",
+    "مخصص الديون المشكوك في تحصيلها": "Allowance for doubtful debts",
+    "مرحّل": "Posted",
+    "مرحّل ·": "Posted ·",
+    "مستبعد": "Excluded",
+    "مستحق": "Due",
+    "مستحق للدفع": "Payable",
+    "مسح الكل": "Clear all",
+    "مسح رقم": "Clear digit",
+    "مسودة": "Draft",
+    "مسودة ·": "Draft ·",
+    "مصاريف بنكية": "Bank charges",
+    "مصروف إهلاك الأصول": "Asset depreciation expense",
+    "مصروف الإهلاك": "Depreciation expense",
+    "مصروف فوائد": "Interest expense",
+    "مصروف مخصص الديون مشكوك في تحصيلها": "Allowance for doubtful debts expense",
+    "مصروفات": "Expenses",
+    "مطابقة رصيد كشف البنك مع رصيد الدفاتر عبر البنود المعلقة.": "Reconcile the bank statement balance with the book balance through outstanding items.",
+    "مطابقة ✓": "Matched ✓",
+    "مطابقة: Δالنقدية (1200)": "Reconciliation: Δcash (1200)",
+    "معكوس": "Reversed",
+    "معيار:": "Standard:",
+    "مغلق": "Closed",
+    "مفتوح": "Open",
+    "ملاحظة:": "Note:",
+    "ملف CSV فارغ": "The CSV file is empty",
+    "ملف JSON": "JSON file",
+    "ملف JSON لاستعادة نسخة احتياطية": "JSON file to restore a backup",
+    "ملف غير صالح — اختر نسخة JSON صادرة من هذه المنصة": "Invalid file — choose a JSON backup exported from this platform",
+    "ميزان مراجعة + قائمة دخل + ميزانية عمومية (من القيود + أرصدة افتتاحية)": "Trial balance + income statement + balance sheet (from entries + opening balances)",
+    "نسبة التعثر للفئة 90+": "Default rate for the 90+ bucket",
+    "نسبة الضريبة والخصم من شريط Tax أعلى الشاشة": "Tax and discount rate from the Tax bar at the top of the screen",
+    "نسبة المخصص لكل فئة": "Allowance rate per bucket",
+    "نسبة مئوية": "Percentage",
+    "نسخ آخر قيد بصيغة ERP": "Copy the last entry in ERP format",
+    "نسخة احتياطية كاملة (JSON)": "Full backup (JSON)",
+    "نشط": "Active",
+    "نقطة التعادل": "Break-even point",
+    "نُزِّل:": "Downloaded:",
+    "نُزّلت النسخة:": "Backup downloaded:",
+    "نُسخ آخر قيد:": "Last entry copied:",
+    "هامش إجمالي %": "Gross margin %",
+    "هامش الربح ونسبة markup": "Profit margin and markup percentage",
+    "هامش الربح يجب أن يكون أقل من 100%": "The profit margin must be less than 100%",
+    "هامش المساهمة ونسبته": "Contribution margin and its percentage",
+    "هامش صافي %": "Net margin %",
+    "هذا القيد معكوس مسبقاً.": "This entry has already been reversed.",
+    "هذا القيد معكوس — احذف القيد العكسي أولاً ثم احذف الأصل.": "This entry is reversed — delete the reversing entry first, then delete the original.",
+    "هذه الأداة لا تقبل إعادة التشغيل": "This tool does not support replay",
+    "وإنشاء قيد إغلاق. لا يمكن التراجع. متابعة؟": "and create a closing entry. This cannot be undone. Continue?",
+    "وحدات وإيراد التعادل": "Break-even units and revenue",
+    "يبقى القيد الأصلي ويُنشأ قيد جديد بمبالغ مدين/دائن معكوسة مرتبط به. تُحرَّر بصمة الأداة ليعود أصل القيد مسودة.": "The original entry is kept and a new linked entry is created with reversed debit/credit amounts. The tool signature is released so the original entry returns to draft.",
+    "يرجى كتابة الاسم (حرفان على الأقل).": "Please enter the name (at least 2 characters).",
+    "يرجى كتابة الملاحظة (5 أحرف على الأقل).": "Please enter the note (at least 5 characters).",
+    "يساوي": "Equals",
+    "يعكس": "Reverses",
+    "يورو": "Euro",
+    "يوم": "Days",
+    "يُحذف القيد من دفتر اليومية نهائياً، وتُحفظ نسخة كاملة منه داخل سجل التدقيق.": "The entry is permanently removed from the journal, and a full copy is kept in the audit log.",
+    "يُطبَّق البحث والفلترة على القيود واللقطات وسجل التدقيق معاً.": "Search and filtering apply to entries, snapshots and the audit log together.",
+    "٠": "0",
+    "١": "1",
+    "٢": "2",
+    "٣": "3",
+    "٤": "4",
+    "٥": "5",
+    "٦": "6",
+    "٧": "7",
+    "٨": "8",
+    "٩": "9",
+    "٫": ".",
+    "٬": ",",
+    "— جيد": "— Good",
+    "— جيدة": "— Good",
+    "— ضعيفة": "— Poor",
+    "— مقبولة": "— Fair",
+    "— منخفض": "— Low",
+    "− شيكات معلقة": "− Outstanding checks",
+    "− عمولات بنكية غير مسجلة": "− Unrecorded bank charges",
+    "⏳ جارٍ التحديث": "⏳ Updating"
+  });
+  /* i18n-supplement: ترجمات مشتقة من القوالب + نصوص ديناميكية */
+  Object.assign(I18N.map, {
+    ". البنود المعلقة تُسوّى في الشهر التالي، والعمولات والفوائد تُثبت بقيد التسوية.": ". Outstanding items are cleared in the following month, and fees and interest are recorded through the reconciliation entry.",
+    ". راجع الشيكات المعلقة أو الإيداعات في الطريق أو حركة غير مسجلة قبل الترحيل — لا تُعد التسوية مكتملة حتى يصبح الفرق صفراً.": ". Review outstanding checks, deposits in transit or unrecorded transactions before posting — the reconciliation is not complete until the difference is zero.",
+    "JSON للتكامل البرمجي": "JSON for programmatic integration",
+    "· إجمالي الإهلاك على العمر =": "· Total depreciation over the life =",
+    "· القيمة الدفترية النهائية =": "· Final book value =",
+    "· تدقيق:": "· Audit:",
+    "· عامل التعديل المستقبلي المطبّق =": "· Applied forward-looking adjustment factor =",
+    "· لقطات:": "· Snapshots:",
+    "× القسط الشهري": "× monthly installment",
+    "آخر نسخة:": "Last backup:",
+    "إجمالي الالتزامات": "Total liabilities",
+    "إجمالي الالتزامات + حقوق الملكية": "Total liabilities + equity",
+    "إجمالي حقوق الملكية": "Total equity",
+    "إعادة تشغيل": "Replay",
+    "استرجاع الناتج": "Restore result",
+    "استعادة اللقطة التلقائية": "Restore auto-snapshot",
+    "اسم المؤسسة والفترة": "Organization name and period",
+    "الأساس": "Base",
+    "الأصول": "Assets",
+    "الالتزامات": "Liabilities",
+    "التاريخ:": "Date:",
+    "التسوية مطابقة:": "Reconciliation matched:",
+    "الحجم:": "Size:",
+    "الرصيد المعدل للبنك = الرصيد المعدل للدفتر =": "adjusted bank balance = adjusted book balance =",
+    "القيد غير موجود": "Entry not found",
+    "القيد:": "Entry:",
+    "اللقطة التلقائية: ستُنشأ بعد أول ترحيل أو تعديل على البيانات.": "Auto-snapshot: it will be created after the first posting or data change.",
+    "اللقطة التلقائية: غير متاحة على هذا المتصفح (تُستخدم عند التخزين عبر IndexedDB).": "Auto-snapshot: not available in this browser (used when storing via IndexedDB).",
+    "المبلغ:": "Amount:",
+    "المخرجات": "Outputs",
+    "المخصص = Σ(رصيد × نسبة × عامل) =": "Allowance = Σ(balance × rate × factor) =",
+    "المدخلات المطلوبة": "Required inputs",
+    "المصدر:": "Source:",
+    "تاريخ النسخة:": "Backup date:",
+    "تدقيق:": "Audit:",
+    "ترحيل نسخة جديدة من هذا القيد": "Post a new copy of this entry",
+    "تنزيل CSV للجدول الأساسي": "Download CSV for the main table",
+    "حذف الحساب": "Delete account",
+    "حسابات:": "Accounts:",
+    "دائن (Cr)": "Credit (Cr)",
+    "سجل التدقيق فارغ.": "The audit log is empty.",
+    "شهراً": "months",
+    "صافي الدخل (حتى التاريخ)": "Net income (to date)",
+    "طباعة أو حفظ PDF": "Print or save PDF",
+    "غير متوازن": "Unbalanced",
+    "فرق غير مفسَّر:": "Unexplained difference:",
+    "قيد جديد": "New entry",
+    "قيود:": "Entries:",
+    "لا توجد أحداث تدقيق مطابقة لبحثك.": "No audit events match your search.",
+    "لا توجد أرصدة": "No balances",
+    "لا توجد أصول": "No assets",
+    "لا توجد ذمم": "No receivables",
+    "لا توجد عمليات": "No operations",
+    "لا توجد قيود مرحّلة — رحّل قيداً من أي أداة وسيظهر هنا.": "No posted entries — post an entry from any tool and it will appear here.",
+    "لا توجد قيود مطابقة لبحثك — جرّب توسيع الفترة أو تصفير الفلاتر.": "No entries match your search — try widening the period or clearing the filters.",
+    "لا توجد لقطات بعد — غيّر أي مدخل في إحدى الأدوات ليُسجَّل تلقائياً.": "No snapshots yet — change any input in a tool to record one automatically.",
+    "لا توجد لقطات مطابقة لبحثك — جرّب توسيع الفترة أو تصفير الفلاتر.": "No snapshots match your search — try widening the period or clearing the filters.",
+    "لا توجد مبالغ": "No amounts",
+    "لا نتائج مسجلة": "No results recorded",
+    "لصق مباشر في Excel": "Paste directly into Excel",
+    "لقطات محفوظة:": "Saved snapshots:",
+    "لقطات مطابقة:": "Matching snapshots:",
+    "لقطات:": "Snapshots:",
+    "لقطة تلقائية:": "Auto-snapshot:",
+    "لم تُنشئ نسخة بعد": "No backup created yet",
+    "ما تفعله الأداة": "What the tool does",
+    "متوازن": "Balanced",
+    "مدين (Dr)": "Debit (Dr)",
+    "مفاتيح:": "Keys:",
+    "ممنوع · IAS 2": "Prohibited · IAS 2",
+    "مُستبدلة": "Replaced",
+    "نص جاهز لأنظمة ERP": "Text ready for ERP systems",
+    "نوع الحساب": "Account type",
+    "⎙ طباعة / PDF": "⎙ Print / PDF",
+    "⚙ رأس التقرير": "⚙ Report header",
+    "⚠️ فرق:": "⚠️ Difference:",
+    "✓ مطابق": "✓ Matched"
+  });
+  /* i18n-manual: إضافات يدوية للنصوص الديناميكية */
+  Object.assign(I18N.map, {
+    "البداية إلى اليوم": "start to today",
+    "دفعة متبقية": "remaining payments",
+    "متبقية": "remaining",
+    "شهراً": "months",
+    "شهر الشراء كامل": "full purchase month",
+    "القسط الشهري": "monthly installment",
+    "آخر شهر": "last month",
+    "جيدة": "good",
+    "جيد": "good",
+    "تغير الذمم المدينة": "change in receivables",
+    "تغير الذمم الدائنة": "change in payables",
+    "تغير المخزون": "change in inventory",
+    "تغير الأصول الثابتة": "change in fixed assets",
+    "تغير القروض": "change in loans",
+    "اجعل": "Make",
+    "البند": "Item",
+    "القيمة": "Value",
+    "السبب": "Reason",
+    "يعكس": "reverses",
+    "عُكس بـ": "reversed by"
+  });
+
+
+
   function currentLang() { try { return localStorage.getItem('sc:lang') || 'ar'; } catch (e) { return 'ar'; } }
-  function applyLang(lang) {
-    try { localStorage.setItem('sc:lang', lang); } catch (e) {}
-    document.documentElement.lang = lang;
-    document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
-    document.querySelectorAll('.nav-item').forEach(function (el) {
-      const p = el.getAttribute('data-page');
-      const lbl = el.querySelector('.lbl');
-      if (p && lbl && I18N.nav[p]) lbl.textContent = I18N.nav[p][lang] || I18N.nav[p].ar;
+
+  // ================= محرك الترجمة AR ⇄ EN =================
+  // يترجم نصوص الواجهة عبر قاموس I18N.map، ويحفظ الأصل العربي لإعادته عند الرجوع.
+  // لا يمسّ قيم الحقول ولا بيانات المستخدم (شعار، مؤسسة، بيان القيد...).
+  const I18N_AR = /[\u0600-\u06FF]/;
+  const I18N_TITLE_AR = 'قيد — منظومة المحاسبة الاحترافية (QAYD)';
+  const I18N_TITLE_EN = 'QAYD — Professional Accounting System';
+  const I18N_SKIP = 'input,textarea,script,style,code,#phOrg,#phLogo,[data-no-i18n],[contenteditable="true"]';
+  const I18N_ATTRS = ['placeholder', 'title', 'aria-label', 'alt'];
+  const i18nOrigText = new WeakMap(), i18nLastText = new WeakMap(), i18nOrigAttr = new WeakMap();
+  let i18nKeys = null, i18nObserver = null, i18nBusy = false;
+
+  function i18nKeysList() {
+    if (i18nKeys) return i18nKeys;
+    i18nKeys = Object.keys(I18N.map || {}).filter(function (k) { return k && I18N_AR.test(k); })
+      .sort(function (a, b) { return b.length - a.length; });
+    return i18nKeys;
+  }
+
+  // ترجمة «مقطع» عربي خالص: مطابقة تامة، ثم أطول بادئة معروفة، ثم تقسيم عند المسافات
+  function i18nRun(run) {
+    if (!run) return run;
+    if (I18N.map[run] != null) return I18N.map[run];
+    const keys = i18nKeysList();
+    for (let i = 0; i < keys.length; i++) {
+      const k = keys[i];
+      if (k.length >= run.length || run.slice(0, k.length) !== k) continue;
+      if (/[\u0621-\u064A]/.test(run.charAt(k.length))) continue;
+      const tail = run.slice(k.length);
+      const sp = /^\s*/.exec(tail)[0];
+      return I18N.map[k] + sp + i18nRun(tail.slice(sp.length));
+    }
+    if (/\s/.test(run)) {
+      const parts = run.split(/(\s+)/);
+      let out = '', changed = false;
+      for (let i = 0; i < parts.length; i++) {
+        const p = parts[i];
+        if (!p || /^\s+$/.test(p)) { out += p; continue; }
+        const t = i18nRun(p);
+        if (t !== p) changed = true;
+        out += t;
+      }
+      if (changed) return out;
+    }
+    return run;
+  }
+
+  // يترجم أي نص: مطابقة كاملة أولاً (تشمل النصوص المختلطة عربي/إنجليزي)،
+  // ثم يترجم المقاطع العربية فقط ويترك الأرقام والرموز كما هي
+  function i18nTranslate(input) {
+    if (!input || !I18N_AR.test(input)) return input;
+    const str = String(input);
+    const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(str) || [];
+    const lead = m[1] || '', core = m[2] || str, trail = m[3] || '';
+    const norm = core.replace(/\s+/g, ' ');
+    if (I18N.map[norm] != null) return lead + I18N.map[norm] + trail;
+    const re = /[\u0600-\u06FF][\u0600-\u06FFA-Za-z\u060C\u061B\u061F\u0640\s:؛،·«»()\-–—./]*/g;
+    return str.replace(re, function (m) { return i18nRun(m); });
+  }
+
+  function i18nSkip(node) {
+    const el = (node && node.nodeType === 1) ? node : (node && node.parentElement);
+    return !!(el && el.closest && el.closest(I18N_SKIP));
+  }
+
+  function i18nTextNode(node) {
+    const cur = node.nodeValue;
+    if (i18nLastText.get(node) !== cur) i18nOrigText.set(node, cur);
+    const src = i18nOrigText.get(node);
+    const next = i18nTranslate(src);
+    if (next !== cur) node.nodeValue = next;
+    i18nLastText.set(node, next);
+  }
+
+  function i18nAttrSkip(el) {
+    return !!(el && el.closest && el.closest('[data-no-i18n],[contenteditable="true"]'));
+  }
+
+  function i18nAttrs(el) {
+    if (i18nAttrSkip(el)) return;
+    for (let i = 0; i < I18N_ATTRS.length; i++) {
+      const a = I18N_ATTRS[i];
+      if (!el.hasAttribute(a)) continue;
+      let store = i18nOrigAttr.get(el);
+      if (!store) { store = {}; i18nOrigAttr.set(el, store); }
+      if (store[a] == null) store[a] = el.getAttribute(a);
+      const next = i18nTranslate(store[a]);
+      if (next !== el.getAttribute(a)) el.setAttribute(a, next);
+    }
+  }
+
+  function i18nWalk(root) {
+    if (!root) return;
+    if (root.nodeType === 3) { if (!i18nSkip(root)) i18nTextNode(root); return; }
+    if (root.nodeType !== 1) return;
+    i18nAttrs(root);
+    if (root.matches && root.matches(I18N_SKIP)) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, null);
+    let n = walker.nextNode();
+    while (n) {
+      if (n.nodeType === 3) { if (!i18nSkip(n)) i18nTextNode(n); }
+      else i18nAttrs(n);
+      n = walker.nextNode();
+    }
+  }
+
+  function i18nRestore(root) {
+    if (!root) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, null);
+    const nodes = [];
+    let n = walker.nextNode();
+    while (n) { nodes.push(n); n = walker.nextNode(); }
+    if (root.nodeType === 3) nodes.push(root);
+    if (root.nodeType === 1) nodes.push(root);
+    nodes.forEach(function (x) {
+      if (x.nodeType === 3) {
+        if (i18nOrigText.has(x)) {
+          const orig = i18nOrigText.get(x);
+          if (x.nodeValue !== orig) x.nodeValue = orig;
+          i18nLastText.set(x, orig);
+        }
+      } else if (x.nodeType === 1) {
+        const store = i18nOrigAttr.get(x);
+        if (store) Object.keys(store).forEach(function (a) {
+          if (x.getAttribute(a) !== store[a]) x.setAttribute(a, store[a]);
+        });
+      }
     });
+  }
+
+  function i18nStart() {
+    if (i18nObserver || !window.MutationObserver) return;
+    i18nObserver = new MutationObserver(function (muts) {
+      if (i18nBusy) return;
+      i18nBusy = true;
+      try {
+        muts.forEach(function (m) {
+          if (m.type === 'characterData') { if (!i18nSkip(m.target)) i18nTextNode(m.target); return; }
+          if (m.type === 'attributes') {
+            if (m.target && m.target.nodeType === 1) i18nAttrs(m.target);
+            return;
+          }
+          for (let i = 0; i < m.addedNodes.length; i++) {
+            const n = m.addedNodes[i];
+            if (n.nodeType === 3) { if (!i18nSkip(n)) i18nTextNode(n); }
+            else if (n.nodeType === 1) i18nWalk(n);
+          }
+        });
+      } finally { i18nBusy = false; }
+    });
+    i18nObserver.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: I18N_ATTRS });
+  }
+
+  function i18nStop() { if (i18nObserver) { i18nObserver.disconnect(); i18nObserver = null; } }
+
+  function applyLang(lang) {
+    const l = (lang === 'en') ? 'en' : 'ar';
+    try { localStorage.setItem('sc:lang', l); } catch (e) {}
+    document.documentElement.lang = l;
+    document.documentElement.dir = (l === 'ar') ? 'rtl' : 'ltr';
+    document.documentElement.setAttribute('data-lang', l);
     const btn = document.getElementById('langToggle');
-    if (btn) { btn.textContent = (lang === 'ar') ? 'EN' : 'AR'; btn.setAttribute('aria-pressed', lang !== 'ar'); }
+    if (btn) { btn.textContent = (l === 'ar') ? 'EN' : 'AR'; btn.setAttribute('aria-pressed', l !== 'ar'); }
     const logo = document.getElementById('brandLogo');
-    if (logo) logo.src = (lang === 'ar') ? 'logo-ar.png' : 'logo-en.png';
+    if (logo) logo.src = (l === 'ar') ? 'logo-ar.png' : 'logo-en.png';
+    document.title = (l === 'en') ? I18N_TITLE_EN : I18N_TITLE_AR;
+    i18nStop();
+    if (l === 'en') { i18nWalk(document.body); i18nStart(); }
+    else { i18nRestore(document.body); }
   }
   function toggleLang() {
     applyLang(currentLang() === 'ar' ? 'en' : 'ar');
@@ -6633,10 +7928,15 @@
   window.applyLang = applyLang;
   window.toggleLang = toggleLang;
   window.currentLang = currentLang;
+  window.i18nTranslate = i18nTranslate;
 
   function bootApp() {
     const lb = document.getElementById("langToggle");
     if (lb) lb.addEventListener("click", toggleLang);
+    // احفظ بيانات القيود الأصلية قبل أي ترجمة (تبقى بصمة القيد ثابتة)
+    document.querySelectorAll('.je-title').forEach(function (el) {
+      if (!el.hasAttribute('data-title-ar')) el.setAttribute('data-title-ar', el.textContent.trim());
+    });
     applyLang(currentLang());
     SCTheme.init();
     SCHelp.init();
