@@ -1253,7 +1253,7 @@
         <div class="card">
           <div class="row">
             <div class="field"><label>تكلفة الأصل</label><input type="number" id="D_cost" value="50000" oninput="calcDepr()" /></div>
-            <div class="field"><label>القيمة التخريدية</label><input type="number" id="D_salvage" value="5000" oninput="calcDepr()" /></div>
+            <div class="field"><label>القيمة المتبقية (التخريدية)</label><input type="number" id="D_salvage" value="5000" oninput="calcDepr()" /></div>
           </div>
           <div class="row">
             <div class="field"><label>العمر (سنوات)</label><input type="number" id="D_life" value="5" oninput="calcDepr()" /></div>
@@ -1295,7 +1295,7 @@
             <div class="field"><label>التكلفة</label><input type="number" id="Ast_cost" value="0" /></div>
           </div>
           <div class="row">
-            <div class="field"><label>القيمة التخريدية</label><input type="number" id="Ast_salvage" value="0" /></div>
+            <div class="field"><label>القيمة المتبقية (التخريدية)</label><input type="number" id="Ast_salvage" value="0" /></div>
             <div class="field"><label>العمر (سنوات)</label><input type="number" id="Ast_life" value="5" /></div>
             <div class="field"><label>العمر (أشهر)</label><input type="number" id="Ast_month" value="0" placeholder="0" /></div>
           </div>
@@ -2525,7 +2525,7 @@
     depr: {
       title: 'إهلاك الأصول',
       about: 'إهلاك الأصول بطريقة القسط الثابت أو الرصيد المتناقص أو مجموع أرقام السنوات.',
-      inputs: ['تكلفة الأصل والقيمة التخريدية والعمر الإنتاجي', 'طريقة الإهلاك وتاريخ الشراء'],
+      inputs: ['تكلفة الأصل والقيمة المتبقية (التخريدية) والعمر الإنتاجي', 'طريقة الإهلاك وتاريخ الشراء'],
       outputs: ['إهلاك السنة الأولى والقسط الشهري', 'جدول إهلاك شهري وقيد الإهلاك'],
       tip: 'شهر الشراء يُحتسب كاملاً وفق السياسة المطبقة هنا (IAS 16).'
     },
@@ -6828,7 +6828,7 @@
     "الفرق": "Difference",
     "القسط الشهري (السنة الأولى)": "Monthly installment (first year)",
     "القيمة": "Value",
-    "القيمة التخريدية": "Salvage value",
+    "القيمة المتبقية (التخريدية)": "Residual (salvage) value",
     "القيمة الجديدة": "New value",
     "القيمة الدفترية": "Book value",
     "القيمة القديمة": "Old value",
@@ -7414,7 +7414,7 @@
     "تغيير الإشارة": "Change sign",
     "تقييم المخزون بطرق FIFO وLIFO والمتوسط المرجح ومقارنة نتائجها.": "Value inventory using FIFO, LIFO and weighted average, and compare the results.",
     "تقييم جدوى استثمار باستخدام صافي القيمة الحالية ومعدل العائد الداخلي.": "Appraise an investment using net present value and internal rate of return.",
-    "تكلفة الأصل والقيمة التخريدية والعمر الإنتاجي": "Asset cost, salvage value and useful life",
+    "تكلفة الأصل والقيمة المتبقية (التخريدية) والعمر الإنتاجي": "Asset cost, residual (salvage) value and useful life",
     "تكلفة المبيعات": "Cost of sales",
     "تكلفة المبيعات وقيمة المخزون النهائي لكل طريقة": "Cost of sales and closing inventory value for each method",
     "تم إرسال الملاحظة ✅": "Note sent ✅",
