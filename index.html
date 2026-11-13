@@ -916,6 +916,12 @@
             <button class="theme-btn" type="button" data-theme-set="auto" aria-pressed="false">تلقائي</button>
           </div>
         </div>
+        <div class="theme-row" role="group" aria-label="language">
+          <span class="theme-lbl">اللغة</span>
+          <div class="theme-seg">
+            <button class="theme-btn" type="button" id="langToggle" aria-pressed="false">EN</button>
+          </div>
+        </div>
         <div class="side-foot" id="sideFoot" title="الحفظ التلقائي">
           <span class="sf-dot" aria-hidden="true"></span>
           <span class="sf-text" id="saveState">محفوظ محلياً</span>
@@ -1130,6 +1136,26 @@
             <div class="je-note" id="V_note" hidden></div>
           </div>
         </div>
+
+         <!-- VAT multi-rate -->
+         <div class="card" id="V_mrCard">
+           <div class="card-title">VAT متعدد المعدلات (Multi-rate)</div>
+           <p style="color:var(--muted);font-size:13px;">أدخل basis لكل معدل (خرج/دخل). يُحسب صافي VAT وقيد إقفال موحّد.</p>
+           <table class="data-table" id="V_mrTable">
+             <thead><tr><th scope="col">المعدل %</th><th scope="col">خرج (مبيعات)</th><th scope="col">دخل (مشتريات)</th><th scope="col">صافي</th><th scope="col"></th></tr></thead>
+             <tbody id="V_mrBody"></tbody>
+           </table>
+           <div style="margin-top:8px;"><button type="button" class="btn" onclick="addVatRate()">+ إضافة معدل</button></div>
+           <div class="results">
+             <div class="rcard"><div class="lbl">إجمالي خرج</div><div class="val" id="V_mr_out">—</div></div>
+             <div class="rcard"><div class="lbl">إجمالي دخل</div><div class="val" id="V_mr_in">—</div></div>
+             <div class="rcard"><div class="lbl">صافي مستحق</div><div class="val red" id="V_mr_net">—</div></div>
+           </div>
+           <div class="je">
+             <div class="je-header"><span class="je-title">قيد VAT (متعدد)</span></div>
+             <div id="V_mr_je"></div>
+           </div>
+         </div>
       </section>
 
       <!-- ============ LOAN ============ -->
@@ -1360,6 +1386,7 @@
           <div class="data-table-wrap">
             <table class="data-table" id="R_table"><thead><tr><th>النسبة</th><th>القيمة</th></tr></thead><tbody></tbody></table>
           </div>
+            <div id="R_bench" class="fin-note" style="margin-top:10px;"></div>
         </div>
       </section>
 
@@ -1637,6 +1664,7 @@
               </div>
             </div>
           </div>
+          <canvas id="Fin_chart" width="600" height="220" style="width:100%;max-width:600px;margin:10px 0;border:1px solid var(--border);border-radius:8px;background:var(--surface);"></canvas>
           <div class="fin-empty" id="Fin_empty" hidden>لا توجد قيود مرحّلة ضمن هذه الفترة — رحّل قيداً من أي أداة ليظهر هنا.</div>
           <div class="fin-note" id="Fin_note" style="margin-top:10px;"></div>
         </div>
@@ -2047,8 +2075,8 @@
     entry.lines.forEach(function (l) {
       const dr = l.debit ? fmt(l.debit) : '';
       const cr = l.credit ? fmt(l.credit) : '';
-      const code = l.code ? '<span class="je-code">' + l.code + '</span>' : '';
-      html += '<tr><td class="acct">' + l.name + ' ' + code + '</td>' +
+      const code = l.code ? '<span class="je-code">' + escHtml(l.code) + '</span>' : '';
+      html += '<tr><td class="acct">' + escHtml(l.name) + ' ' + code + '</td>' +
         '<td class="num ' + (l.debit ? 'dr' : '') + '">' + dr + '</td>' +
         '<td class="num ' + (l.credit ? 'cr' : '') + '">' + cr + '</td></tr>';
     });
@@ -2873,6 +2901,57 @@
     }
   }
 
+  // ===== VAT متعدد المعدلات =====
+  window.__vatMR = window.__vatMR || [{rate:15,out:0,inn:0},{rate:5,out:0,inn:0}];
+  function renderVatMR() {
+    const tbody = document.getElementById('V_mrBody');
+    if (!tbody) return;
+    tbody.innerHTML = window.__vatMR.map(function (r, i) {
+      const net = (Number(r.out)||0) - (Number(r.inn)||0);
+      return '<tr>' +
+        '<td><input type="number" value="' + (r.rate||0) + '" style="width:70px" oninput="window.__vatMR[' + i + '].rate=this.value; calcVatMR();" /></td>' +
+        '<td><input type="number" value="' + (r.out||0) + '" oninput="window.__vatMR[' + i + '].out=this.value; calcVatMR();" /></td>' +
+        '<td><input type="number" value="' + (r.inn||0) + '" oninput="window.__vatMR[' + i + '].inn=this.value; calcVatMR();" /></td>' +
+        '<td>' + fmt(net * ((Number(r.rate)||0)/100)) + '</td>' +
+        '<td><button type="button" class="btn" onclick="removeVatRate(' + i + ')">حذف</button></td>' +
+        '</tr>';
+    }).join('');
+    calcVatMR();
+  }
+  function addVatRate() {
+    window.__vatMR.push({rate:15,out:0,inn:0});
+    renderVatMR();
+  }
+  function removeVatRate(i) {
+    window.__vatMR.splice(i,1);
+    renderVatMR();
+  }
+  function calcVatMR() {
+    let totalOut=0, totalIn=0;
+    const lines=[];
+    const outByRate={};
+    window.__vatMR.forEach(function(r){
+      const rate=(Number(r.rate)||0)/100;
+      const o=money((Number(r.out)||0)*rate);
+      const inn=money((Number(r.inn)||0)*rate);
+      totalOut=money(totalOut+o);
+      totalIn=money(totalIn+inn);
+    });
+    if (totalOut>0) lines.push({code:'2200',account:'ضريبة المخرجات',dr:totalOut,cr:null});
+    if (totalIn>0) lines.push({code:'2210',account:'ضريبة المدخلات',dr:null,cr:totalIn});
+    const bal=money(totalOut-totalIn);
+    if (bal>0) lines.push({code:'2400',account:'ذمم ضريبية دائنة',dr:null,cr:bal});
+    else if (bal<0) lines.push({code:'2400',account:'ذمم ضريبية مدينة',dr:Math.abs(bal),cr:null});
+    const el=document.getElementById('V_mr_out'); if(el) el.textContent=fmt(totalOut);
+    const el2=document.getElementById('V_mr_in'); if(el2) el2.textContent=fmt(totalIn);
+    const el3=document.getElementById('V_mr_net'); if(el3) el3.textContent=fmt(Math.abs(money(totalOut-totalIn))) + (money(totalOut-totalIn)>=0?' مستحق':' استرداد');
+    setJE('V_mr_je', lines);
+  }
+  window.addVatRate=addVatRate;
+  window.removeVatRate=removeVatRate;
+  window.calcVatMR=calcVatMR;
+  window.renderVatMR=renderVatMR;
+
   function calcLoan() {
     const P = parseFloat($('L_principal').value) || 0;
     const annual = parseFloat($('L_rate').value) || 0;
@@ -2977,7 +3056,12 @@
     for (let y = 1; y <= life; y++) {
       let dep;
       if (method === 'sl') dep = depreciable / life;
-      else if (method === 'ddb') dep = book * (2 / life);
+      else if (method === 'ddb') {
+        const remaining = Math.max(1, life - y + 1);
+        const slDep = (book - salvage) / remaining;
+        const ddbDep = book * (2 / life);
+        dep = Math.max(slDep, ddbDep);
+      }
       else dep = depreciable * ((life - y + 1) / sumYears);
       dep = Math.min(Math.max(dep, 0), Math.max(book - salvage, 0));
       yearDeps.push(dep);
@@ -3117,6 +3201,14 @@
     add('DSO (أيام تحصيل)', rev > 0 ? (ar / rev) * 365 : 0, ' يوم');
     add('DPO (أيام دفع)', cogs > 0 ? (ap / cogs) * 365 : 0, ' يوم');
     $('R_table').querySelector('tbody').innerHTML = rows.join('');
+    const bench = $('R_bench');
+    if (bench) {
+      const cr = cl > 0 ? ca / cl : 0;
+      const msgs = [];
+      msgs.push('السيولة ' + cr.toFixed(2) + (cr >= 1.5 ? ' — جيدة' : cr >= 1 ? ' — مقبولة' : ' — ضعيفة'));
+      msgs.push('ROE ' + ((eq > 0 ? (ni / eq) * 100 : 0).toFixed(1)) + '%' + ((eq > 0 ? (ni / eq) * 100 : 0) >= 15 ? ' — جيد' : ' — منخفض'));
+      bench.textContent = 'معيار: ' + msgs.join(' · ');
+    }
   }
 
   function calcAging() {
@@ -3417,7 +3509,7 @@
       setOpen(false);
     });
 
-    try { const saved = localStorage.getItem('fbName'); if (saved) nameEl.value = saved; } catch (e) {}
+    // fbName no longer persisted (privacy)
     msgEl.addEventListener('input', () => { countEl.textContent = String(msgEl.value.length); });
 
     form.addEventListener('submit', async (e) => {
@@ -3455,7 +3547,7 @@
         '\nالتاريخ: ' + new Date().toLocaleString('ar-EG'));
       try {
         await fetch(FB_CONFIG.formAction, { method: 'POST', mode: 'no-cors', body: body });
-        try { localStorage.setItem('fbName', name); localStorage.setItem('fbLast', String(Date.now())); } catch (e) {}
+        try { localStorage.setItem('fbLast', String(Date.now())); } catch (e) {}
         form.reset();
         countEl.textContent = '0';
         setStatus('تم إرسال ملاحظتك. (لا يمكن التحقق من التسليم بسبب إعدادات الخدمة)', 'ok');
@@ -4477,6 +4569,7 @@
       let posted = 0;
       (rows || []).forEach(function (e) {
         if (!usable(e) || !inRange(e.date, from, to)) return;
+        if (e.src === 'opening') return; // opening-balance JE is a summary; counted via kv (avoid double-count)
         posted++;
         (e.lines || []).forEach(function (l) {
           const code = String(l.code || '');
@@ -4532,11 +4625,16 @@
       else if (equityOffset < 0) lines.push({ code: '3100', debit: Math.abs(equityOffset), credit: 0 });
       const entry = (lines.length ? SCJE.build({ date: new Date().toISOString().slice(0, 10), memo: 'أرصدة افتتاحية', src: 'opening' }, lines) : null);
       const p = SCStore.kvSet('openingBalances', openingCache);
+      // remove previous opening JEs (avoid accumulation)
+      const cleanup = SCJE.allEntries().then(function (rows) {
+        const prev = (rows || []).filter(function (e) { return e.src === 'opening'; });
+        return Promise.all(prev.map(function (e) { return SCStore.del('journal', e.id); }));
+      });
       if (entry && entry.balanced && entry.total > 0) {
         entry.noFp = true;
-        return p.then(function () { return SCJE.post(entry).catch(function () { return null; }); });
+        return Promise.all([p, cleanup]).then(function () { return SCJE.post(entry).catch(function () { return null; }); });
       }
-      return p;
+      return Promise.all([p, cleanup]);
     }
     function openingAmt(code, type) {
       const v = Number((openingCache || {})[code]) || 0;
@@ -4744,6 +4842,7 @@
         const diff = R(t.dr - t.cr);
         set('Fin_diff', fmt(diff), Math.abs(diff) < 0.005 ? 'green' : 'red');
         set('Fin_net', fmt(inc.net), inc.net >= 0 ? 'green' : 'red');
+        try { if (window.drawFinChart) window.drawFinChart(inc.revenue, inc.expense, prev ? prev.net : null); } catch (e) {}
         const pc = $('Fin_prevCard'), cc = $('Fin_changeCard');
         if (compare && prev) {
           if (pc) pc.hidden = false;
@@ -6450,12 +6549,92 @@
     if (act) act.setAttribute('aria-current', 'page');
   }
 
+  function drawFinChart(rev, exp, prevNet) {
+    const c = document.getElementById('Fin_chart');
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    const w = c.width, h = c.height;
+    ctx.clearRect(0,0,w,h);
+    const pad = 40;
+    const maxv = Math.max(rev||0, exp||0, Math.abs(prevNet||0), 1);
+    const barW = (w - pad*2) / 3;
+    const scale = (h - pad*2) / maxv;
+    const vals = [rev||0, exp||0, (prevNet==null?0:Math.abs(prevNet))];
+    const labels = ['إيرادات','مصروفات','صافي (سابق)'];
+    const colors = ['#4caf50','#f44336','#2196f3'];
+    vals.forEach(function(v,i){
+      const x = pad + i*(barW+10);
+      const bh = v*scale;
+      const y = h - pad - bh;
+      ctx.fillStyle = colors[i];
+      ctx.fillRect(x, y, barW, bh);
+      ctx.fillStyle = '#888';
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(labels[i], x+barW/2, h-10);
+      ctx.fillText((v||0).toFixed(0), x+barW/2, y-4);
+    });
+    ctx.strokeStyle = '#555';
+    ctx.beginPath();
+    ctx.moveTo(pad-5, pad); ctx.lineTo(pad-5, h-pad); ctx.lineTo(w-pad, h-pad);
+    ctx.stroke();
+  }
+  window.drawFinChart = drawFinChart;
+
   function recalcAll() {
-    ['calcDiscount','calcFx','calcProfit','calcVAT','calcLoan','calcInterest','calcDepr','calcBE','calcNPV','calcRatios','calcAging','calcFxRev','calcInv','calcBank']
+    ['calcDiscount','calcFx','calcProfit','calcVAT','calcLoan','calcInterest','calcDepr','calcBE','calcNPV','calcRatios','calcAging','calcFxRev','calcInv','calcBank','renderVatMR']
       .forEach(function (f) { try { window[f](); } catch (e) {} });
   }
 
+  // ===== i18n (Phase 12 scaffold) =====
+  const I18N = {
+    nav: {
+      calc: {ar:'حاسبة', en:'Calculator'},
+      disc: {ar:'خصومات/عملات', en:'Discounts/FX'},
+      fx: {ar:'أسعار العملات', en:'FX Rates'},
+      profit: {ar:"ربح/هامش", en:'Profit/Margin'},
+      vat: {ar:'VAT', en:'VAT'},
+      loan: {ar:'قروض', en:'Loans'},
+      interest: {ar:'فائدة FV/PV', en:'Interest'},
+      depr: {ar:'إهلاك', en:'Depreciation'},
+      be: {ar:'تعادل', en:'Break-even'},
+      npv: {ar:'NPV/IRR', en:'NPV/IRR'},
+      ratios: {ar:'نسب مالية', en:'Ratios'},
+      aging: {ar:'أعمار ديون', en:'Aging'},
+      fxrev: {ar:'إعادة تقييم FX', en:'FX Reval'},
+      inv: {ar:'مخزون', en:'Inventory'},
+      bank: {ar:'تسوية بنكية', en:'Bank Rec'},
+      tape: {ar:'السجل والقيود', en:'Journal'}
+    },
+    titles: {
+      calc: {ar:'حاسبة محاسبية', en:'Accounting Calculator'},
+      vat: {ar:'حاسبة VAT', en:'VAT Calculator'}
+    }
+  };
+  function currentLang() { try { return localStorage.getItem('sc:lang') || 'ar'; } catch (e) { return 'ar'; } }
+  function applyLang(lang) {
+    try { localStorage.setItem('sc:lang', lang); } catch (e) {}
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+    document.querySelectorAll('.nav-item').forEach(function (el) {
+      const p = el.getAttribute('data-page');
+      const lbl = el.querySelector('.lbl');
+      if (p && lbl && I18N.nav[p]) lbl.textContent = I18N.nav[p][lang] || I18N.nav[p].ar;
+    });
+    const btn = document.getElementById('langToggle');
+    if (btn) { btn.textContent = (lang === 'ar') ? 'EN' : 'AR'; btn.setAttribute('aria-pressed', lang !== 'ar'); }
+  }
+  function toggleLang() {
+    applyLang(currentLang() === 'ar' ? 'en' : 'ar');
+  }
+  window.applyLang = applyLang;
+  window.toggleLang = toggleLang;
+  window.currentLang = currentLang;
+
   function bootApp() {
+    const lb = document.getElementById("langToggle");
+    if (lb) lb.addEventListener("click", toggleLang);
+    applyLang(currentLang());
     SCTheme.init();
     SCHelp.init();
     a11yBoot();
