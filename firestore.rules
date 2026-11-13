@@ -1,0 +1,146 @@
+rules_version = '2';
+
+// ============================================================
+//  QAYD — قيد | Firestore Security Rules
+//  المبدأ: رفض افتراضي + صلاحيات مبنية على عضوية الشركة ودورها
+//  انشر هذه القواعد من: Firebase Console → Firestore → Rules
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- helpers ----------
+    function signedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function memberPath(cid) {
+      return /databases/$(database)/documents/companies/$(cid)/members/$(request.auth.uid);
+    }
+    function companyPath(cid) {
+      return /databases/$(database)/documents/companies/$(cid);
+    }
+    function invitePath(cid, email) {
+      return /databases/$(database)/documents/companies/$(cid)/invites/$(email);
+    }
+    function isMember(cid) {
+      return signedIn() && exists(memberPath(cid)) && get(memberPath(cid)).data.active == true;
+    }
+    function myRole(cid) {
+      return get(memberPath(cid)).data.role;
+    }
+    function inRole(cid, roles) {
+      return isMember(cid) && myRole(cid) in roles;
+    }
+    function canWrite(cid) {
+      return inRole(cid, ['owner', 'accountant']);
+    }
+    function canApprove(cid) {
+      return inRole(cid, ['owner', 'reviewer']);
+    }
+    function isOwner(cid) {
+      return inRole(cid, ['owner']);
+    }
+
+    // ---------- user profile ----------
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'name', 'companies', 'createdAt', 'updatedAt'])
+        && request.resource.data.email == request.auth.token.email;
+      allow delete: if false;
+    }
+
+    // ---------- company (tenant) ----------
+    match /companies/{cid} {
+      allow read: if isMember(cid);
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 120;
+      allow update: if isOwner(cid);
+      allow delete: if false;
+
+      // ---------- membership ----------
+      match /members/{uid} {
+        allow read: if isMember(cid);
+        allow create: if isOwner(cid) || (
+          uid == request.auth.uid
+          && signedIn()
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.active == true
+          && (
+            // أول مالك عند إنشاء الشركة
+            (exists(companyPath(cid))
+              && get(companyPath(cid)).data.ownerId == request.auth.uid
+              && request.resource.data.role == 'owner')
+            // أو دعوة مطابقة لبريده الإلكتروني
+            || (exists(invitePath(cid, request.auth.token.email))
+              && get(invitePath(cid, request.auth.token.email)).data.email == request.auth.token.email
+              && request.resource.data.role == get(invitePath(cid, request.auth.token.email)).data.role)
+          )
+        );
+        allow update, delete: if isOwner(cid);
+      }
+
+      // ---------- invites (document id = email) ----------
+      match /invites/{email} {
+        allow read: if isMember(cid)
+          || (signedIn() && email == request.auth.token.email);
+        allow create: if isOwner(cid)
+          && request.resource.data.email == email
+          && request.resource.data.role in ['owner', 'accountant', 'reviewer', 'viewer'];
+        allow update, delete: if isOwner(cid);
+      }
+
+      // ---------- settings / counters ----------
+      match /kv/{key} {
+        allow read: if isMember(cid);
+        allow write: if canWrite(cid);
+      }
+
+      // ---------- chart of accounts ----------
+      match /coa/{code} {
+        allow read: if isMember(cid);
+        allow write: if canWrite(cid);
+      }
+
+      // ---------- journal ----------
+      match /journal/{id} {
+        allow read: if isMember(cid);
+        allow create: if canWrite(cid)
+          || (canApprove(cid) && request.resource.data.src == 'reverse');
+        allow update: if canWrite(cid) || canApprove(cid);
+        allow delete: if canApprove(cid);
+      }
+
+      // ---------- saved calculator sessions ----------
+      match /sessions/{id} {
+        allow read: if isMember(cid);
+        allow write: if canWrite(cid);
+      }
+
+      // ---------- journal numbering (server-side atomic) ----------
+      match /counters/{name} {
+        allow read: if isMember(cid);
+        allow write: if canWrite(cid);
+      }
+
+      // ---------- audit trail: append-only ----------
+      match /audit/{id} {
+        allow read: if isMember(cid);
+        allow create: if isMember(cid)
+          && myRole(cid) in ['owner', 'accountant', 'reviewer']
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.role == myRole(cid)
+          && request.resource.data.ts is int;
+        allow update, delete: if false;
+      }
+    }
+
+    // ---------- deny everything else ----------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
