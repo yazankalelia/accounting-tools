@@ -79,8 +79,10 @@
   .nav-item.active { background: var(--surface-2); border-color: rgba(79,140,255,0.35); color: var(--active-ink, #fff); position: relative; }
   .nav-item.active::after { content: ""; position: absolute; inset-block: 6px; inset-inline-end: 0; width: 2px;
     border-radius: 0; background: var(--accent-2); }
-  .nav-item .ico { font-size: 16px; width: 20px; text-align: center;
-    color: var(--muted); font-weight: 400; line-height: 1; }
+  .nav-item .ico { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;
+    color: var(--muted); line-height: 1; flex: 0 0 auto; }
+  .nav-item .ico svg { width: 20px; height: 20px; display: block; }
+  .ico svg { width: 1em; height: 1em; display: inline-block; vertical-align: -0.12em; }
   .nav-item.active .ico { color: var(--accent-ink); }
   .page-header h1 .ico { color: var(--muted); font-weight: 400; margin-inline-end: 2px; }
   .nav-item .lbl { flex: 1; }
@@ -390,7 +392,7 @@
     .group { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 8px 0 2px; }
     .group-title { grid-column: 1 / -1; display: block; padding: 8px 2px 2px; margin: 0; }
     .nav-item { min-height: 46px; padding: 9px 10px; font-size: 13px; }
-    .nav-item .ico { font-size: 16px; width: 22px; }
+    .nav-item .ico { width: 22px; height: 22px; }
     .nav-backdrop { display: block; position: fixed; inset: 0; z-index: 95;
       background: rgba(4,7,15,0.62); opacity: 0; visibility: hidden;
       transition: opacity .25s, visibility .25s; }
@@ -891,36 +893,39 @@
         <button class="btn secondary sm" id="profileAdd" type="button" title="إضافة شركة">+</button>
       </div>
 
+      <div class="group" id="favGroup" hidden>
+        <div class="group-title">الأكثر استخدامًا</div>
+      </div>
       <div class="group">
         <div class="group-title">الأدوات اليومية</div>
-        <div class="nav-item active" data-page="calc" aria-current="page"><span class="ico" aria-hidden="true">▣</span><span class="lbl">حاسبة</span></div>
-        <div class="nav-item" data-page="disc"><span class="ico" aria-hidden="true">⇄</span><span class="lbl">خصومات/عملات</span></div>
-        <div class="nav-item" data-page="fx"><span class="ico" aria-hidden="true">¤</span><span class="lbl">أسعار العملات</span></div>
-        <div class="nav-item" data-page="profit"><span class="ico" aria-hidden="true">%</span><span class="lbl">ربح/هامش</span></div>
-        <div class="nav-item" data-page="vat"><span class="ico" aria-hidden="true">ض</span><span class="lbl">VAT</span></div>
+        <div class="nav-item active" data-page="calc" aria-current="page"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.8" width="14" height="18.4" rx="2.4"/><path d="M8.6 7.4h6.8"/><path d="M8.8 12h.01M12 12h.01M15.2 12h.01M8.8 15.6h.01M12 15.6h.01M15.2 15.6h.01"/></svg></span><span class="lbl">حاسبة</span></div>
+        <div class="nav-item" data-page="disc"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 5L5 19"/><circle cx="7.4" cy="7.4" r="2.4"/><circle cx="16.6" cy="16.6" r="2.4"/></svg></span><span class="lbl">خصومات/عملات</span></div>
+        <div class="nav-item" data-page="fx"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6.5" width="19" height="11" rx="2.2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 12h.01M18 12h.01"/></svg></span><span class="lbl">أسعار العملات</span></div>
+        <div class="nav-item" data-page="profit"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 16.5l5.5-5.5 4 4 7.5-7.5"/><path d="M14.8 7.5H21V14"/></svg></span><span class="lbl">ربح/هامش</span></div>
+        <div class="nav-item" data-page="vat"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5h10V20.5l-2.5-1.4-2.5 1.4-2.5-1.4L7 20.5z"/><path d="M9.6 8.2h4.8M9.6 12h4.8M9.6 15.8h3"/></svg></span><span class="lbl">VAT</span></div>
       </div>
       <div class="group">
         <div class="group-title">الأصول والتمويل</div>
-        <div class="nav-item" data-page="loan"><span class="ico" aria-hidden="true">◷</span><span class="lbl">قروض</span></div>
-        <div class="nav-item" data-page="interest"><span class="ico" aria-hidden="true">△</span><span class="lbl">فائدة FV/PV</span></div>
-        <div class="nav-item" data-page="depr"><span class="ico" aria-hidden="true">↘</span><span class="lbl">إهلاك</span></div>
+        <div class="nav-item" data-page="loan"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9.2L12 4l8.5 5.2"/><path d="M5 9.5h14"/><path d="M6.5 12.2v5.8M10.3 12.2v5.8M13.7 12.2v5.8M17.5 12.2v5.8"/><path d="M4 20.5h16"/></svg></span><span class="lbl">قروض</span></div>
+        <div class="nav-item" data-page="interest"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5V4.5"/><path d="M4.5 19.5h15"/><path d="M7.5 15l3.5-3.5 3 2.5 5.5-6.5"/></svg></span><span class="lbl">فائدة FV/PV</span></div>
+        <div class="nav-item" data-page="depr"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5l5.5 5.5 4-4 7.5 7.5"/><path d="M14.8 16.5H21V9.8"/></svg></span><span class="lbl">إهلاك</span></div>
       </div>
       <div class="group">
         <div class="group-title">التحليل والاستثمار</div>
-        <div class="nav-item" data-page="be"><span class="ico" aria-hidden="true">⊙</span><span class="lbl">تعادل</span></div>
-        <div class="nav-item" data-page="npv"><span class="ico" aria-hidden="true">∑</span><span class="lbl">NPV/IRR</span></div>
-        <div class="nav-item" data-page="ratios"><span class="ico" aria-hidden="true">≡</span><span class="lbl">نسب مالية</span></div>
+        <div class="nav-item" data-page="be"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="4.6"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/></svg></span><span class="lbl">تعادل</span></div>
+        <div class="nav-item" data-page="npv"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 5.5H7l6 6.5-6 6.5h10"/></svg></span><span class="lbl">NPV/IRR</span></div>
+        <div class="nav-item" data-page="ratios"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 13.5a7.5 7.5 0 1 1 15 0"/><path d="M12 13.5l3.8-3.8"/><path d="M4.5 17.5h15"/></svg></span><span class="lbl">نسب مالية</span></div>
       </div>
       <div class="group">
         <div class="group-title">العمليات والتقييم</div>
-        <div class="nav-item" data-page="aging"><span class="ico" aria-hidden="true">◔</span><span class="lbl">أعمار ديون</span></div>
-        <div class="nav-item" data-page="fxrev"><span class="ico" aria-hidden="true">↻</span><span class="lbl">إعادة تقييم FX</span></div>
-        <div class="nav-item" data-page="inv"><span class="ico" aria-hidden="true">▤</span><span class="lbl">مخزون</span></div>
-        <div class="nav-item" data-page="bank"><span class="ico" aria-hidden="true">⇋</span><span class="lbl">تسوية بنكية</span></div>
+        <div class="nav-item" data-page="aging"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l8.5 4.5L12 12.5 3.5 8z"/><path d="M4.5 12.8L12 17l7.5-4.2"/><path d="M4.5 16.8L12 21l7.5-4.2"/></svg></span><span class="lbl">أعمار ديون</span></div>
+        <div class="nav-item" data-page="fxrev"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.2A8 8 0 1 0 17.8 17"/><path d="M20.5 5.2v6h-6"/></svg></span><span class="lbl">إعادة تقييم FX</span></div>
+        <div class="nav-item" data-page="inv"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 7.6L12 3 3.5 7.6v8.8L12 21l8.5-4.6z"/><path d="M3.8 7.7L12 12l8.2-4.3"/><path d="M12 12v8.5"/></svg></span><span class="lbl">مخزون</span></div>
+        <div class="nav-item" data-page="bank"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l8-5 8 5"/><path d="M6.5 9.2h11"/><path d="M7.5 12v5.5M12 12v5.5M16.5 12v5.5"/><path d="M5 20.5h14"/></svg></span><span class="lbl">تسوية بنكية</span></div>
       </div>
       <div class="group">
         <div class="group-title">السجل والتدقيق</div>
-        <div class="nav-item" data-page="tape"><span class="ico" aria-hidden="true">▦</span><span class="lbl">السجل والقيود</span></div>
+        <div class="nav-item" data-page="tape"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 6A2 2 0 0 1 6.5 4h12A2 2 0 0 1 19.5 6v14.5l-3.75-1.5-3.75 1.5-3.75-1.5L4.5 20.5z"/><path d="M8 8.5h8M8 12.5h8"/></svg></span><span class="lbl">السجل والقيود</span></div>
       </div>
       <div class="side-bottom">
         <div class="theme-row" role="group" aria-label="مظهر الواجهة">
@@ -951,7 +956,7 @@
       <!-- ============ CALC ============ -->
       <section class="page active" id="page-calc">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">▣</span> حاسبة محاسبية</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.8" width="14" height="18.4" rx="2.4"/><path d="M8.6 7.4h6.8"/><path d="M8.8 12h.01M12 12h.01M15.2 12h.01M8.8 15.6h.01M12 15.6h.01M15.2 15.6h.01"/></svg></span> حاسبة محاسبية</h1>
           <p>آلة حاسبة مع ذاكرة، ضريبة، خصم، مجموع كلي، سجل</p>
         </div>
         <div class="card">
@@ -1026,7 +1031,7 @@
       <!-- ============ DISC ============ -->
       <section class="page" id="page-disc">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">⇄</span> خصومات متتالية وتحويل عملات</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 5L5 19"/><circle cx="7.4" cy="7.4" r="2.4"/><circle cx="16.6" cy="16.6" r="2.4"/></svg></span> خصومات متتالية وتحويل عملات</h1>
           <p>حساب الخصومات المركبة وتحويل العملات</p>
         </div>
         <div class="card">
@@ -1064,7 +1069,7 @@
       <!-- ============ FX RATES ============ -->
       <section class="page" id="page-fx">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">¤</span> أسعار العملات العالمية</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6.5" width="19" height="11" rx="2.2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 12h.01M18 12h.01"/></svg></span> أسعار العملات العالمية</h1>
           <p>تحويل فوري بين 10 عملات بأسعار محدّثة، وأهم 3 عملات مثبّتة في الأعلى</p>
         </div>
         <div class="card">
@@ -1097,7 +1102,7 @@
       <!-- ============ PROFIT ============ -->
       <section class="page" id="page-profit">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">%</span> ربح وهامش (التسعير)</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 16.5l5.5-5.5 4 4 7.5-7.5"/><path d="M14.8 7.5H21V14"/></svg></span> ربح وهامش (التسعير)</h1>
           <p>تحويل مباشر بين تكلفة، سعر، هامش، و markup</p>
         </div>
         <div class="card">
@@ -1132,7 +1137,7 @@
       <!-- ============ VAT ============ -->
       <section class="page" id="page-vat">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">ض</span> حاسبة VAT</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5h10V20.5l-2.5-1.4-2.5 1.4-2.5-1.4L7 20.5z"/><path d="M9.6 8.2h4.8M9.6 12h4.8M9.6 15.8h3"/></svg></span> حاسبة VAT</h1>
           <p>حساب الضريبة المستحقة/الاسترداد مع قيد تلقائي</p>
         </div>
         <div class="card">
@@ -1176,7 +1181,7 @@
       <!-- ============ LOAN ============ -->
       <section class="page" id="page-loan">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">◷</span> قروض (Loan Amortization)</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9.2L12 4l8.5 5.2"/><path d="M5 9.5h14"/><path d="M6.5 12.2v5.8M10.3 12.2v5.8M13.7 12.2v5.8M17.5 12.2v5.8"/><path d="M4 20.5h16"/></svg></span> قروض (Loan Amortization)</h1>
           <p>PMT + جدول إطفاء (أول 24 دفعة)</p>
         </div>
         <div class="card">
@@ -1218,7 +1223,7 @@
       <!-- ============ INTEREST ============ -->
       <section class="page" id="page-interest">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">△</span> فائدة (FV / PV)</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19.5V4.5"/><path d="M4.5 19.5h15"/><path d="M7.5 15l3.5-3.5 3 2.5 5.5-6.5"/></svg></span> فائدة (FV / PV)</h1>
           <p>القيمة المستقبلية/الحالية + DCF</p>
         </div>
         <div class="card">
@@ -1247,7 +1252,7 @@
       <!-- ============ DEPR ============ -->
       <section class="page" id="page-depr">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">↘</span> إهلاك الأصول (Depreciation)</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5l5.5 5.5 4-4 7.5 7.5"/><path d="M14.8 16.5H21V9.8"/></svg></span> إهلاك الأصول (Depreciation)</h1>
           <p>SL / DDB / SYD + إهلاك نسبي للسنة الأولى + جدول شهري</p>
         </div>
         <div class="card">
@@ -1324,7 +1329,7 @@
       <!-- ============ BE ============ -->
       <section class="page" id="page-be">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">⊙</span> نقطة التعادل (Break-Even)</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="4.6"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/></svg></span> نقطة التعادل (Break-Even)</h1>
           <p>وحدات/إيراد التعادل + ربح مستهدف</p>
         </div>
         <div class="card">
@@ -1349,7 +1354,7 @@
       <!-- ============ NPV ============ -->
       <section class="page" id="page-npv">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">∑</span> NPV / IRR / DCF</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 5.5H7l6 6.5-6 6.5h10"/></svg></span> NPV / IRR / DCF</h1>
           <p>تقييم استثماري</p>
         </div>
         <div class="card">
@@ -1374,7 +1379,7 @@
       <!-- ============ RATIOS ============ -->
       <section class="page" id="page-ratios">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">≡</span> نسب مالية</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 13.5a7.5 7.5 0 1 1 15 0"/><path d="M12 13.5l3.8-3.8"/><path d="M4.5 17.5h15"/></svg></span> نسب مالية</h1>
           <p>10 نسب رئيسية</p>
         </div>
         <div class="card">
@@ -1408,7 +1413,7 @@
       <!-- ============ AGING ============ -->
       <section class="page" id="page-aging">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">◔</span> أعمار الديون + ECL</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l8.5 4.5L12 12.5 3.5 8z"/><path d="M4.5 12.8L12 17l7.5-4.2"/><path d="M4.5 16.8L12 21l7.5-4.2"/></svg></span> أعمار الديون + ECL</h1>
           <p>مخصص مشكوك فيها + قيد تلقائي</p>
         </div>
         <div class="card">
@@ -1453,7 +1458,7 @@
       <!-- ============ FXREV ============ -->
       <section class="page" id="page-fxrev">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">↻</span> إعادة تقييم FX</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.2A8 8 0 1 0 17.8 17"/><path d="M20.5 5.2v6h-6"/></svg></span> إعادة تقييم FX</h1>
           <p>فروق عملات + قيد تلقائي</p>
         </div>
         <div class="card">
@@ -1480,7 +1485,7 @@
       <!-- ============ INV ============ -->
       <section class="page" id="page-inv">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">▤</span> تقييم المخزون</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 7.6L12 3 3.5 7.6v8.8L12 21l8.5-4.6z"/><path d="M3.8 7.7L12 12l8.2-4.3"/><path d="M12 12v8.5"/></svg></span> تقييم المخزون</h1>
           <p>FIFO / LIFO / WAC</p>
         </div>
         <div class="card">
@@ -1518,7 +1523,7 @@
       <!-- ============ BANK REC ============ -->
       <section class="page" id="page-bank">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">⇋</span> التسوية البنكية (Bank Rec)</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l8-5 8 5"/><path d="M6.5 9.2h11"/><path d="M7.5 12v5.5M12 12v5.5M16.5 12v5.5"/><path d="M5 20.5h14"/></svg></span> التسوية البنكية (Bank Rec)</h1>
           <p>رصيد البنك + شيكات معلقة + إيداعات في الطريق + عمولات وفوائد · قيد تسوية متوازن</p>
         </div>
         <div class="card">
@@ -1568,7 +1573,7 @@
       <!-- ============ TAPE ============ -->
       <section class="page" id="page-tape">
         <div class="page-header">
-          <h1><span class="ico" aria-hidden="true">▦</span> السجل والقيود</h1>
+          <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 6A2 2 0 0 1 6.5 4h12A2 2 0 0 1 19.5 6v14.5l-3.75-1.5-3.75 1.5-3.75-1.5L4.5 20.5z"/><path d="M8 8.5h8M8 12.5h8"/></svg></span> السجل والقيود</h1>
           <p>لقطات قابلة لإعادة التشغيل · القيود المرحّلة · سجل تدقيق دائم</p>
         </div>
 
@@ -1715,7 +1720,7 @@
         </div>
 
         <div class="card">
-          <div class="card-title"><span class="ico" aria-hidden="true">◷</span> لقطات الحساب</div>
+          <div class="card-title"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9.2L12 4l8.5 5.2"/><path d="M5 9.5h14"/><path d="M6.5 12.2v5.8M10.3 12.2v5.8M13.7 12.2v5.8M17.5 12.2v5.8"/><path d="M4 20.5h16"/></svg></span> لقطات الحساب</div>
           <div class="tape-sum" id="tapeSum"></div>
           <div class="tape-acts" style="margin-top:10px">
             <button class="btn secondary sm" id="tapeRefresh" type="button">تحديث</button>
@@ -1726,7 +1731,7 @@
         </div>
 
         <div class="card">
-          <div class="card-title"><span class="ico" aria-hidden="true">▤</span> القيود المرحّلة</div>
+          <div class="card-title"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 7.6L12 3 3.5 7.6v8.8L12 21l8.5-4.6z"/><path d="M3.8 7.7L12 12l8.2-4.3"/><path d="M12 12v8.5"/></svg></span> القيود المرحّلة</div>
           <div class="tape-sum">العكس يُنشئ قيداً معاكساً ويُبقي الأصل · الحذف نهائي مع نسخة في سجل التدقيق</div>
           <div class="je-log" id="tapeJE"></div>
         </div>
@@ -1951,6 +1956,7 @@
       else x.removeAttribute('aria-current');
     });
     document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + page));
+    if (window.__favSync) window.__favSync(page);
     const cur = navItems.find(x => x.dataset.page === page);
     if (mbCurrent && cur) {
       const lbl = cur.querySelector('.lbl');
@@ -1976,6 +1982,47 @@
       }
     });
   });
+
+  // ---- Favorites (most used pages) ----
+  (function () {
+    const favGroup = document.getElementById('favGroup');
+    if (!favGroup) return;
+    const KEY = 'qayd:favs';
+    const readFavs = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; } };
+    const writeFavs = (o) => { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {} };
+    const bump = (p) => { const o = readFavs(); o[p] = (o[p] || 0) + 1; writeFavs(o); };
+    const labelFor = (p) => { const l = document.querySelector('.nav-item:not(.fav-item)[data-page="' + p + '"] .lbl'); return l ? l.textContent : p; };
+    const iconFor = (p) => { const i = document.querySelector('.nav-item:not(.fav-item)[data-page="' + p + '"] .ico'); return i ? i.innerHTML : ''; };
+    function renderFavs() {
+      const o = readFavs();
+      const keys = Object.keys(o).filter(k => o[k] > 0 && document.querySelector('.nav-item:not(.fav-item)[data-page="' + k + '"]'));
+      keys.sort((a, b) => o[b] - o[a]);
+      const top = keys.slice(0, 4);
+      favGroup.querySelectorAll('.fav-item').forEach(n => n.remove());
+      if (!top.length) { favGroup.hidden = true; return; }
+      const frag = document.createDocumentFragment();
+      top.forEach(p => {
+        const d = document.createElement('div');
+        d.className = 'nav-item fav-item';
+        d.dataset.page = p;
+        d.tabIndex = 0;
+        d.setAttribute('role', 'button');
+        d.innerHTML = '<span class="ico" aria-hidden="true">' + iconFor(p) + '</span><span class="lbl">' + escHtml(labelFor(p)) + '</span>';
+        d.addEventListener('click', () => { bump(p); goTo(p); renderFavs(); if (window.__favSync) window.__favSync(p); });
+        d.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); d.click(); } });
+        frag.appendChild(d);
+      });
+      favGroup.appendChild(frag);
+      favGroup.hidden = false;
+    }
+    window.__favSync = function (p) {
+      favGroup.querySelectorAll('.fav-item').forEach(n => n.classList.toggle('active', n.dataset.page === p));
+    };
+    navItems.forEach(n => n.addEventListener('click', () => bump(n.dataset.page)));
+    renderFavs();
+    const act = document.querySelector('.nav-item.active');
+    if (act && act.dataset.page) window.__favSync(act.dataset.page);
+  })();
 
   const skipLink = document.querySelector('.skip-link');
   if (skipLink) skipLink.addEventListener('click', function (e) {
@@ -6774,6 +6821,7 @@
     "افتح الدليل في أي أداة بالضغط على": "Open the guide in any tool by pressing",
     "الأدوات": "Tools",
     "الأدوات اليومية": "Daily tools",
+    "الأكثر استخدامًا": "Most used",
     "الأسماء المعدّلة تظهر في القيود الجديدة": "Renamed accounts appear in new entries",
     "الأصل": "Principal",
     "الأصول المتداولة": "Current assets",
