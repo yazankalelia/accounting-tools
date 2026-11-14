@@ -773,6 +773,35 @@
     font-size: 13px; line-height: 1; padding: 2px 5px; cursor: pointer; border-radius: var(--radius-sm); }
   .side-foot .sf-keys:hover { color: var(--text); background: var(--surface-2); }
 
+  /* ===== الشيكات ===== */
+  .cq-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #1b2a47; color: #a9c1e8; white-space: nowrap; }
+  .cq-pending { background: rgba(232,176,75,.18); color: #e8b04b; }
+  .cq-collected { background: rgba(48,205,140,.18); color: #39d193; }
+  .cq-bounced { background: rgba(255,86,86,.16); color: #ff7a7a; }
+  .cq-cancelled { background: rgba(160,160,160,.16); color: #9aa7bd; }
+  .cq-due-soon td:first-child { box-shadow: inset 4px 0 0 #e8b04b; }
+  .cq-overdue td:first-child { box-shadow: inset 4px 0 0 #ff7a7a; }
+
+  /* ===== طباعة الفواتير ===== */
+  .invoice-print-root { display: none; }
+  @media print {
+    body.printing-invoice > *:not(.invoice-print-root) { display: none !important; }
+    body.printing-invoice .invoice-print-root { display: block !important; }
+    .invoice-print { font-family: "Segoe UI", "Tahoma", "Cairo", sans-serif; color: #000; padding: 10mm; font-size: 12pt; }
+    .invoice-print h1 { font-size: 20pt; margin: 0 0 2mm; }
+    .invoice-print .ip-org { font-size: 11pt; color: #444; margin-bottom: 6mm; }
+    .invoice-print .ip-meta { display: flex; justify-content: space-between; gap: 8mm; border: 1pt solid #bbb; padding: 4mm 5mm; margin-bottom: 6mm; }
+    .invoice-print .ip-meta div b { display: block; font-size: 8pt; color: #555; text-transform: uppercase; }
+    .invoice-print table { width: 100%; border-collapse: collapse; margin: 6mm 0; }
+    .invoice-print th, .invoice-print td { border: 0.5pt solid #bbb; padding: 3mm 2.5mm; text-align: start; }
+    .invoice-print th { background: #eee; font-size: 9pt; }
+    .invoice-print .ip-totals { margin-inline-start: auto; width: 70mm; }
+    .invoice-print .ip-totals div { display: flex; justify-content: space-between; padding: 2mm 3mm; }
+    .invoice-print .ip-totals .grand { border-top: 1.5pt solid #000; font-weight: 800; font-size: 13pt; }
+    .invoice-print .ip-sign { display: flex; justify-content: space-between; gap: 20mm; margin-top: 14mm; color: #333; font-size: 10pt; }
+    .invoice-print .ip-sign div { flex: 1; border-top: 0.75pt solid #000; padding-top: 2mm; text-align: center; }
+  }
+
   /* ===== التقارير والطباعة (المرحلة 6) ===== */
   .rep-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; }
   .rep-bar .btn { padding: 5px 9px; font-size: 11px; gap: 4px; }
@@ -935,6 +964,11 @@
         <div class="nav-item" data-page="fxrev"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.2A8 8 0 1 0 17.8 17"/><path d="M20.5 5.2v6h-6"/></svg></span><span class="lbl">إعادة تقييم FX</span></div>
         <div class="nav-item" data-page="inv"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 7.6L12 3 3.5 7.6v8.8L12 21l8.5-4.6z"/><path d="M3.8 7.7L12 12l8.2-4.3"/><path d="M12 12v8.5"/></svg></span><span class="lbl">مخزون</span></div>
         <div class="nav-item" data-page="bank"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l8-5 8 5"/><path d="M6.5 9.2h11"/><path d="M7.5 12v5.5M12 12v5.5M16.5 12v5.5"/><path d="M5 20.5h14"/></svg></span><span class="lbl">تسوية بنكية</span></div>
+      </div>
+      <div class="group">
+        <div class="group-title">المحاسبة التجارية</div>
+        <div class="nav-item" data-page="trade"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8.5L19 8v12.5H6z"/><path d="M13.5 3.5V8H18"/><path d="M9.3 12.5h5.4M9.3 16h5.4M9.3 9h1.8"/></svg></span><span class="lbl">الفواتير والدفاتر</span></div>
+        <div class="nav-item" data-page="cheques"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5h17a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 15V9a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M6 12.5h.01M9.5 12.5h.01M13 12.5h.01M6 9.5h3"/></svg></span><span class="lbl">الشيكات</span></div>
       </div>
       <div class="group">
         <div class="group-title">السجل والتدقيق</div>
@@ -1189,9 +1223,30 @@
              <div id="V_mr_je"></div>
            </div>
          </div>
+          <!-- VAT quarterly summary -->
+          <div class="card" id="V_qCard">
+            <div class="card-title">ملخص الضريبة ربع السنوي (تقريبي)</div>
+            <div class="row" style="align-items:flex-end;gap:8px;flex-wrap:wrap">
+              <div class="field" style="flex:0 1 110px"><label for="V_qYear">السنة</label><input id="V_qYear" type="number" min="2000" max="2100"></div>
+              <div class="field" style="flex:0 1 130px"><label for="V_qQuarter">الربع</label><select id="V_qQuarter"><option value="1">الربع 1</option><option value="2">الربع 2</option><option value="3">الربع 3</option><option value="4">الربع 4</option></select></div>
+              <button class="btn" id="V_qCompute" type="button">احسب</button>
+            </div>
+            <div class="data-table-wrap">
+              <table class="data-table" id="V_qTable">
+                <thead><tr><th>الشهر</th><th>ضريبة المخرجات (2200)</th><th>ضريبة المدخلات (2210)</th><th>الصافي</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="results">
+              <div class="rcard"><div class="lbl">إجمالي المخرجات</div><div class="val" id="V_qOut">—</div></div>
+              <div class="rcard"><div class="lbl">إجمالي المدخلات</div><div class="val" id="V_qIn">—</div></div>
+              <div class="rcard"><div class="lbl">صافي المستحق</div><div class="val red" id="V_qNet">—</div></div>
+            </div>
+            <div class="coa-hint">محسوب من القيود المرحّلة في أشهر الربع — الإقرار النهائي لدى مأمور الضرائب.</div>
+          </div>
       </section>
 
-      <!-- ============ LOAN ============ -->
+<!-- ============ LOAN ============ -->
       <section class="page" id="page-loan">
         <div class="page-header">
           <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9.2L12 4l8.5 5.2"/><path d="M5 9.5h14"/><path d="M6.5 12.2v5.8M10.3 12.2v5.8M13.7 12.2v5.8M17.5 12.2v5.8"/><path d="M4 20.5h16"/></svg></span> قروض (Loan Amortization)</h1>
@@ -1754,6 +1809,135 @@
           <div class="je-log" id="tapeAudit"></div>
         </div>
       </section>
+    <!-- ============ TRADE (فواتير ودفاتر) ============ -->
+    <section class="page" id="page-trade">
+      <div class="page-header">
+        <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8.5L19 8v12.5H6z"/><path d="M13.5 3.5V8H18"/><path d="M9.3 12.5h5.4M9.3 16h5.4M9.3 9h1.8"/></svg></span> الفواتير والدفاتر</h1>
+        <p>شركاء (دائنون/مدينون)، فواتير بيع وشراء، ترحيلها للقيود تلقائيًا، وطباعتها بترويسة الشركة.</p>
+      </div>
+
+      <!-- الشركاء -->
+      <div class="card">
+        <div class="card-title">الشركاء (دائنون / مدينون)</div>
+        <div class="row" style="align-items:flex-end;gap:8px;flex-wrap:wrap">
+          <div class="field" style="flex:2 1 180px"><label for="ptName">اسم الشريك</label><input id="ptName" type="text" placeholder="اسم الزبون / المورد"></div>
+          <div class="field" style="flex:1 1 110px"><label for="ptKind">النوع</label><select id="ptKind"><option value="customer">زبون</option><option value="supplier">مورد</option><option value="both">زبون/مورد</option></select></div>
+          <div class="field" style="flex:1 1 120px"><label for="ptPhone">الهاتف</label><input id="ptPhone" type="text" inputmode="tel"></div>
+          <div class="field" style="flex:1 1 130px"><label for="ptVat">الرقم الضريبي</label><input id="ptVat" type="text"></div>
+          <div class="field" style="flex:1 1 110px"><label for="ptOpen">رصيد افتتاحي</label><input id="ptOpen" type="number" step="0.01" value="0"></div>
+          <div class="field" style="flex:1 1 115px"><label for="ptOpenSide">اتجاه الرصيد</label><select id="ptOpenSide"><option value="dr">عليه (مدين)</option><option value="cr">له (دائن)</option></select></div>
+          <button class="btn sm" id="ptAdd" type="button">إضافة</button>
+        </div>
+        <div class="row" style="align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button class="btn secondary sm" id="ptTemplate" type="button">تنزيل قالب CSV</button>
+          <label class="btn ghost sm" for="ptImportFile" style="cursor:pointer">استيراد من CSV</label>
+          <input id="ptImportFile" type="file" accept=".csv,text/csv" hidden>
+          <span class="coa-hint">الأعمدة: الاسم، النوع (customer/supplier/both)، الهاتف، الرقم الضريبي، رصيد افتتاحي، الاتجاه (dr/cr)</span>
+        </div>
+        <div class="table-actions"><button class="btn copy sm" id="ptExport" type="button">تنزيل CSV للشركاء</button></div>
+        <div class="data-table-wrap">
+          <table class="data-table" id="ptTable">
+            <thead><tr><th>#</th><th>الاسم</th><th>النوع</th><th>الهاتف</th><th>الرصيد الافتتاحي</th><th>رصيد الفواتير</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="card" id="ptStatement" hidden style="margin:12px 0 0;background:var(--surface-2)">
+          <div class="card-title">كشف حساب الشريك</div>
+          <div class="row" style="justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+            <div><b id="ptStmtName"></b></div>
+            <div class="table-actions" style="margin:0"><button class="btn sm" id="ptStmtPrint" type="button">⎙ طباعة الكشف</button><button class="btn ghost sm" id="ptStmtClose" type="button">إغلاق</button></div>
+          </div>
+          <div class="data-table-wrap"><table class="data-table" id="ptStmtTable"><thead><tr><th>التاريخ</th><th>البيان</th><th>الرصيد</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- فاتورة جديدة -->
+      <div class="card">
+        <div class="card-title">فاتورة جديدة</div>
+        <div class="row" style="align-items:flex-end;gap:8px;flex-wrap:wrap">
+          <div class="field" style="flex:1 1 120px"><label for="ptgType">النوع</label><select id="ptgType"><option value="sale">فاتورة مبيعات (زبون)</option><option value="purchase">فاتورة مشتريات (مورد)</option></select></div>
+          <div class="field" style="flex:2 1 180px"><label for="ptgPartner">الشريك</label><select id="ptgPartner"><option value="">— اختر —</option></select></div>
+          <div class="field" style="flex:1 1 150px"><label for="ptgDate">التاريخ</label><input id="ptgDate" type="date"></div>
+          <div class="field" style="flex:2 1 220px"><label for="ptgMemo">البيان</label><input id="ptgMemo" type="text" placeholder="مثال: دفعة بضاعة #12"></div>
+        </div>
+        <div class="row" style="align-items:flex-end;gap:8px;flex-wrap:wrap">
+          <div class="field" style="flex:2 1 220px"><label for="ptgAcct">الحساب المالي</label><select id="ptgAcct"></select></div>
+          <div class="field" style="flex:1 1 130px"><label for="ptgVatRate">نسبة الضريبة</label><select id="ptgVatRate"><option value="16">16%</option><option value="10">10%</option><option value="5">5%</option><option value="0">0%</option></select></div>
+        </div>
+        <div class="table-actions"><button class="btn secondary sm" id="ptgAddLine" type="button">+ إضافة بند</button></div>
+        <div class="data-table-wrap">
+          <table class="data-table" id="ptgItems">
+            <thead><tr><th style="width:42%">البيان</th><th>الكمية</th><th>سعر الوحدة</th><th>المبلغ</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="results">
+          <div class="rcard"><div class="lbl">المجموع الفرعي</div><div class="val" id="ptgSub">0.00</div></div>
+          <div class="rcard"><div class="lbl">الضريبة</div><div class="val" id="ptgVat">0.00</div></div>
+          <div class="rcard"><div class="lbl">الإجمالي</div><div class="val" id="ptgTot">0.00</div></div>
+        </div>
+        <div class="table-actions"><button class="btn secondary sm" id="ptgSaveDraft" type="button">حفظ مسودة</button><button class="btn" id="ptgPost" type="button">حفظ + ترحيل قيد</button><button class="btn danger sm" id="ptgClearForm" type="button">مسح النموذج</button></div>
+        <div class="fin-note" id="ptgMsg">الترحيل ينشئ قيدًا متوازنًا في دفتر الأستاذ ويربط الفاتورة به تلقائيًا.</div>
+      </div>
+
+      <!-- سجل الفواتير -->
+      <div class="card">
+        <div class="card-title">سجل الفواتير</div>
+        <div class="row" style="align-items:flex-end;gap:8px;flex-wrap:wrap">
+          <div class="field" style="flex:0 1 130px"><label for="ptgFType">النوع</label><select id="ptgFType"><option value="">الكل</option><option value="sale">مبيعات</option><option value="purchase">مشتريات</option></select></div>
+          <div class="field" style="flex:0 1 130px"><label for="ptgFStatus">الحالة</label><select id="ptgFStatus"><option value="">الكل</option><option value="draft">مسودة</option><option value="posted">مرحّلة</option></select></div>
+        </div>
+        <div class="table-actions"><button class="btn copy sm" id="ptgExport" type="button">تنزيل CSV للفواتير</button></div>
+        <div class="data-table-wrap">
+          <table class="data-table" id="ptgTable">
+            <thead><tr><th>رقم</th><th>التاريخ</th><th>النوع</th><th>الشريك</th><th>الإجمالي</th><th>الحالة</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CHEQUES ============ -->
+    <section class="page" id="page-cheques">
+      <div class="page-header">
+        <h1><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5h17a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 15V9a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M6 12.5h.01M9.5 12.5h.01M13 12.5h.01M6 9.5h3"/></svg></span> الشيكات</h1>
+        <p>الشيكات الواردة والصادرة، الاستحقاقات القادمة، تحصيلها وارتدادها مع قيد تلقائي.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">شيك جديد</div>
+        <div class="row" style="align-items:flex-end;gap:8px;flex-wrap:wrap">
+          <div class="field" style="flex:0 1 140px"><label for="cqDir">النوع</label><select id="cqDir"><option value="in">وارد (لنا)</option><option value="out">صادر (علينا)</option></select></div>
+          <div class="field" style="flex:2 1 200px"><label for="cqParty">الجهة</label><input id="cqParty" type="text" list="cqPartners" placeholder="اسم الزبون/المورد"><datalist id="cqPartners"></datalist></div>
+          <div class="field" style="flex:1 1 140px"><label for="cqBank">المصرف</label><input id="cqBank" type="text" placeholder="بنك الراجح"></div>
+          <div class="field" style="flex:1 1 130px"><label for="cqNo">رقم الشيك</label><input id="cqNo" type="text" inputmode="text"></div>
+          <div class="field" style="flex:1 1 150px"><label for="cqDue">تاريخ الاستحقاق</label><input id="cqDue" type="date"></div>
+          <div class="field" style="flex:1 1 130px"><label for="cqAmt">المبلغ</label><input id="cqAmt" type="number" min="0" step="0.01" placeholder="0.00"></div>
+        </div>
+        <div class="row" style="align-items:flex-end;gap:8px;flex-wrap:wrap">
+          <div class="field" style="flex:3 1 260px"><label for="cqMemo">البيان</label><input id="cqMemo" type="text" placeholder="مقابل دفعة فاتورة / دفعة أولية"></div>
+          <button class="btn" id="cqAdd" type="button">إضافة الشيك</button>
+        </div>
+        <div class="fin-note">عند «تحصيل» شيك وارد يُنشأ قيد Dr البنك 1200 / Cr المدينون 1300؛ وعند «صرف» شيك صادر Dr الدائنون 2100 / Cr البنك 1200 — ويمكن تعديل القيد في السجل لاحقًا.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">سجل الشيكات</div>
+        <div class="row" style="align-items:flex-end;gap:8px;flex-wrap:wrap">
+          <div class="field" style="flex:0 1 130px"><label for="cqFDir">النوع</label><select id="cqFDir"><option value="">الكل</option><option value="in">واردة</option><option value="out">صادرة</option></select></div>
+          <div class="field" style="flex:0 1 160px"><label for="cqFStatus">الحالة</label><select id="cqFStatus"><option value="">الكل</option><option value="pending">قيد التحصيل / معلق</option><option value="collected">مُحصّل / مصروف</option><option value="bounced">مرتجع</option><option value="cancelled">ملغى</option></select></div>
+          <div class="field" style="flex:0 1 170px"><label for="cqFDue">الاستحقاق خلال</label><select id="cqFDue"><option value="">الكل</option><option value="7">7 أيام</option><option value="30">30 يومًا</option><option value="overdue">متأخرة</option></select></div>
+        </div>
+        <div class="table-actions"><button class="btn copy sm" id="cqExport" type="button">تنزيل CSV للشيكات</button></div>
+        <div class="data-table-wrap">
+          <table class="data-table" id="cqTable">
+            <thead><tr><th>#</th><th>رقم الشيك</th><th>الاستحقاق</th><th>الجهة</th><th>المصرف</th><th>النوع</th><th>المبلغ</th><th>الحالة</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     </main>
 
     <!-- Mobile bottom navigation (desktop: hidden) -->
@@ -1936,6 +2120,7 @@
 <script>
   const $ = (id) => document.getElementById(id);
   function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400); }
+  window.toastSafe = toast;
   function fmt(n){ if(!isFinite(n)) return 'خطأ'; const r=Math.round(n*1e9)/1e9; return r.toLocaleString('en-US',{maximumFractionDigits:9}); }
   function toCents(n){ return Math.round((Number(n)||0)*100); }
   function fromCents(c){ return (Number(c)||0)/100; }
@@ -3893,25 +4078,28 @@
   const SCStore = (function () {
     const _profile = (function () { try { return localStorage.getItem('sc:profile') || 'default'; } catch (e) { return 'default'; } })();
     const DB_NAME = _profile === 'default' ? 'supercalc' : 'supercalc_' + _profile;
-    const DB_VERSION = 1;
+    const DB_VERSION = 3;
     const SPEC = {
       kv: { keyPath: 'k' },
       journal: { keyPath: 'id' },
       audit: { keyPath: 'id', autoIncrement: true },
       coa: { keyPath: 'code' },
-      sessions: { keyPath: 'id' }
+      sessions: { keyPath: 'id' },
+      partners: { keyPath: 'id' },
+      invoices: { keyPath: 'id' },
+      cheques: { keyPath: 'id' }
     };
     const LS_KEY = 'sc:fallback:' + _profile;
     let db = null, mode = 'ls', memory = null, seq = 1, opening = null;
 
     function loadFallback() {
       if (memory) return memory;
-      memory = { kv: {}, journal: {}, coa: {}, sessions: {}, audit: [] };
+      memory = { kv: {}, journal: {}, coa: {}, sessions: {}, audit: [], partners: {}, invoices: {}, cheques: {} };
       try {
         const raw = localStorage.getItem(LS_KEY);
         if (raw) {
           const o = JSON.parse(raw) || {};
-          ['kv', 'journal', 'coa', 'sessions'].forEach(function (n) {
+          ['kv', 'journal', 'coa', 'sessions', 'partners', 'invoices', 'cheques'].forEach(function (n) {
             if (o[n] && typeof o[n] === 'object') memory[n] = o[n];
           });
           if (Array.isArray(o.audit)) memory.audit = o.audit;
@@ -4706,6 +4894,865 @@
       loadPeriodStatus: loadPeriodStatus, isPeriodClosed: isPeriodClosed, closeYear: closeYear };
   })();
   window.SCJE = SCJE;
+// ================= الشركاء والفواتير · SCTrade =================
+  const SCTrade = (function () {
+    function pad4(n) { return String(n).padStart(4, '0'); }
+    function r2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+    function f2(n) { return (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function today() {
+      const d = new Date(); const p = function (n) { return String(n).padStart(2, '0'); };
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+    }
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+    function yearNow() { return String(new Date().getFullYear()); }
+    const $t = function (id) { return document.getElementById(id); };
+    function esc(s) { return escHtml(s == null ? '' : s); }
+    function toast(m, k) { if (window.toastSafe) toastSafe(m); else window.alert(m); }
+    function kindLabel(k) { return k === 'supplier' ? 'مورد' : (k === 'both' ? 'زبون/مورد' : 'زبون'); }
+    function fmtVatRate(v) { return (Number(v) || 0) + '%'; }
+
+    // ---------- ترقيم الفواتير ----------
+    function formatNo(y, n) { return 'F-' + y + '-' + pad4(n); }
+    function nextInvoiceNo() {
+      return SCStore.kvGet('invSeq').then(function (seq) {
+        seq = (seq && typeof seq === 'object') ? seq : {};
+        const y = yearNow();
+        const n = (Number(seq[y]) || 0) + 1;
+        seq[y] = n;
+        return SCStore.kvSet('invSeq', seq).then(function () { return formatNo(y, n); });
+      });
+    }
+
+    // ---------- الشركاء ----------
+    function partnersAll() {
+      return SCStore.all('partners').then(function (rows) {
+        return (rows || []).slice().sort(function (a, b) {
+          return String(a.name).localeCompare(String(b.name), 'ar');
+        });
+      });
+    }
+    function invoicesAll() {
+      return SCStore.all('invoices').then(function (rows) {
+        return (rows || []).slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+      });
+    }
+    function addPartner(p) {
+      const rec = {
+        id: uid(),
+        kind: p.kind === 'supplier' || p.kind === 'both' ? p.kind : 'customer',
+        name: String(p.name || '').trim().slice(0, 80),
+        phone: String(p.phone || '').trim().slice(0, 30),
+        vat: String(p.vat || '').trim().slice(0, 30),
+        opening: r2(p.opening), openingSide: p.openingSide === 'cr' ? 'cr' : 'dr',
+        note: String(p.note || '').slice(0, 200), ts: Date.now()
+      };
+      if (rec.name.length < 2) return Promise.reject(new Error('name'));
+      return SCStore.put('partners', rec).then(function () { return rec; });
+    }
+    function removePartner(id) {
+      return invoicesAll().then(function (rows) {
+        const used = (rows || []).some(function (r) { return r.partnerId === id; });
+        if (used) return Promise.reject(new Error('linked'));
+        return SCStore.del('partners', id);
+      });
+    }
+    function partnerOpening(p) {
+      const v = r2((p && p.opening) || 0);
+      return (p && p.openingSide === 'cr') ? -v : v;
+    }
+    function partnerInvoiceBalance(partnerId, invoices) {
+      let bal = 0;
+      (invoices || []).forEach(function (v) {
+        if (String(v.partnerId) !== String(partnerId) || v.status !== 'posted') return;
+        bal += v.type === 'sale' ? r2(v.total) : -r2(v.total);
+      });
+      return r2(bal);
+    }
+
+    // ---------- الفواتير ----------
+    function computeTotals(items, vatRate) {
+      let sub = 0;
+      (items || []).forEach(function (it) { sub += r2(it.qty) * r2(it.price); });
+      sub = r2(sub);
+      const rate = Number(vatRate) || 0;
+      const vat = r2(sub * rate / 100);
+      return { subtotal: sub, vat: vat, total: r2(sub + vat), rate: rate };
+    }
+    function cleanItems(items) {
+      return (items || []).map(function (it) {
+        return { desc: String(it.desc || '').trim().slice(0, 120), qty: r2(it.qty), price: r2(it.price) };
+      }).filter(function (it) { return it.desc && it.qty > 0 && it.price > 0; });
+    }
+    function saveInvoice(rec) {
+      const items = cleanItems(rec.items);
+      if (!items.length) return Promise.reject(new Error('items'));
+      if (!rec.partnerId) return Promise.reject(new Error('partner'));
+      if (!/^(sale|purchase)$/.test(rec.type)) return Promise.reject(new Error('type'));
+      const t = computeTotals(items, rec.vatRate);
+      if (!(t.total > 0)) return Promise.reject(new Error('total'));
+      return partnersAll().then(function (list) {
+        const partner = (list || []).filter(function (p) { return p.id === rec.partnerId; })[0];
+        if (!partner) throw new Error('partner');
+        return partner;
+      }).then(function (partner) {
+        return nextInvoiceNo().then(function (no) {
+          const inv = {
+            id: uid(), no: no, date: rec.date || today(),
+            type: rec.type, partnerId: partner.id, partnerName: partner.name, partnerVat: partner.vat || '',
+            acct: String(rec.acct || ''), items: items, subtotal: t.subtotal, vatRate: t.rate, vat: t.vat,
+            total: t.total, memo: String(rec.memo || '').slice(0, 200), status: 'draft', jeId: '', ts: Date.now()
+          };
+          return SCStore.put('invoices', inv).then(function () { return inv; });
+        });
+      }).then(function (inv) {
+        if (rec.post) return postInvoice(inv.id);
+        return inv;
+      });
+    }
+    function acctName(code) { return (window.SCCOA ? SCCOA.name(code, code) : code); }
+    function saleLines(inv) {
+      const lines = [
+        { code: '1300', name: acctName('1300'), debit: inv.total, credit: 0 },
+        { code: inv.acct, name: acctName(inv.acct), debit: 0, credit: inv.subtotal }
+      ];
+      if (inv.vat > 0) lines.push({ code: '2200', name: acctName('2200'), debit: 0, credit: inv.vat });
+      return lines;
+    }
+    function purchaseLines(inv) {
+      const lines = [
+        { code: inv.acct, name: acctName(inv.acct), debit: inv.subtotal, credit: 0 }
+      ];
+      if (inv.vat > 0) lines.push({ code: '2210', name: acctName('2210'), debit: inv.vat, credit: 0 });
+      lines.push({ code: '2100', name: acctName('2100'), debit: 0, credit: inv.total });
+      return lines;
+    }
+    function postInvoice(id) {
+      return SCStore.get('invoices', id).then(function (inv) {
+        if (!inv) return Promise.reject(new Error('notfound'));
+        if (inv.status === 'posted' && inv.jeId) return inv;
+        const lines = inv.type === 'purchase' ? purchaseLines(inv) : saleLines(inv);
+        const memo = (inv.type === 'purchase' ? 'فاتورة مشتريات ' : 'فاتورة مبيعات ') + inv.no + (inv.partnerName ? ' · ' + inv.partnerName : '');
+        const entry = SCJE.build({ date: inv.date, memo: memo, src: 'inv:' + inv.id }, lines);
+        return SCJE.post(entry).then(function (saved) {
+          inv.status = 'posted';
+          inv.jeId = saved.id;
+          return SCStore.put('invoices', inv).then(function () { return inv; });
+        });
+      });
+    }
+    function unpostInvoice(id) {
+      return SCStore.get('invoices', id).then(function (inv) {
+        if (!inv) return Promise.reject(new Error('notfound'));
+        if (inv.status !== 'posted' || !inv.jeId) return inv;
+        return SCJE.reverse(inv.jeId, 'إلغاء ترحيل الفاتورة ' + inv.no).then(function () {
+          inv.status = 'draft';
+          inv.jeId = '';
+          return SCStore.put('invoices', inv).then(function () { return inv; });
+        });
+      });
+    }
+    function removeInvoice(id) {
+      return SCStore.get('invoices', id).then(function (inv) {
+        if (!inv) return true;
+        if (inv.status === 'posted') return Promise.reject(new Error('posted'));
+        return SCStore.del('invoices', id);
+      });
+    }
+
+    // ---------- CSV ----------
+    function csvCell(v) {
+      const s = String(v == null ? '' : v);
+      return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }
+    function downloadCSV(rows, name) {
+      const lines = (rows || []).map(function (r) { return r.map(csvCell).join(','); });
+      const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+      const a = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      a.href = url; a.download = (name || 'qayd') + '-' + yearNow() + '.csv';
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(url); if (a.parentNode) a.parentNode.removeChild(a); }, 1500);
+    }
+
+    // ---------- الطباعة ----------
+    function printRootHtml(bodyHtml) {
+      const root = $t('invoicePrintRoot');
+      if (!root) return;
+      SCStore.kvGet('repHead').then(function (head) {
+        head = head || {};
+        const org = head.org || 'مؤسستي';
+        const logo = head.logo || '';
+        root.innerHTML = '<div class="invoice-print">' +
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6mm;margin-bottom:4mm">' +
+            '<div><h1>' + esc(org) + '</h1><div class="ip-org">قيد — QAYD · Professional Accounting System</div></div>' +
+            (logo ? '<img alt="" src="' + esc(logo) + '" style="max-width:32mm;max-height:16mm;object-fit:contain">' : '') +
+          '</div>' +
+          bodyHtml +
+          '<div style="margin-top:10mm;font-size:9pt;color:#555">حُرّر بواسطة قيد — QAYD · Professional Accounting System · ' + esc(today()) + '</div>' +
+        '</div>';
+        document.body.classList.add('printing-invoice');
+        const restore = function () { document.body.classList.remove('printing-invoice'); root.innerHTML = ''; };
+        window.addEventListener('afterprint', function once() { restore(); }, { once: true });
+        try { window.print(); } catch (e) { restore(); toast('تعذر فتح الطباعة'); }
+        setTimeout(restore, 2000);
+      }).catch(function () {
+        toast('تعذر تجهيز الطباعة');
+      });
+    }
+
+    function statementHtml(p, invs, balance) {
+      const opening = partnerOpening(p);
+      let running = opening;
+      const body = [];
+      body.push('<div class="ip-meta"><div><b>كشف حساب</b>' + esc(p.name) + '</div><div><b>النوع</b>' + kindLabel(p.kind) + (p.vat ? ' · الرقم الضريبي: ' + esc(p.vat) : '') + '</div></div>');
+      body.push('<table><thead><tr><th>التاريخ</th><th>البيان</th><th>الرصيد</th></tr></thead><tbody>');
+      body.push('<tr><td>افتتاحي</td><td>رصيد افتتاحي (' + (opening >= 0 ? 'مدين' : 'دائن') + ')</td><td>' + f2(Math.abs(opening)) + '</td></tr>');
+      (invs || []).forEach(function (v) {
+        if (String(v.partnerId) !== String(p.id) || v.status !== 'posted') return;
+        running = r2(running + (v.type === 'sale' ? r2(v.total) : -r2(v.total)));
+        body.push('<tr><td>' + esc(v.date) + '</td><td>فاتورة ' + (v.type === 'sale' ? 'مبيعات' : 'مشتريات') + ' ' + esc(v.no) + (v.memo ? ' · ' + esc(v.memo) : '') + '</td><td>' + f2(Math.abs(running)) + ' ' + (running >= 0 ? 'مدين' : 'دائن') + '</td></tr>');
+      });
+      body.push('</tbody></table>');
+      body.push('<div class="ip-totals">' +
+        '<div><span>الرصيد الحالي</span><span>' + f2(Math.abs(balance)) + ' ' + (balance >= 0 ? 'مدين' : 'دائن') + '</span></div>' +
+      '</div>');
+      return body.join('');
+    }
+
+    function invoiceHtml(inv) {
+      const rows = (inv.items || []).map(function (it, i) {
+        const amt = r2(it.qty * it.price);
+        return '<tr><td>' + (i + 1) + '</td><td>' + esc(it.desc) + '</td><td>' + f2(it.qty) + '</td><td>' + f2(it.price) + '</td><td>' + f2(amt) + '</td></tr>';
+      }).join('');
+      const kind = inv.type === 'sale' ? 'فاتورة مبيعات' : 'فاتورة مشتريات';
+      const vatRow = inv.vat > 0 ? '<div><span>الضريبة (' + fmtVatRate(inv.vatRate) + ')</span><span>' + f2(inv.vat) + '</span></div>' : '';
+      return '<div class="ip-meta"><div><b>' + esc(kind) + '</b>' + esc(inv.no) + '</div>' +
+        '<div><b>التاريخ</b>' + esc(inv.date) + '</div>' +
+        '<div><b>' + (inv.type === 'sale' ? 'الزبون' : 'المورد') + '</b>' + esc(inv.partnerName) + (inv.partnerVat ? '<br>الرقم الضريبي: ' + esc(inv.partnerVat) : '') + '</div></div>' +
+        (inv.memo ? '<div style="margin-bottom:4mm"><b style="font-size:9pt;color:#555">البيان: </b>' + esc(inv.memo) + '</div>' : '') +
+        '<table><thead><tr><th>#</th><th>البيان</th><th>الكمية</th><th>سعر الوحدة</th><th>المبلغ</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+        '<div class="ip-totals">' +
+          '<div><span>المجموع الفرعي</span><span>' + f2(inv.subtotal) + '</span></div>' + vatRow +
+          '<div class="grand"><span>الإجمالي</span><span>' + f2(inv.total) + '</span></div>' +
+        '</div>' +
+        '<div class="ip-sign"><div>التوقيع والختم</div></div>';
+    }
+
+    // ---------- واجهة المستخدم ----------
+    function resetItemRows() {
+      const tb = $t('ptgItems') && $t('ptgItems').querySelector('tbody');
+      if (tb) tb.innerHTML = '';
+    }
+    function addItemRow(it) {
+      it = it || { qty: 1, price: 0 };
+      const tb = $t('ptgItems').querySelector('tbody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td><input class="it-desc" type="text" placeholder="بيان البند" value="' + esc(it.desc || '') + '"></td>'
+        + '<td><input class="it-qty" type="number" min="0" step="0.01" value="' + (it.qty != null ? it.qty : 1) + '" style="width:80px"></td>'
+        + '<td><input class="it-price" type="number" min="0" step="0.01" value="' + (it.price != null ? it.price : 0) + '" style="width:100px"></td>'
+        + '<td class="num it-amt">0.00</td>'
+        + '<td><button class="btn danger sm it-del" type="button" aria-label="حذف البند">✕</button></td>';
+      tr.querySelector('.it-del').addEventListener('click', function () { tr.remove(); refreshTotals(); });
+      tr.querySelectorAll('input').forEach(function (inp) {
+        inp.addEventListener('input', refreshTotals);
+      });
+      tb.appendChild(tr);
+      refreshTotals();
+    }
+    function readItems() {
+      const rows = Array.prototype.slice.call($t('ptgItems').querySelectorAll('tbody tr'));
+      return rows.map(function (tr) {
+        return {
+          desc: tr.querySelector('.it-desc').value.trim(),
+          qty: Number(tr.querySelector('.it-qty').value) || 0,
+          price: Number(tr.querySelector('.it-price').value) || 0
+        };
+      });
+    }
+    function refreshTotals() {
+      const items = readItems();
+      const t = computeTotals(items, $t('ptgVatRate') ? $t('ptgVatRate').value : 16);
+      $t('ptgItems').querySelectorAll('tbody tr').forEach(function (tr) {
+        const qty = Number(tr.querySelector('.it-qty').value) || 0;
+        const price = Number(tr.querySelector('.it-price').value) || 0;
+        tr.querySelector('.it-amt').textContent = f2(r2(qty * price));
+      });
+      if ($t('ptgSub')) $t('ptgSub').textContent = f2(t.subtotal);
+      if ($t('ptgVat')) $t('ptgVat').textContent = f2(t.vat);
+      if ($t('ptgTot')) $t('ptgTot').textContent = f2(t.total);
+    }
+    function fillPartnerSelect() {
+      const sel = $t('ptgPartner');
+      if (!sel) return Promise.resolve();
+      return partnersAll().then(function (list) {
+        const cur = sel.value;
+        sel.innerHTML = '<option value="">— اختر —</option>' + (list || []).map(function (p) {
+          return '<option value="' + esc(p.id) + '">' + esc(p.name) + ' · ' + kindLabel(p.kind) + '</option>';
+        }).join('');
+        if (cur) sel.value = cur;
+        if (window.__tradeSyncButtons) window.__tradeSyncButtons();
+      });
+    }
+    function fillAccountSelect() {
+      const sel = $t('ptgAcct');
+      if (!sel) return;
+      const rows = (window.SCCOA && SCCOA.list) ? SCCOA.list() : [];
+      const type = $t('ptgType').value === 'purchase' ? 'expense' : 'revenue';
+      sel.innerHTML = rows.filter(function (a) { return a.type === type || (!type && true); })
+        .map(function (a) { return '<option value="' + esc(a.code) + '">' + esc(a.code) + ' — ' + esc(a.name) + '</option>'; })
+        .join('');
+      if (!sel.value && sel.options.length) sel.selectedIndex = 0;
+      if (window.__tradeSyncButtons) window.__tradeSyncButtons();
+    }
+    function renderPartners() {
+      return partnersAll().then(function (list) {
+        return invoicesAll().then(function (invs) {
+          const tb = $t('ptTable').querySelector('tbody');
+          if (!tb) return;
+          tb.innerHTML = (list || []).map(function (p, i) {
+            const opening = partnerOpening(p);
+            const bal = r2(opening + partnerInvoiceBalance(p.id, invs));
+            const side = bal >= 0 ? 'مدين' : 'دائن';
+            return '<tr><td>' + (i + 1) + '</td><td>' + esc(p.name) + '</td><td>' + kindLabel(p.kind) + '</td><td>' + esc(p.phone) + '</td><td>' + f2(Math.abs(opening)) + ' ' + (opening >= 0 ? 'مدين' : 'دائن') + '</td><td>' + f2(Math.abs(bal)) + ' ' + side + '</td><td><button class="btn ghost sm pt-stmt" type="button" data-id="' + esc(p.id) + '">كشف</button> <button class="btn danger sm pt-del" type="button" data-id="' + esc(p.id) + '">حذف</button></td></tr>';
+          }).join('');
+        });
+      });
+    }
+    function renderInvoices() {
+      return invoicesAll().then(function (list) {
+        const fType = $t('ptgFType') ? $t('ptgFType').value : '';
+        const fStatus = $t('ptgFStatus') ? $t('ptgFStatus').value : '';
+        const rows = (list || []).filter(function (v) {
+          return (!fType || v.type === fType) && (!fStatus || v.status === fStatus);
+        });
+        const tb = $t('ptgTable').querySelector('tbody');
+        tb.innerHTML = rows.map(function (v) {
+          const status = v.status === 'posted'
+            ? 'مرحّلة' + (v.jeId ? ' · ' + esc(v.jeId) : '')
+            : '<span style="color:var(--amber)">مسودة</span>';
+          const toggle = v.status === 'posted'
+            ? '<button class="btn ghost sm ptg-unpost" type="button" data-id="' + esc(v.id) + '">إلغاء ترحيل</button>'
+            : '<button class="btn sm ptg-post" type="button" data-id="' + esc(v.id) + '">ترحيل</button>';
+          return '<tr><td>' + esc(v.no) + '</td><td>' + esc(v.date) + '</td><td>' + (v.type === 'sale' ? 'مبيعات' : 'مشتريات') + '</td><td>' + esc(v.partnerName) + '</td><td>' + f2(v.total) + '</td><td>' + status + '</td><td>' + toggle + ' <button class="btn ghost sm ptg-print" type="button" data-id="' + esc(v.id) + '">طباعة</button>' + (v.status !== 'posted' ? ' <button class="btn danger sm ptg-del" type="button" data-id="' + esc(v.id) + '">حذف</button>' : '') + '</td></tr>';
+        }).join('');
+      });
+    }
+    function refreshAll() {
+      return renderPartners().then(fillPartnerSelect).then(renderInvoices);
+    }
+    function exportPartners() {
+      return partnersAll().then(function (list) {
+        return invoicesAll().then(function (invs) {
+          const rows = [['#', 'الاسم', 'النوع', 'الهاتف', 'الرقم الضريبي', 'الرصيد الافتتاحي', 'رصيد الفواتير']];
+          (list || []).forEach(function (p, i) {
+            const opening = partnerOpening(p);
+            const bal = r2(opening + partnerInvoiceBalance(p.id, invs));
+            rows.push([i + 1, p.name, kindLabel(p.kind), p.phone, p.vat,
+              (opening >= 0 ? '' : '-') + f2(Math.abs(opening)) + ' ' + (opening >= 0 ? 'مدين' : 'دائن'),
+              (bal >= 0 ? '' : '-') + f2(Math.abs(bal)) + ' ' + (bal >= 0 ? 'مدين' : 'دائن')]);
+          });
+          downloadCSV(rows, 'الشركاء');
+        });
+      });
+    }
+    function exportInvoices() {
+      return invoicesAll().then(function (list) {
+        const rows = [['رقم', 'التاريخ', 'النوع', 'الشريك', 'المجموع الفرعي', 'الضريبة', 'الإجمالي', 'الحالة', 'رقم القيد']];
+        (list || []).forEach(function (v) {
+          rows.push([v.no, v.date, v.type === 'sale' ? 'مبيعات' : 'مشتريات', v.partnerName, f2(v.subtotal), f2(v.vat), f2(v.total), v.status === 'posted' ? 'مرحّلة' : 'مسودة', v.jeId || '']);
+        });
+        downloadCSV(rows, 'الفواتير');
+      });
+    }
+    function printStatement(id) {
+      return partnersAll().then(function (list) {
+        const p = (list || []).filter(function (x) { return x.id === id; })[0];
+        if (!p) return;
+        return invoicesAll().then(function (invs) {
+          const bal = r2(partnerOpening(p) + partnerInvoiceBalance(p.id, invs));
+          const head = statementHtml(p, invs, bal);
+          printRootHtml(head);
+        });
+      });
+    }
+    function printInvoice(id) {
+      return SCStore.get('invoices', id).then(function (inv) {
+        if (!inv) return;
+        printRootHtml(invoiceHtml(inv));
+      });
+    }
+    function showStatement(id) {
+      return partnersAll().then(function (list) {
+        const p = (list || []).filter(function (x) { return x.id === id; })[0];
+        if (!p) return;
+        return invoicesAll().then(function (invs) {
+          const panel = $t('ptStatement');
+          const table = $t('ptStmtTable').querySelector('tbody');
+          let running = partnerOpening(p);
+          const opening = running;
+          const lines = [];
+          lines.push('<tr><td>افتتاحي</td><td>رصيد افتتاحي (' + (opening >= 0 ? 'مدين' : 'دائن') + ')</td><td>' + f2(Math.abs(opening)) + '</td></tr>');
+          (invs || []).forEach(function (v) {
+            if (String(v.partnerId) !== String(p.id) || v.status !== 'posted') return;
+            running = r2(running + (v.type === 'sale' ? r2(v.total) : -r2(v.total)));
+            lines.push('<tr><td>' + esc(v.date) + '</td><td>فاتورة ' + (v.type === 'sale' ? 'مبيعات' : 'مشتريات') + ' ' + esc(v.no) + '</td><td>' + f2(Math.abs(running)) + ' ' + (running >= 0 ? 'مدين' : 'دائن') + '</td></tr>');
+          });
+          table.innerHTML = lines.join('');
+          $t('ptStmtName').textContent = p.name + ' · ' + kindLabel(p.kind);
+          panel.hidden = false;
+          panel.dataset.partnerId = p.id;
+          try { panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+        });
+      });
+    }
+    function init() {
+      const page = $t('page-trade');
+      if (!page) return;
+      $t('ptgDate').value = today();
+      // add the first item row
+      resetItemRows();
+      addItemRow({ qty: 1, price: 0 });
+      fillAccountSelect();
+      function syncTradeButtons() {
+        const ok = !!($t('ptgPartner').value && $t('ptgAcct').value);
+        $t('ptgSaveDraft').disabled = !ok;
+        $t('ptgPost').disabled = !ok;
+      }
+      if (window.SCCOA && SCCOA.ready) {
+        SCCOA.ready().then(function () { fillAccountSelect(); refreshAll(); syncTradeButtons(); });
+      }
+      if (window.__tradeSyncButtons) window.__tradeSyncButtons = syncTradeButtons;
+      $t('ptgPartner').addEventListener('change', syncTradeButtons);
+      $t('ptgAcct').addEventListener('change', syncTradeButtons);
+      const addLine = $t('ptgAddLine');
+      if (addLine) addLine.addEventListener('click', function () { addItemRow({ qty: 1, price: 0 }); });
+      const vatSel = $t('ptgVatRate');
+      if (vatSel) vatSel.addEventListener('change', refreshTotals);
+      const typeSel = $t('ptgType');
+      if (typeSel) typeSel.addEventListener('change', fillAccountSelect);
+      const addPartnerBtn = $t('ptAdd');
+      if (addPartnerBtn) addPartnerBtn.addEventListener('click', function () {
+        addPartner({
+          name: $t('ptName').value, kind: $t('ptKind').value, phone: $t('ptPhone').value, vat: $t('ptVat').value,
+          opening: $t('ptOpen').value, openingSide: $t('ptOpenSide').value
+        }).then(function () {
+          $t('ptName').value = ''; $t('ptPhone').value = ''; $t('ptVat').value = ''; $t('ptOpen').value = '0';
+          return refreshAll();
+        }).catch(function (e) { toast(e && e.message === 'name' ? 'أدخل اسم الشريك' : 'تعذر الحفظ'); });
+      });
+      const saveDraft = $t('ptgSaveDraft');
+      if (saveDraft) saveDraft.addEventListener('click', function () {
+        saveCurrentInvoice(false, saveDraft);
+      });
+      const postBtn = $t('ptgPost');
+      if (postBtn) postBtn.addEventListener('click', function () {
+        saveCurrentInvoice(true, postBtn);
+      });
+      const clearForm = $t('ptgClearForm');
+      if (clearForm) clearForm.addEventListener('click', function () {
+        resetItemRows(); addItemRow({ qty: 1, price: 0 });
+        $t('ptgMemo').value = '';
+        $t('ptgPartner').value = '';
+        refreshTotals();
+      });
+      const exportP = $t('ptExport');
+      if (exportP) exportP.addEventListener('click', function () { exportPartners(); });
+      const tpl = $t('ptTemplate');
+      if (tpl) tpl.addEventListener('click', function () {
+        downloadCSV([['الاسم', 'النوع', 'الهاتف', 'الرقم الضريبي', 'رصيد افتتاحي', 'الاتجاه'],
+          ['اسم الزبون', 'customer', '0790000000', '123456789', '0', 'dr'],
+          ['اسم المورد', 'supplier', '', '', '0', 'cr']], 'قالب-الشركاء');
+      });
+      const imp = $t('ptImportFile');
+      if (imp) imp.addEventListener('change', function () {
+        const file = imp.files && imp.files[0];
+        if (!file) return;
+        const fr = new FileReader();
+        fr.onload = function () {
+          if (typeof parseCSV !== 'function') { toast('أداة CSV غير متوفرة'); return; }
+          const rows = parseCSV(fr.result);
+          if (!rows.length) { toast('ملف CSV فارغ'); return; }
+          const header = rows[0].map(function (c) { return String(c || '').trim().toLowerCase(); });
+          const col = function (patterns) {
+            for (let i = 0; i < patterns.length; i++) {
+              const idx = header.findIndex(function (c) { return patterns[i].test(c); });
+              if (idx >= 0) return idx;
+            }
+            return -1;
+          };
+          const map = {
+            name: col([/name|الاسم/]), kind: col([/kind|type|نوع/]), phone: col([/phone|هاتف/]),
+            vat: col([/vat|ضريبي/]), opening: col([/opening|رصيد/]), side: col([/side|اتجاه/])
+          };
+          const pos = map.name >= 0 ? map : { name: 0, kind: 1, phone: 2, vat: 3, opening: 4, side: 5 };
+          const dataRows = map.name >= 0 ? rows.slice(1) : rows;
+          const kindMap = { customer: 'customer', 'زبون': 'customer', supplier: 'supplier', 'مورد': 'supplier', both: 'both', 'زبون/مورد': 'both' };
+          let added = 0, skipped = 0;
+          const chain = dataRows.reduce(function (p, r) {
+            return p.then(function () {
+              const name = String((r[pos.name] || '')).trim();
+              if (name.length < 2) { skipped++; return; }
+              const rawKind = String(pos.kind >= 0 ? r[pos.kind] : 'customer').trim().toLowerCase();
+              const kind = kindMap[rawKind] || 'customer';
+              return addPartner({
+                name: name, kind: kind,
+                phone: pos.phone >= 0 ? r[pos.phone] : '',
+                vat: pos.vat >= 0 ? r[pos.vat] : '',
+                opening: Number(pos.opening >= 0 ? r[pos.opening] : 0) || 0,
+                openingSide: String(pos.side >= 0 ? r[pos.side] : 'dr').trim().toLowerCase() === 'cr' ? 'cr' : 'dr'
+              }).then(function () { added++; }).catch(function () { skipped++; });
+            });
+          }, Promise.resolve());
+          chain.then(function () {
+            toast('أُضيف ' + added + ' شريك' + (skipped ? ' · تخطي ' + skipped : ''));
+            refreshAll();
+          });
+        };
+        fr.readAsText(file, 'utf-8');
+        imp.value = '';
+      });
+      const exportI = $t('ptgExport');
+      if (exportI) exportI.addEventListener('click', function () { exportInvoices(); });
+      const fType = $t('ptgFType');
+      if (fType) fType.addEventListener('change', renderInvoices);
+      const fStatus = $t('ptgFStatus');
+      if (fStatus) fStatus.addEventListener('change', renderInvoices);
+      // delegation for dynamic buttons
+      page.addEventListener('click', function (e) {
+        const t = e.target.closest('button');
+        if (!t) return;
+        if (t.classList.contains('pt-stmt')) { e.preventDefault(); showStatement(t.dataset.id); return; }
+        if (t.classList.contains('pt-del')) {
+          e.preventDefault();
+          const id = t.dataset.id;
+          if (window.confirm('حذف الشريك نهائيًا؟ (لا يمكن حذفه إن كانت له فواتير)')) {
+            removePartner(id).then(refreshAll).catch(function (err) { toast(err && err.message === 'linked' ? 'لا يمكن حذف شريك له فواتير' : 'تعذر الحذف'); });
+          }
+          return;
+        }
+        if (t.classList.contains('ptg-post')) { e.preventDefault(); postInvoice(t.dataset.id).then(refreshAll).catch(function () { toast('تعذر ترحيل الفاتورة'); }); return; }
+        if (t.classList.contains('ptg-unpost')) { e.preventDefault(); if (window.confirm('سيُنشأ قيد معاكس. المتابعة؟')) unpostInvoice(t.dataset.id).then(refreshAll).catch(function () { toast('تعذر إلغاء الترحيل'); }); return; }
+        if (t.classList.contains('ptg-print')) { e.preventDefault(); printInvoice(t.dataset.id); return; }
+        if (t.classList.contains('ptg-del')) {
+          e.preventDefault();
+          const id = t.dataset.id;
+          if (window.confirm('حذف هذه الفاتورة (مسودة)؟')) {
+            removeInvoice(id).then(refreshAll).catch(function (err) { toast(err && err.message === 'posted' ? 'لا يمكن حذف فاتورة مرحّلة' : 'تعذر الحذف'); });
+          }
+          return;
+        }
+      });
+      const stmtPrint = $t('ptStmtPrint');
+      if (stmtPrint) stmtPrint.addEventListener('click', function () {
+        const panel = $t('ptStatement');
+        if (panel && panel.dataset.partnerId) printStatement(panel.dataset.partnerId);
+      });
+      const stmtClose = $t('ptStmtClose');
+      if (stmtClose) stmtClose.addEventListener('click', function () { $t('ptStatement').hidden = true; });
+      refreshAll();
+    }
+    function saveCurrentInvoice(post, btn) {
+      const items = readItems();
+      const rec = {
+        type: $t('ptgType').value === 'purchase' ? 'purchase' : 'sale',
+        partnerId: $t('ptgPartner').value,
+        date: $t('ptgDate').value || today(),
+        memo: $t('ptgMemo').value,
+        acct: $t('ptgAcct').value,
+        vatRate: $t('ptgVatRate').value,
+        items: items,
+        post: !!post
+      };
+      const msg = $t('ptgMsg');
+      if (!$t('ptgAcct').value) {
+        if (msg) msg.textContent = 'اختر الحساب المالي أولًا.';
+        if (btn) btn.disabled = false;
+        return;
+      }
+      if (btn) btn.disabled = true;
+      saveInvoice(rec).then(function (inv) {
+        if (msg) msg.textContent = (post ? 'رُحّلت الفاتورة برقم قيد ' + (inv.jeId || '') : 'حُفظت مسودة بالرقم ' + inv.no);
+        $t('ptgMemo').value = '';
+        resetItemRows(); addItemRow({ qty: 1, price: 0 });
+        return refreshAll();
+      }).catch(function (e) {
+        if (msg) msg.textContent = e && e.message === 'items' ? 'أضف بندًا واحدًا على الأقل بكميات وأسعار.'
+          : e && e.message === 'partner' ? 'اختر شريكًا أولًا.'
+          : 'تعذر حفظ الفاتورة.';
+      }).then(function () { if (btn) btn.disabled = false; });
+    }
+
+    return {
+      init: init,
+      exportPartners: exportPartners,
+      exportInvoices: exportInvoices,
+      printInvoice: printInvoice,
+      postInvoice: postInvoice,
+      unpostInvoice: unpostInvoice,
+      invoicesAll: invoicesAll,
+      partnersAll: partnersAll
+    };
+  })();
+  window.SCTrade = SCTrade;
+  SCTrade.init();
+  // ================= الشيكات · SCCheques =================
+  const SCCheques = (function () {
+    function pad2(n) { return String(n).padStart(2, '0'); }
+    function today() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+    function r2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+    function f2(n) { return (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+    const $c = function (id) { return document.getElementById(id); };
+    function esc(s) { return escHtml(s == null ? '' : s); }
+    function toast(m) { if (window.toastSafe) toastSafe(m); else window.alert(m); }
+    function acctName(code) { return (window.SCCOA ? SCCOA.name(code, code) : code); }
+    function statusLabel(s) {
+      return s === 'collected' ? 'مُحصّل' : s === 'bounced' ? 'مرتجع' : s === 'cancelled' ? 'ملغى' : 'قيد التحصيل';
+    }
+    function chequesAll() {
+      return SCStore.all('cheques').then(function (rows) {
+        return (rows || []).slice().sort(function (a, b) { return String(a.due || '').localeCompare(String(b.due || '')); });
+      });
+    }
+    function addCheque(rec) {
+      const amt = r2(rec && rec.amount);
+      if (!(amt > 0)) return Promise.reject(new Error('amount'));
+      const party = String((rec && rec.party) || '').trim();
+      if (!party) return Promise.reject(new Error('party'));
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(rec.due || '')) rec = Object.assign({}, rec, { due: today() });
+      const cq = {
+        id: uid(), dir: rec.dir === 'out' ? 'out' : 'in',
+        party: party.slice(0, 80), bank: String(rec.bank || '').trim().slice(0, 60),
+        no: String(rec.no || '').trim().slice(0, 30), due: rec.due,
+        amount: amt, memo: String(rec.memo || '').slice(0, 200),
+        status: 'pending', jeId: '', ts: Date.now()
+      };
+      return SCStore.put('cheques', cq).then(function () { return cq; });
+    }
+    function buildSettleJE(cq) {
+      const bankCode = '1200', arCode = '1300', apCode = '2100';
+      const isIn = cq.dir === 'in';
+      const lines = isIn
+        ? [{ code: bankCode, name: acctName(bankCode), debit: cq.amount, credit: 0 },
+           { code: arCode, name: acctName(arCode), debit: 0, credit: cq.amount }]
+        : [{ code: apCode, name: acctName(apCode), debit: cq.amount, credit: 0 },
+           { code: bankCode, name: acctName(bankCode), debit: 0, credit: cq.amount }];
+      const memo = 'شيك ' + (isIn ? 'وارد' : 'صادر') + (cq.no ? ' رقم ' + cq.no : '') + ' · ' + cq.party;
+      return SCJE.build({ date: cq.due, memo: memo, src: 'cq:' + cq.id }, lines);
+    }
+    function settle(id) {
+      return SCStore.get('cheques', id).then(function (cq) {
+        if (!cq) return Promise.reject(new Error('notfound'));
+        if (cq.status === 'collected') return cq;
+        return SCJE.post(buildSettleJE(cq)).then(function (saved) {
+          cq.status = 'collected';
+          cq.jeId = saved.id;
+          return SCStore.put('cheques', cq).then(function () { return cq; });
+        });
+      });
+    }
+    function unsettle(id) {
+      return SCStore.get('cheques', id).then(function (cq) {
+        if (!cq) return Promise.reject(new Error('notfound'));
+        if (cq.status !== 'collected' || !cq.jeId) return cq;
+        return SCJE.reverse(cq.jeId, 'إلغاء تسوية شيك' + (cq.no ? ' رقم ' + cq.no : '')).then(function () {
+          cq.status = 'pending';
+          cq.jeId = '';
+          return SCStore.put('cheques', cq).then(function () { return cq; });
+        });
+      });
+    }
+    function setStatus(id, status) {
+      return SCStore.get('cheques', id).then(function (cq) {
+        if (!cq) return;
+        cq.status = status;
+        return SCStore.put('cheques', cq);
+      });
+    }
+    function removeCheque(id) {
+      return SCStore.get('cheques', id).then(function (cq) {
+        if (!cq) return true;
+        if (cq.status === 'collected') return Promise.reject(new Error('posted'));
+        return SCStore.del('cheques', id);
+      });
+    }
+    function daysUntil(due) {
+      const t = new Date(today() + 'T00:00:00');
+      const d = new Date(String(due || '') + 'T00:00:00');
+      return Math.round((d - t) / 86400000);
+    }
+    function csvCell(v) {
+      const s = String(v == null ? '' : v);
+      return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }
+    function downloadCSV(rows, name) {
+      const lines = (rows || []).map(function (r) { return r.map(csvCell).join(','); });
+      const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+      const a = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      a.href = url; a.download = (name || 'cheque') + '.csv';
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(url); if (a.parentNode) a.parentNode.removeChild(a); }, 1500);
+    }
+    function exportCSVCheques() {
+      return chequesAll().then(function (list) {
+        const rows = [['#', 'رقم الشيك', 'النوع', 'الاستحقاق', 'الجهة', 'المصرف', 'المبلغ', 'الحالة', 'البيان', 'رقم القيد']];
+        (list || []).forEach(function (cq, i) {
+          rows.push([i + 1, cq.no, cq.dir === 'in' ? 'وارد' : 'صادر', cq.due, cq.party, cq.bank, f2(cq.amount), statusLabel(cq.status), cq.memo, cq.jeId || '']);
+        });
+        downloadCSV(rows, 'الشيكات');
+      });
+    }
+    function render() {
+      return chequesAll().then(function (list) {
+        const fDir = $c('cqFDir').value, fStatus = $c('cqFStatus').value, fDue = $c('cqFDue').value;
+        const rows = (list || []).filter(function (cq) {
+          if (fDir && cq.dir !== fDir) return false;
+          if (fStatus && cq.status !== fStatus) return false;
+          if (fDue) {
+            const d = daysUntil(cq.due);
+            if (fDue === 'overdue') return d < 0 && cq.status === 'pending';
+            return d >= 0 && d <= Number(fDue);
+          }
+          return true;
+        });
+        const tb = $c('cqTable').querySelector('tbody');
+        tb.innerHTML = rows.map(function (cq, i) {
+          const isIn = cq.dir === 'in';
+          const due = daysUntil(cq.due);
+          const cls = cq.status === 'pending' ? (due < 0 ? 'cq-overdue' : due <= 7 ? 'cq-due-soon' : '') : '';
+          const badge = '<span class="cq-badge cq-' + (cq.status || 'pending') + '">' + statusLabel(cq.status) + '</span>';
+          const toggle = cq.status === 'collected'
+            ? '<button class="btn ghost sm cq-settle" type="button" data-id="' + esc(cq.id) + '">إلغاء ' + (isIn ? 'التحصيل' : 'الصرف') + '</button>'
+            : (cq.status === 'cancelled' ? '' : '<button class="btn sm cq-settle" type="button" data-id="' + esc(cq.id) + '">' + (isIn ? 'تحصيل' : 'صرف') + '</button>');
+          const actions = [];
+          if (toggle) actions.push(toggle);
+          if (cq.status !== 'collected' && cq.status !== 'cancelled') actions.push('<button class="btn ghost sm cq-bounce" type="button" data-id="' + esc(cq.id) + '">مرتجع</button>');
+          if (cq.status !== 'cancelled' && cq.status !== 'collected') actions.push('<button class="btn ghost sm cq-cancel" type="button" data-id="' + esc(cq.id) + '">إلغاء</button>');
+          if (cq.status !== 'collected') actions.push('<button class="btn danger sm cq-del" type="button" data-id="' + esc(cq.id) + '">حذف</button>');
+          return '<tr class="' + cls + '"><td>' + (i + 1) + '</td><td>' + esc(cq.no) + '</td><td>' + esc(cq.due) + '</td><td>' + esc(cq.party) + '</td><td>' + esc(cq.bank) + '</td><td>' + (isIn ? 'وارد' : 'صادر') + '</td><td>' + f2(cq.amount) + '</td><td>' + badge + '</td><td>' + actions.join(' ') + '</td></tr>';
+        }).join('');
+      });
+    }
+    function fillDatalist() {
+      const dl = $c('cqPartners');
+      if (!dl || !window.SCTrade || !SCTrade.partnersAll) return;
+      SCTrade.partnersAll().then(function (list) {
+        dl.innerHTML = (list || []).map(function (p) { return '<option value="' + esc(p.name) + '">'; }).join('');
+      }).catch(function () {});
+    }
+    function init() {
+      const page = $c('page-cheques');
+      if (!page) return;
+      $c('cqDue').value = today();
+      fillDatalist();
+      $c('cqAdd').addEventListener('click', function () {
+        const rec = { dir: $c('cqDir').value, party: $c('cqParty').value, bank: $c('cqBank').value,
+          no: $c('cqNo').value, due: $c('cqDue').value, amount: $c('cqAmt').value, memo: $c('cqMemo').value };
+        addCheque(rec).then(function (cq) {
+          $c('cqParty').value = ''; $c('cqBank').value = ''; $c('cqNo').value = ''; $c('cqAmt').value = ''; $c('cqMemo').value = '';
+          toast('أُضيف الشيك' + (cq.no ? ' رقم ' + cq.no : ''));
+          return render();
+        }).catch(function (e) {
+          toast(e && e.message === 'amount' ? 'أدخل مبلغًا أكبر من صفر' : e && e.message === 'party' ? 'أدخل الجهة' : 'تعذر الحفظ');
+        });
+      });
+      page.addEventListener('click', function (e) {
+        const t = e.target.closest('button');
+        if (!t) return;
+        const id = t.dataset.id;
+        if (t.classList.contains('cq-settle')) {
+          e.preventDefault();
+          settle(id).then(render).catch(function () { toast('تعذر تسوية الشيك'); });
+          return;
+        }
+        if (t.classList.contains('cq-bounce')) {
+          e.preventDefault();
+          if (window.confirm('سيتحول الشيك إلى «مرتجع». المتابعة؟')) setStatus(id, 'bounced').then(render);
+          return;
+        }
+        if (t.classList.contains('cq-cancel')) {
+          e.preventDefault();
+          if (window.confirm('إلغاء هذا الشيك؟')) setStatus(id, 'cancelled').then(render);
+          return;
+        }
+        if (t.classList.contains('cq-del')) {
+          e.preventDefault();
+          if (window.confirm('حذف الشيك نهائيًا؟')) {
+            removeCheque(id).then(render).catch(function (err) { toast(err && err.message === 'posted' ? 'لا يمكن حذف شيك مُحصّل' : 'تعذر الحذف'); });
+          }
+          return;
+        }
+      });
+      ['cqFDir', 'cqFStatus', 'cqFDue'].forEach(function (id) {
+        const el = $c(id);
+        if (el) el.addEventListener('change', render);
+      });
+      const exp = $c('cqExport');
+      if (exp) exp.addEventListener('click', exportCSVCheques);
+      render();
+    }
+
+    return { init: init, exportCSVCheques: exportCSVCheques };
+  })();
+  window.SCCheques = SCCheques;
+  SCCheques.init();
+  // ================= ملخص VAT ربع السنوي · SCVatQ =================
+  const SCVatQ = (function () {
+    function pad2(n) { return String(n).padStart(2, '0'); }
+    function r2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+    function f2(n) { return (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    const $v = function (id) { return document.getElementById(id); };
+    function sumAccount(entries, code, isDebit) {
+      let s = 0;
+      (entries || []).forEach(function (e) {
+        (e.lines || []).forEach(function (l) {
+          if (String(l.code) !== code) return;
+          s += isDebit ? r2(l.debit) : r2(l.credit);
+        });
+      });
+      return r2(s);
+    }
+    function compute() {
+      const y = Number($v('V_qYear').value) || new Date().getFullYear();
+      const q = Number($v('V_qQuarter').value) || 1;
+      const startMonth = (q - 1) * 3 + 1;
+      return SCJE.allEntries().then(function (rows) {
+        const tb = $v('V_qTable').querySelector('tbody');
+        let totOut = 0, totIn = 0;
+        const lines = [];
+        for (let i = 0; i < 3; i++) {
+          const m = startMonth + i;
+          const last = new Date(y, m, 0).getDate();
+          const a = y + '-' + pad2(m) + '-01';
+          const b = y + '-' + pad2(m) + '-' + pad2(last);
+          const monthEntries = (rows || []).filter(function (e) {
+            const d = String(e.date || '');
+            return d >= a && d <= b;
+          });
+          const out = sumAccount(monthEntries, '2200', false);
+          const inp = sumAccount(monthEntries, '2210', true);
+          totOut = r2(totOut + out);
+          totIn = r2(totIn + inp);
+          lines.push('<tr><td>' + y + '-' + pad2(m) + '</td><td>' + f2(out) + '</td><td>' + f2(inp) + '</td><td>' + f2(r2(out - inp)) + '</td></tr>');
+        }
+        tb.innerHTML = lines.join('');
+        $v('V_qOut').textContent = f2(totOut);
+        $v('V_qIn').textContent = f2(totIn);
+        $v('V_qNet').textContent = f2(r2(totOut - totIn));
+      });
+    }
+    function init() {
+      const yEl = $v('V_qYear');
+      if (!yEl) return;
+      yEl.value = String(new Date().getFullYear());
+      const btn = $v('V_qCompute');
+      if (btn) btn.addEventListener('click', function () { compute(); });
+    }
+    return { init: init };
+  })();
+  window.SCVatQ = SCVatQ;
+  SCVatQ.init();
 
   // ================= التقارير المالية من القيود المرحّلة · SCFin =================
   const SCFin = (function () {
@@ -7076,6 +8123,24 @@
     "قيد — منظومة المحاسبة الاحترافية (QAYD)": "QAYD — Professional Accounting System",
     "كل الأدوات": "All tools",
     "التنقل السريع": "Quick navigation",
+    "المحاسبة التجارية": "Trade accounting",
+    "الفواتير والدفاتر": "Invoices & Ledgers",
+    "الشركاء (دائنون / مدينون)": "Partners (AP / AR)",
+    "فاتورة جديدة": "New invoice",
+    "سجل الفواتير": "Invoice log",
+    "كشف حساب الشريك": "Partner statement",
+    "حفظ + ترحيل قيد": "Save + post entry",
+    "إلغاء ترحيل": "Unpost",
+    "ترحيل": "Post",
+    "مسودة": "Draft",
+    "مرحّلة": "Posted",
+    "الرصيد الافتتاحي": "Opening balance",
+    "رصيد الفواتير": "Invoices balance",
+    "الشيكات": "Cheques",
+    "شيك جديد": "New cheque",
+    "سجل الشيكات": "Cheque log",
+    "وارد (لنا)": "Incoming (ours)",
+    "صادر (علينا)": "Outgoing (ours)",
     "المزيد": "More",
     "كل الأنواع": "All types",
     "كل الاختصارات": "All shortcuts",
@@ -8053,5 +9118,6 @@
 
   bootApp();
 </script>
+  <div class="invoice-print-root" id="invoicePrintRoot" aria-hidden="true"></div>
 </body>
 </html>
