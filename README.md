@@ -140,3 +140,13 @@
 4. للتحقق: `python verify_patch.py` (يفحص صياغة JS) ثم فحص متصفح بلا أخطاء كونسول.
 5. السجل الكامل لكل التعديلات: `CHANGELOG.md`.
 6. الهندسة المعتمدة للمرحلة القادمة (Dexie v4، تعدد الشركات، المزامنة): `ARCHITECTURE.md`.
+
+## 8. مشروع الجيل الجديد `qayd/`
+
+داخل هذا المستودع توجد البنية التحتية للمرحلة القادمة (لم تُنشر بعد على الموقع؛ الموقع الحي يظل على `index.html`):
+
+- `qayd/` — مشروع **Vite + TypeScript + Dexie v4**، قيد مزدوج ذري، RBAC + Company Scope، نسخ احتياطي تلقائي.
+- التشغيل: `cd qayd` ثم `npm install` ثم `npm run dev`؛ الاختبارات `npm test`؛ البناء `npm run build`.
+- `qayd/src/legacy/index.html` — نسخة التطبيق الحالي للرجوع (لا تُحذف إلا بعد اجتياز الاختبارات).
+- التوثيق: `qayd/docs/` (ACCOUNTING · DATABASE · SECURITY · BACKUP · CHANGELOG).
+- حاليًا: **29/29 اختبار ناجح** والبناء سليم.

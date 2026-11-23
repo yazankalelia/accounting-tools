@@ -105,20 +105,32 @@ db.version(4).stores({
 
 - **مفتاح الجلسة المحلي**: `localStorage['qayd:activeCompany']`. كل استعلام يمر عبر `withCompany(table)` تُحقن `companyId` تلقائيًا.
 - **تبديل الشركة** من الشريط العلوي → يعيد تحميل السياق دون إعادة تحميل الصفحة، ويُحدّث كل التقارير.
-- **الأدوار** (`userCompanies.role`): `owner` / `accountant` / `reviewer` / `viewer`.
-  - في الوضع المحلي هذه **توجيهية فقط (advisory)** — لا حماية أمنية حقيقية لأن المستخدم يملك المتصفح والملف. الحماية الفعلية تأتي مع المزامنة/الخادم في مرحلة لاحقة (Firestore rules أو Supabase RLS).
-  - تُستخدم لتعطيل أزرار الترحيل/الحذف على الواجهة وتسجيل `auditLogs.userId`.
+- **RBAC + Company Scope (مُطبَّق في طبقة الخدمة — لا بالواجهة فقط):**
+  - المستخدم قد ينتمي لعدة شركات، بدور **مختلف في كل شركة** (`userCompanies`).
+  - الأدوار: `OWNER | ADMIN | ACCOUNTANT | AUDITOR | DATA_ENTRY | VIEWER` (جدول الصلاحيات في `qayd/docs/SECURITY.md`).
+  - `can(user, companyId, resource, action)` → يجد العضوية النشطة، يعتمد `permissions` الخاصة بالعضوية إن وُجدت، وإلا افتراضيات الدور. `OWNER` = كل شيء.
+  - `assertCompanyAccess()` + `assertCan()` يُستدعيان في بداية **كل دالة خدمة** (`postBusinessTransaction`, `reverseEntry`, `voidEntry`, `getAccountBalance`, `trialBalance`, `auditSince`) — لا يكفي إخفاء الزر.
+  - تجاوز النطاق برمي استثناء: `لا صلاحية على هذه الشركة (Company Scope)`.
+  - في الوضع المحلي هذا يمنع الخطأ والعبث عبر الواجهة/الكود، لكنه **ليس حماية مشفّرة** لأن المستخدم يملك الجهاز؛ الحماية القانونية/الإدارية الحقيقية تأتي مع B6 (RLS/Cursor rules).
+  - `auditLogs.userId` يسجّل من نفّذ العملية دائمًا.
 
 ---
 
 ## 6. النسخ الاحتياطي التلقائي
 
-- جدول `backups` يسجّل كل نسخة (النوع: `auto` / `manual`، الحجم، `checksum`، مكان التخزين).
-- الآلية المحلية المتاحة اليوم:
-  1. **File System Access API** (Chrome/Edge): إذن مجلد واحد من المستخدم → كتابة `qayd-YYYY-MM-DD.json` تلقائيًا عند الخروج أو كل N من التغييرات (600 تغيير افتراضيًا).
-  2. **تنزيل مُذكّر به**: إن لم يدعم المتصفح الواجهة، يظهر شارة «نسخة احتياطية متأخرة» ويُفتح مربع الحفظ بنقرة واحدة.
-  3. التصدير الكامل الحالي (JSON يدوي) يبقى كما هو ويُسجَّل كـ`manual`.
-- الاستعادة تتحقق من `checksum` قبل الكتابة، وتعمل داخل معاملة واحدة لضمان عدم تلف البيانات.
+**الطبقات الثلاث (مُطبَّقة في `qayd/src/core/backup/backup.service.ts`):**
+
+1. **محلية تلقائية داخل المتصفح**: `backups` (البيانات الوصفية) + `backups_data` (الحمولة الكاملة) في IndexedDB — لا شيء في `localStorage`.
+2. **ملف JSON قابل للتنزيل**: `downloadBackup(id)` ينشئ Blob ويحفظ `qayd-<company>-<date>.json`.
+3. **سحابية اختيارية لاحقًا** في النسخة المدفوعة (لا يوجد أي طلب شبكة الآن).
+
+**قواعد الإنشاء:** بعد كل عملية مالية مهمة (`AUTO_AFTER_POST`)، يوميًا 02:00 (`AUTO_DAILY`)، وقبل الاستيراد/الترقية/الحذف (`BEFORE_*`)، وقبل الاستعادة (`PRE_RESTORE`).
+
+**الاحتفاظ:** آخر 30 نسخة + أحدث نسخة لكل أسبوع (12 أسبوعًا) + لكل شهر (12 شهرًا) — `applyRetention()`.
+
+**ملف النسخة:** `app`, `schemaVersion`, `createdAt`, `companyId`, `checksum` (SHA-256), `data` (كل الجداول + اسم `settings`).
+
+**الاستعادة الآمنة بالترتيب:** نسخة وقائية → التحقق من `app`/`schemaVersion`/`checksum` → `pauseSync()` → حذف+إدراج كل الجداول في **معاملة واحدة** → سطر `RESTORE` في `auditLogs` → `resumeSync()`. لا تُمس بيانات الشركات الأخرى.
 
 ---
 
@@ -160,9 +172,130 @@ db.version(4).stores({
 
 ---
 
-## 10. القرارات المعلّقة
+## 10. القرارات المعلّقة (بعد تحديث التصميم)
 
-- **inline Dexie مقابل CDN:** اُختير **inline** (ملف واحد، بلا شبكة). الحجم المتوقع ~+165KB ليصبح `index.html` ~700KB — مقبول.
+- **نموذج المشروع:** تُرقيَ القرار من «ملف واحد + Dexie مدمج» إلى **مشروع Vite + TypeScript** (انظر القسم 13). الناتج النهائي يبقى ثابتًا (`dist/`) ويُنشر على GitHub Pages.
+- **Dexie:** يعتمد كحزمة npm في `package.json` بدل تضمينه يدويًا.
 - **حذف `supercalc`:** لا يُحذف في v4؛ يُترك قابلًا للاستعادة.
 - **تفعيل المزامنة:** ليس الآن — البنية جاهزة فقط.
 - **صلاحيات محلية:** توجيهية، تُفعّل فعليًا مع B6.
+
+---
+
+## 11. قواعد تصميم الجداول (ملزمة)
+
+| القاعدة | التطبيق في QAYD |
+|---|---|
+| كل بيانات مالية تنتمي لشركة | `companyId` في **كل** جدول مالي |
+| لا تحذف السجلات المالية | `status: 'VOID'` أو قيد عكسي `reversalOfId` |
+| كل مستند يولّد قيدًا | `sourceType` + `sourceId` في `journalEntries` |
+| الرصيد يُحسب | من `journalLines` — **لا يُخزّن** كرقم نهائي |
+| كل تعديل يُوثّق | سطر في `auditLogs` (قبل/بعد) |
+| كل تغيير قابل للمزامنة | `updatedAt`, `version`, `syncStatus` |
+| كل عملية متعددة الجداول | داخل `db.transaction()` — ذرّيًا |
+
+### حالات وأنواع القيد
+
+`journalEntries.status`: `DRAFT | POSTED | REVERSED | VOID`
+`journalEntries.sourceType`: `MANUAL | INVOICE | PAYMENT | CHECK | BANK_RECONCILIATION | TAX_RETURN`
+
+```ts
+journalEntries: {
+  id, companyId, entryNumber, entryDate, description,
+  status, sourceType, sourceId, reversalOfId,
+  currency, exchangeRate, updatedAt, version, syncStatus
+}
+journalLines: {
+  id, companyId, journalEntryId, accountId,
+  debit, credit, currency, exchangeRate,
+  description, lineDate, costCenterId, projectId
+}
+```
+
+### القاعدة الإلزامية للتوازن
+
+```ts
+const debit  = lines.reduce((s, l) => s + Number(l.debit  || 0), 0);
+const credit = lines.reduce((s, l) => s + Number(l.credit || 0), 0);
+if (debit !== credit) throw new Error('القيد غير متوازن');
+```
+
+> تُطبَّق في `assertBalanced()` مع تقريب إلى منزلتين عشريتين لتفادي انحراف الفاصلة العائمة (0.1 + 0.2).
+
+### مثال: فاتورة مبيعات 1,000 + 15%
+
+| الحساب | مدين | دائن |
+|---|---:|---:|
+| المدينون (1300) | 1,150 | 0 |
+| إيرادات المبيعات (4100) | 0 | 1,000 |
+| ضريبة المخرجات (2200) | 0 | 150 |
+
+عند التحصيل:
+
+| الحساب | مدين | دائن |
+|---|---:|---:|
+| البنك/الصندوق (1200) | 1,150 | 0 |
+| المدينون (1300) | 0 | 1,150 |
+
+---
+
+## 12. نمط Strangler (الترحيل التدريجي)
+
+**لا تُعاد كتابة التطبيق دفعة واحدة.** تُنقل صفحة/وحدة واحدة في كل مرة من `index.html` القديم إلى وحدات `src/`:
+
+1. المشروع الجديد `qayd/` بـVite + TypeScript.
+2. صورة من `index.html` الحالي في `src/legacy/` (مرجع فقط).
+3. `src/core/db/dexie.ts` + `schema.ts` + `migrations.ts`.
+4. **الدفعة الأولى:** دليل الحسابات → القيود → التقارير.
+5. **الدفعة الثانية:** الشركاء → الفواتير → الشيكات.
+6. **الدفعة الثالثة:** VAT → التسوية البنكية → بقية الأدوات.
+7. **لا يُحذف الكود القديم إلا بعد اجتياز الاختبارات.**
+
+### هيكل المشروع المعتمد
+
+```
+qayd/
+├─ index.html            # Shell جديد (Vite)
+├─ package.json
+├─ vite.config.ts
+├─ tsconfig.json
+├─ .env.example
+├─ public/
+│  ├─ manifest.webmanifest
+│  ├─ icons/
+│  └─ sw.js
+├─ src/
+│  ├─ main.ts
+│  ├─ app/        router.ts · layout.ts · theme.ts
+│  ├─ legacy/     index.html (النسخة الحالية، للرجوع)
+│  ├─ core/
+│  │  ├─ db/            dexie.ts · schema.ts · migrations.ts · repositories/
+│  │  ├─ ledger/        journal.service.ts · account.service.ts · balance.service.ts · validation.ts
+│  │  ├─ tax/           vat.service.ts
+│  │  ├─ reports/       trial-balance · income-statement · balance-sheet · cash-flow
+│  │  ├─ security/      auth.service.ts · permissions.ts · audit.service.ts
+│  │  ├─ backup/        backup.service.ts · restore.service.ts · scheduler.ts
+│  │  └─ sync/          queue.ts · sync.engine.ts · conflict.resolver.ts
+│  ├─ modules/          dashboard · companies · accounts · journal · invoices · payments ·
+│  │                    checks · banking · partners · products · inventory · tax · reports
+│  ├─ ui/               components/ · forms/ · tables/
+│  └─ utils/
+├─ tests/         ledger.test.ts · invoice.test.ts · vat.test.ts · reports.test.ts
+└─ docs/          ACCOUNTING.md · DATABASE.md · SECURITY.md · CHANGELOG.md
+```
+
+---
+
+## 13. ترتيب التنفيذ الفعلي (حالة العمل)
+
+- [x] توثيق التصميم (README + CHANGELOG + ARCHITECTURE) — commit `3137b43`
+- [x] إنشاء مشروع Vite + TypeScript داخل المستودع الحالي في `accounting-tools\qayd\` (Vite 6.4.6 / TS 5.x / Dexie 4)
+- [x] نسخ `calculator.html` إلى `src/legacy/index.html`
+- [x] `db/schema.ts` + `db/dexie.ts` + `db/migrations.ts` (ترحيل supercalc بلا حذف)
+- [x] `ledger/validation.ts` + `journal.service.ts` + `balance.service.ts` + `audit.service.ts` + `sync/queue.ts`
+- [x] اختبارات `ledger.test.ts`: **7/7 ناجحة** (توازن، عائم، رفض سطر مزدوج، فاتورة 15%، عكس، منع تكرار العكس، ميزان المراجعة) + `npm run build` ناجح
+- [x] RBAC + Company Scope في طبقة الخدمة: `permissions.ts`, `auth.service.ts`، وربطها بكل خدمات القيد/الأرصدة/التدقيق — **21/21 اختبار ناجح**
+- [x] النسخ الاحتياطي ثلاثي الطبقات + الجدولة + الاحتفاظ + الاستعادة الآمنة — **8 اختبارات إضافية (المجموع 29/29 ناجح)**
+- [ ] نقل أول واجهة (دليل الحسابات/القيود) إلى `src/modules/`
+- [ ] الباقي حسب الدفعات في القسم 12
+
