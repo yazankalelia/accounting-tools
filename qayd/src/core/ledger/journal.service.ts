@@ -39,7 +39,18 @@ export interface PostEntryInput {
   user?: CurrentUser;
   /** يمنع نسخة مكررة عند الاستدعاء من داخل معاملة أكبر (مثل العكس). */
   skipBackup?: boolean;
+  /** كتابات المستند (فاتورة/شيك/دفعة) داخل نفس معاملة القيد — الذرّية. */
+  extraWrites?: (tx: any) => Promise<void>;
+  /** يُمرَّر مسبقًا حين يحتاج المستند ربط سجله برقم القيد داخل نفس المعاملة. */
+  entryId?: string;
 }
+
+/** نطاق المعاملة يشمل المستندات والقيد معًا: كل شيء أو لا شيء. */
+const TX_TABLES = [
+  db.journalEntries, db.journalLines, db.auditLogs, db.syncQueue,
+  db.invoices, db.invoiceLines, db.payments, db.paymentAllocations,
+  db.checks, db.checkEvents, db.partners, db.products, db.taxRates,
+];
 
 /** ترقيم ذري لكل شركة شهريًا: JE-YYYYMM-0001. */
 export async function nextEntryNumber(companyId: string, entryDate: string): Promise<string> {
@@ -67,15 +78,9 @@ export async function postBusinessTransaction(input: PostEntryInput): Promise<st
   const status = input.status ?? 'POSTED';
   const userId = input.createdBy ?? actor.id;
 
-  const savedId = await db.transaction(
-    'rw',
-    db.journalEntries,
-    db.journalLines,
-    db.auditLogs,
-    db.syncQueue,
-    async () => {
+  const savedId = await db.transaction('rw', TX_TABLES, async (tx) => {
       const entryNumber = await nextEntryNumber(input.companyId, input.entryDate);
-      const entryId = newId();
+      const entryId = input.entryId ?? newId();
 
       const entry: JournalEntry = {
         id: entryId,
@@ -115,11 +120,13 @@ export async function postBusinessTransaction(input: PostEntryInput): Promise<st
       await db.journalLines.bulkAdd(lines);
       await writeAudit(input.companyId, 'journalEntries', entryId, 'POST', undefined, { ...entry, totals, lines }, userId);
       await enqueue(input.companyId, 'CREATE', 'journalEntries', entryId, { entry, lines });
+      if (input.extraWrites) await input.extraWrites(tx);
       return entryId;
     },
   );
 
-  if (!input.skipBackup) await createBackup(input.companyId, 'AUTO_AFTER_POST');
+  // المسودة لا تغيّر الأرصدة، فلا حاجة لنسخة تلقائية — ولا صلاحية backup لها.
+  if (!input.skipBackup && status === 'POSTED') await createBackup(input.companyId, 'AUTO_AFTER_POST', actor);
   return savedId;
 }
 
@@ -128,13 +135,7 @@ export async function reverseEntry(entryId: string, companyId: string, userId?: 
   const actor = user ?? getCurrentUser();
   assertCompanyAccess(actor, companyId);
   assertCan(actor, companyId, 'journal', 'reverse');
-  const reversalId = await db.transaction(
-    'rw',
-    db.journalEntries,
-    db.journalLines,
-    db.auditLogs,
-    db.syncQueue,
-    async () => {
+  const reversalId = await db.transaction('rw', TX_TABLES, async () => {
       const original = await db.journalEntries.get(entryId);
       if (!original || original.companyId !== companyId) throw new Error('القيد غير موجود');
       const exists = await db.journalEntries.where('reversalOfId').equals(entryId).count();
@@ -171,7 +172,7 @@ export async function reverseEntry(entryId: string, companyId: string, userId?: 
       return reversalId;
     },
   );
-  await createBackup(companyId, 'AUTO_AFTER_POST');
+  await createBackup(companyId, 'AUTO_AFTER_POST', actor);
   return reversalId;
 }
 
@@ -187,5 +188,5 @@ export async function voidEntry(entryId: string, companyId: string, userId?: str
     await writeAudit(companyId, 'journalEntries', entryId, 'VOID', entry, { status: 'VOID' }, userId);
     await enqueue(companyId, 'VOID', 'journalEntries', entryId, { id: entryId });
   });
-  await createBackup(companyId, 'AUTO_AFTER_POST');
+  await createBackup(companyId, 'AUTO_AFTER_POST', actor);
 }

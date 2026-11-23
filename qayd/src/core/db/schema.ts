@@ -56,7 +56,7 @@ export interface AuditLog {
   userId?: string;
   tableName: string;
   recordId: string;
-  action: 'CREATE' | 'UPDATE' | 'VOID' | 'REVERSE' | 'POST' | 'MIGRATION' | 'RESTORE' | 'BACKUP';
+  action: 'CREATE' | 'UPDATE' | 'VOID' | 'REVERSE' | 'POST' | 'MIGRATION' | 'RESTORE' | 'BACKUP' | 'IMPORT_REJECTED_UNBALANCED';
   changedAt: number;
   beforeData?: unknown;
   afterData?: unknown;

@@ -1,0 +1,53 @@
+:root{--bg:#f1f5f9;--card:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#0f766e;--brand2:#115e59;--danger:#dc2626;--ok:#059669;--sidebar:#0f172a}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:248px;background:var(--sidebar);color:#e2e8f0;padding:22px 14px;display:flex;flex-direction:column;gap:18px;flex-shrink:0}
+.brand{font-size:26px;font-weight:800;letter-spacing:.5px;padding:4px 10px 14px;border-bottom:1px solid #1e293b}
+.brand small{display:block;font-size:11px;font-weight:500;color:#94a3b8;letter-spacing:2px;margin-top:2px}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav a{color:#cbd5e1;text-decoration:none;padding:10px 12px;border-radius:9px;font-size:14px;display:flex;gap:10px;align-items:center}
+.nav a:hover{background:#1e293b;color:#fff}
+.nav a.active{background:var(--brand);color:#fff;font-weight:700}
+.company-box{margin-top:auto;background:#1e293b;padding:12px;border-radius:10px;font-size:12px;color:#94a3b8}
+.company-box select{width:100%;margin-top:6px;padding:7px;border-radius:7px;border:1px solid #334155;background:#0f172a;color:#e2e8f0}
+.content{flex:1;min-width:0;padding:22px 30px 50px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.topbar h1{margin:0;font-size:22px}
+.pill{background:#dcfce7;color:#166534;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.pill.warn{background:#fef3c7;color:#92400e}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.card h2{margin:0 0 14px;font-size:16px;color:var(--brand2)}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:14px}
+input:focus,select:focus{outline:2px solid #99f6e4;border-color:var(--brand)}
+button{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:9px 15px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+button:hover{background:var(--brand2)}
+button.ghost{background:#e2e8f0;color:#334155}
+button.danger{background:var(--danger)}
+button.sm{padding:5px 10px;font-size:12px}
+.row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.row>*{flex:1}
+.row>.fixed{flex:0 0 auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line)}
+th{background:#f8fafc;color:var(--muted);font-size:12px}
+tbody tr:hover{background:#f8fafc}
+.num{text-align:left;font-variant-numeric:tabular-nums;direction:ltr;display:block}
+.debit{color:var(--ok);font-weight:700}.credit{color:var(--danger);font-weight:700}
+.stat{padding:18px;border-radius:12px;background:#f8fafc;border:1px solid var(--line)}
+.stat b{display:block;font-size:26px;margin-top:6px;color:var(--brand2)}
+.stat span{font-size:12px;color:var(--muted)}
+.alert{padding:12px 14px;border-radius:9px;margin:10px 0;font-size:13px}
+.alert.err{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+.alert.ok{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
+pre{margin:0;background:#0f172a;color:#a7f3d0;padding:14px;border-radius:10px;overflow:auto;font-size:12px;direction:ltr;text-align:left;max-height:360px}
+.line-item{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
+.empty{color:var(--muted);font-size:13px;padding:14px;text-align:center}
+#toast{position:fixed;bottom:22px;left:22px;background:#0f172a;color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;opacity:0;transform:translateY(10px);transition:.2s;pointer-events:none;z-index:99}
+#toast.show{opacity:1;transform:none}
+@media(max-width:900px){.sidebar{width:190px}.g4,.g3{grid-template-columns:repeat(2,1fr)}.content{padding:16px}}

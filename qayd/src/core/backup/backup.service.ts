@@ -3,7 +3,8 @@ import { newId } from '../../utils/id';
 import { sha256, byteLength } from '../../utils/crypto';
 import { writeAudit } from '../security/audit.service';
 import { pauseSync, resumeSync } from '../sync/control';
-import type { CurrentUser } from '../security/permissions';
+import { getCurrentUser } from '../security/auth.service';
+import { assertCan, type CurrentUser } from '../security/permissions';
 
 export const SCHEMA_VERSION = 4;
 
@@ -18,9 +19,17 @@ export type BackupType =
   | 'MANUAL'
   | 'PRE_RESTORE';
 
-/** الجداول المالية لكل شركة. companies تُعامل خاصة لأن سجلها هو companyId نفسه. */
+/**
+ * الجداول المؤثرة في النسخة الكاملة. `syncQueue` حالة تشغيل مؤقتة لا تُنسخ.
+ * `users` و`userCompanies` و`backups` تُعامل بطريقة خاصة (انظر createBackup/restoreBackup).
+ */
 export const BACKUP_TABLES = [
   'companies',
+  'companySettings',
+  'users',
+  'userCompanies',
+  'fiscalYears',
+  'fiscalPeriods',
   'accounts',
   'journalEntries',
   'journalLines',
@@ -36,12 +45,22 @@ export const BACKUP_TABLES = [
   'bankTransactions',
   'taxRates',
   'taxReturns',
-  'inventoryItems',
   'warehouses',
+  'inventoryItems',
   'inventoryMovements',
-  'companySettings',
+  'attachments',
   'auditLogs',
+  'backups',
 ] as const;
+
+/** لا تُخزَّن أسرار كلمة المرور في النسخة ولا في قوائم المستخدمين. */
+const SECRET_KEYS = ['password', 'passwordHash', 'password_hash', 'hash', 'secret', 'pin', 'token'];
+
+function stripSecrets<T extends Record<string, any>>(row: T): T {
+  const clean: Record<string, any> = { ...row };
+  for (const key of SECRET_KEYS) delete clean[key];
+  return clean as T;
+}
 
 export interface BackupPayload {
   app: 'QAYD';
@@ -53,12 +72,23 @@ export interface BackupPayload {
 }
 
 /** نسخة كاملة داخل IndexedDB + بياناتها في جدول منفصل (لا localStorage). */
-export async function createBackup(companyId: string, type: BackupType = 'MANUAL'): Promise<string> {
+export async function createBackup(companyId: string, type: BackupType = 'MANUAL', user?: CurrentUser): Promise<string> {
+  const actor = user ?? getCurrentUser();
+  // الرفض افتراضيًا: لا نسخة دون صلاحية صريحة (VIEWER ممنوع).
+  assertCan(actor, companyId, 'backup', 'create_backup');
+
   const data: Record<string, unknown[]> = {};
   for (const table of BACKUP_TABLES) {
-    data[table] = table === 'companies'
-      ? await db.companies.where('id').equals(companyId).toArray()
-      : await db.table(table).where('companyId').equals(companyId).toArray();
+    if (table === 'companies') {
+      data[table] = await db.companies.where('id').equals(companyId).toArray();
+    } else if (table === 'users') {
+      // المستخدمون جدول عام: نأخذ فقط أعضاء هذه الشركة ونجرّد الأسرار.
+      const memberships = await db.userCompanies.where('companyId').equals(companyId).toArray();
+      const users = await db.users.bulkGet(memberships.map((m) => m.userId));
+      data[table] = users.filter(Boolean).map((u) => stripSecrets(u as Record<string, any>));
+    } else {
+      data[table] = await db.table(table).where('companyId').equals(companyId).toArray();
+    }
   }
   data.settings = data.companySettings; // الاسم في ملف JSON كما في المواصفة
 
@@ -88,12 +118,17 @@ export async function createBackup(companyId: string, type: BackupType = 'MANUAL
     });
     await db.backups_data.add({ id, payload });
   });
+  if (type.startsWith('AUTO_')) await applyRetention(companyId);
   return id;
 }
 
 /** تُستدعى قبل استيراد/ترقية/حذف مهم. */
-export function backupBefore(companyId: string, type: Extract<BackupType, 'BEFORE_IMPORT' | 'BEFORE_UPGRADE' | 'BEFORE_DELETE'>): Promise<string> {
-  return createBackup(companyId, type);
+export function backupBefore(
+  companyId: string,
+  type: Extract<BackupType, 'BEFORE_IMPORT' | 'BEFORE_UPGRADE' | 'BEFORE_DELETE'>,
+  user?: CurrentUser,
+): Promise<string> {
+  return createBackup(companyId, type, user);
 }
 
 export async function listBackups(companyId: string): Promise<any[]> {
@@ -160,10 +195,14 @@ export async function applyRetention(companyId: string): Promise<{ kept: number;
 }
 
 /** تنزيل ملف JSON قابل للاستعادة على جهاز آخر. */
-export async function downloadBackup(backupId: string): Promise<void> {
+export async function downloadBackup(companyId: string, backupId: string, user?: CurrentUser): Promise<void> {
+  const actor = user ?? getCurrentUser();
+  assertCan(actor, companyId, 'backup', 'create_backup');
   const meta = await db.backups.get(backupId);
   const row = await db.backups_data.get(backupId);
-  if (!meta || !row) throw new Error('النسخة غير موجودة');
+  if (!meta || meta.companyId !== companyId || !row) {
+    throw new Error('النسخة غير موجودة أو لا تنتمي لهذه الشركة');
+  }
   if (typeof document === 'undefined') throw new Error('التنزيل متاح في المتصفح فقط');
   const blob = new Blob([JSON.stringify(row.payload, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -176,37 +215,64 @@ export async function downloadBackup(backupId: string): Promise<void> {
   URL.revokeObjectURL(url);
 }
 
-/** استعادة آمنة: نسخة وقائية → تحقق الإصدار → تحقق الـchecksum → معاملة واحدة → تدقيق. */
-export async function restoreBackup(backupId: string, user?: CurrentUser): Promise<void> {
+/** استعادة آمنة: فحص صلاحية → نسخة وقائية → checksum → معاملة واحدة → تدقيق. */
+export async function restoreBackup(companyId: string, backupId: string, user?: CurrentUser): Promise<void> {
+  const actor = user ?? getCurrentUser();
+  // العملية تدميرية محتملة: الرفض هو الافتراضي، وتُفحص الصلاحية عند كل عملية حساسة.
+  assertCan(actor, companyId, 'backup', 'restore');
+
+  const meta = await db.backups.get(backupId);
+  if (!meta || meta.companyId !== companyId) {
+    throw new Error('النسخة الاحتياطية غير موجودة أو لا تنتمي لهذه الشركة');
+  }
   const row = await db.backups_data.get(backupId);
-  if (!row) throw new Error('النسخة غير موجودة');
+  if (!row) throw new Error('النسخة الاحتياطية غير موجودة');
   const payload = row.payload as BackupPayload;
+  if (payload.companyId !== companyId) {
+    throw new Error('النسخة الاحتياطية غير موجودة أو لا تنتمي لهذه الشركة');
+  }
 
   await verifyBackup(payload);
-  await createBackup(payload.companyId, 'PRE_RESTORE'); // قبل أي تعديل
+  await createBackup(companyId, 'PRE_RESTORE', actor); // قبل أي تعديل
   pauseSync();
 
-  const tablesWithCompany = BACKUP_TABLES.filter((t) => t !== 'companies');
+  // المستخدمون وعضويتهم وسجل النسخ الحالي لا يُستبدلون بأعمى: نضيف المفقود فقط.
+  const special = new Set<string>(['companies', 'users', 'userCompanies', 'backups']);
+  const replaceTables = BACKUP_TABLES.filter((t) => !special.has(t));
   try {
-    const scope = new Set<string>(['companies', ...tablesWithCompany, 'auditLogs']);
+    const scope = [...new Set<string>(['companies', 'users', 'userCompanies', 'auditLogs', ...replaceTables])];
     await db.transaction(
       'rw',
-      [...scope].map((name) => db.table(name)),
+      scope.map((name) => db.table(name)),
       async () => {
-        await db.companies.where('id').equals(payload.companyId).delete();
-        await db.companies.bulkPut((payload.data.companies ?? []) as any[]);
+        await db.companies.where('id').equals(companyId).delete();
+        await db.companies.bulkPut((payload.data.companies ?? []).filter((c: any) => c.id === companyId) as any[]);
 
-        for (const table of tablesWithCompany) {
+        for (const incoming of (payload.data.users ?? []) as any[]) {
+          if (await db.users.get(incoming.id)) continue; // احتفظ بالمستخدم الحالي
+          await db.users.add(stripSecrets(incoming));
+        }
+        const memberships = ((payload.data.userCompanies ?? []) as any[])
+          .filter((m) => m.companyId === companyId);
+        for (const m of memberships) {
+          if (m.userId === actor.id) continue; // احتفظ بعضوية المستخدم الحالي
+          if (await db.userCompanies.get(m.id)) continue;
+          const duplicate = await db.userCompanies.where('[userId+companyId]').equals([m.userId, companyId]).first();
+          if (duplicate) continue;
+          await db.userCompanies.add(m);
+        }
+
+        for (const table of replaceTables) {
           const rows = table === 'companySettings'
             ? (payload.data.companySettings ?? payload.data.settings ?? [])
             : (payload.data[table] ?? []);
-          await db.table(table).where('companyId').equals(payload.companyId).delete();
+          await db.table(table).where('companyId').equals(companyId).delete();
           if (rows.length) await db.table(table).bulkPut(rows as any[]);
         }
         await writeAudit(
-          payload.companyId, 'companies', payload.companyId, 'RESTORE',
+          companyId, 'companies', companyId, 'RESTORE',
           undefined, { backupId, checksum: payload.checksum, schemaVersion: payload.schemaVersion },
-          user?.id,
+          actor.id,
         );
       },
     );
